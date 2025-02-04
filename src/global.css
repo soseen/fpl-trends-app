@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+@layer base {
+  :root {
+    --background: #131720;
+    --primary: #151622;
+    --secondary: #1d202c;
+    --accent: #36384a;
+    --accent-2: #13141c;
+    --magenta: #c71e4d;
+    --text: #c9c5c5;
+    --shadow-1: "4px 3px 8px 4px #00000030";
+    --chart-1: #e76e50;
+    --chart-2: #2a9d90;
+    --chart-3: #274754;
+    --chart-4: #e8c468;
+    --chart-5: #f4a462;
+  }
+
+  body {
+    @apply font-roboto;
+  }
+}

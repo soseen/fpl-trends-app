@@ -1,0 +1,67 @@
+{
+    "extends": [
+      "prettier",
+      "react-app",
+      "plugin:import/typescript",
+      "plugin:import/warnings",
+      "plugin:storybook/recommended",
+      "plugin:cypress/recommended"
+    ],
+    "plugins": ["import", "prettier", "storybook"],
+    "rules": {
+      "prettier/prettier": 1,
+      "import/no-named-as-default-member": 0,
+      "import/newline-after-import": [
+        1,
+        {
+          "count": 1
+        }
+      ],
+      "import/order": [
+        "warn",
+        {
+          "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+          "pathGroups": [
+            {
+              "pattern": "react",
+              "group": "external",
+              "position": "before"
+            },
+            {
+              "pattern": "{components,config}",
+              "group": "internal"
+            },
+            {
+              "pattern": "{assets,components,hooks,modules,services,utils,graphql}/{*,*/**}",
+              "group": "internal"
+            }
+          ],
+          "pathGroupsExcludedImportTypes": ["react"],
+          "newlines-between": "always",
+          "alphabetize": {
+            "order": "asc",
+            "caseInsensitive": true
+          }
+        }
+      ],
+      "sort-imports": "off",
+      "import/no-named-as-default": "off",
+      "no-redeclare": "off",
+      "@typescript-eslint/no-redeclare": "off"
+    },
+    "overrides": [
+      {
+        "files": ["**/*.stories.*"],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      },
+      {
+        "files": ["**/*.stories.*"],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  }
+  
