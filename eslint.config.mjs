@@ -25,6 +25,16 @@ export default [
       prettier,
     },
 
+    overrides: [
+    {
+      files: ["*.ts", "*.tsx"],
+      rules: {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-console": "warn"
+      }
+    }
+    ]
+
     rules: {
       "prettier/prettier": 1,
       "import/no-named-as-default-member": 0,

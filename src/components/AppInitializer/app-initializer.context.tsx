@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchEvents } from "src/redux/slices/eventsSlice";
 import { fetchFootballersData } from "src/redux/slices/footballersSlice";
 import { fetchTeams } from "src/redux/slices/teamsSlice";
+import { fetchTotalPlayers } from "src/redux/slices/totalPlayersSlice";
 import { AppDispatch, RootState } from "src/redux/store";
 import { AsyncThunkStatus } from "src/redux/types";
+import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
 
 type AppInitializerProvider = {
   children: React.ReactNode;
@@ -25,8 +28,16 @@ const AppInitializerContext = createContext<AppInitializerState>({
 
 export const AppInitializerProvider = ({ children }: AppInitializerProvider) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { status } = useSelector((state: RootState) => state.footballers);
+  const { status, list } = useSelector((state: RootState) => state.footballers);
   const { status: teamsStatus } = useSelector((state: RootState) => state.teams);
+  const { status: totalPlayersStatus } = useSelector(
+    (state: RootState) => state.totalPlayers,
+  );
+  const { startGameweek, endGameweek } = useSelector(
+    (state: RootState) => state.gameweeks,
+  );
+  const { status: eventsStatus } = useSelector((state: RootState) => state.events);
+  const gameweeksCount = endGameweek - startGameweek + 1;
 
   useEffect(() => {
     if (status === "idle") {
@@ -35,12 +46,55 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
     if (teamsStatus === "idle") {
       dispatch(fetchTeams());
     }
-  }, [dispatch, status, teamsStatus]);
+    if (totalPlayersStatus === "idle") {
+      dispatch(fetchTotalPlayers());
+    }
+    if (eventsStatus === "idle") {
+      dispatch(fetchEvents());
+    }
+  }, [dispatch, status, teamsStatus, totalPlayersStatus, eventsStatus]);
+
+  useEffect(() => {
+    if (!list.length) return;
+
+    const enrichedFootballers = list.map((footballer) => {
+      const historyInRange = footballer.history.filter(
+        (h) => h.round >= startGameweek && h.round <= endGameweek,
+      );
+      const additionalInfo = historyInRange.reduce(
+        (acc, val) => ({
+          totalPoints: acc.totalPoints + val.total_points,
+          totalGoals: acc.totalGoals + val.goals_scored,
+          totalAssists: acc.totalAssists + val.assists,
+          totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
+          totalSaves: acc.totalSaves + val.saves,
+          totalXGI: acc.totalXGI + parseFloat(val.expected_goal_involvements),
+          xGIPerGame: (
+            (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
+            gameweeksCount
+          ).toFixed(2),
+          teamName: footballer.teams.name,
+        }),
+        {
+          totalPoints: 0,
+          totalGoals: 0,
+          totalAssists: 0,
+          totalCleanSheets: 0,
+          totalSaves: 0,
+          totalXGI: 0,
+          xGIPerGame: "0.00",
+          teamName: "",
+        },
+      );
+
+      return { ...footballer, ...additionalInfo };
+    });
+
+    dispatch(setEnrichedFootballers(enrichedFootballers));
+  }, [dispatch, list, startGameweek, endGameweek]);
 
   const appStatus = useMemo(() => {
-    const statuses = [status, teamsStatus];
-    console.log("STATUS!");
-    console.log(statuses);
+    const statuses = [status, teamsStatus, totalPlayersStatus];
     if (statuses.includes(AsyncThunkStatus.failed)) {
       return AppInitStatus.error;
     } else if (
@@ -51,9 +105,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
     } else {
       return AppInitStatus.idle;
     }
-  }, [status, teamsStatus]);
-
-  console.log("APP STATUS IS: ", appStatus);
+  }, [status, teamsStatus, totalPlayersStatus, eventsStatus]);
 
   return (
     <AppInitializerContext.Provider value={{ status: appStatus }}>

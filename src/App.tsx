@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppInitializerProvider } from "./components/AppInitializer/app-initializer.context";
+import Players from "./components/Players/players";
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
+                <Route path="players" element={<Players />} />
               </Route>
             </Routes>
           </TooltipProvider>

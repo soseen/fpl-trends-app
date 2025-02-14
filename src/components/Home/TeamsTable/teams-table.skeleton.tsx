@@ -5,7 +5,7 @@ const TeamsTableSkeleton = () => {
   return (
     <div className="flex flex-col space-y-3">
       <Skeleton className="h-8 w-full" />
-      {[...Array(10).keys()].map((_, index) => (
+      {[...Array(20).keys()].map((_, index) => (
         <Skeleton key={index} className="h-6 w-full" />
       ))}
     </div>

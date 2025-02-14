@@ -6,12 +6,13 @@ import { getFootballersImage } from "src/utils/images";
 type Props = {
   footballer: Footballer;
   size?: number;
+  styles?: React.CSSProperties;
 };
 
-const FootballerAvatar = ({ footballer, size }: Props) => (
+const FootballerAvatar = ({ footballer, size, styles }: Props) => (
   <Avatar
-    className={`flex justify-center`}
-    style={{ height: size ? size : 12, width: size ? size : 12 }}
+    className={`justify-center, flex`}
+    style={{ height: "size ? size : 12", width: size ? size : 12, ...styles }}
   >
     <AvatarImage
       className="rounded-lg object-cover object-top"

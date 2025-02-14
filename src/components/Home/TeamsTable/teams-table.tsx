@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import React from "react";
-import { useTeamsTable } from "./useTeamsTable";
+import { useTeamsTable } from "./use-teams-table";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import {
   Select,
@@ -31,11 +31,9 @@ const TeamsTable = () => {
   if (status === AppInitStatus.loading) return <TeamsTableSkeleton />;
 
   return (
-    <div className="flex w-fit flex-col text-text">
+    <div className="flex w-full flex-col text-text">
       <div className="mb-4 flex flex-shrink flex-grow-0 items-center justify-between">
-        <h2 className="text-xs text-text md:text-lg">
-          {isDefensiveStats ? "Best Defenses" : "Best Attacks"}
-        </h2>
+        <h2 className="text-xs text-text md:text-lg">Team Rankings</h2>
         <Select defaultValue="defensive" onValueChange={onSelectValueChange}>
           <SelectTrigger className="w-[120px] bg-magenta px-2 py-1 text-text">
             <SelectValue placeholder="Stats Type" />
@@ -57,42 +55,43 @@ const TeamsTable = () => {
         </Select>
       </div>
 
-      <Table className="w-auto rounded-md bg-secondary px-4 py-6 shadow-xl md:px-6">
+      <Table className="rounded-md bg-secondary px-4 py-6 text-sm shadow-xl md:px-6 md:text-base">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[50px] px-4 py-2">#</TableHead>
-            <TableHead className="px-4 py-2">Team</TableHead>
-            <TableHead className="px-4 py-2 text-right">Avg xGC</TableHead>
-            <TableHead className="px-4 py-2 text-right">Clean Sheets</TableHead>
+            <TableHead className="w-[50px] p-2">#</TableHead>
+            <TableHead className="p-2">Team</TableHead>
+            <TableHead className="p-2 text-right">
+              {isDefensiveStats ? "Avg xGC" : "Avg xGS"}
+            </TableHead>
+            <TableHead className="p-2 text-right">
+              {isDefensiveStats ? "Clean Sheets" : "Goals Scored"}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {teams.map((team, index) => {
-            const xGCDiff = (team.avgXGC ?? 0) - (team.avgXGCFullSeason ?? 0);
+            const diff =
+              (team?.avg ?? 0) -
+              (isDefensiveStats
+                ? (team.avgXGCFullSeason ?? 0)
+                : (team.avgXGSFullSeason ?? 0));
             const rankingDiff = (team.fullSeasonRank ?? 0) - (index + 1);
 
             return (
-              <TableRow
-                style={index % 2 === 0 ? { backgroundColor: "--var(accent)" } : {}}
-                key={team?.name}
-              >
-                {/* Position */}
-                <TableCell className="px-4 py-2 text-center font-medium">
-                  {index + 1}
-                </TableCell>
+              <TableRow className={index % 2 === 0 ? "bg-accent3" : ""} key={team?.name}>
+                <TableCell className="p-2 text-left font-medium">{index + 1}</TableCell>
 
-                {/* Team Name & Badge */}
-                <TableCell className="px-4 py-2 text-left">
-                  <div className="flex items-center gap-2">
+                <TableCell className="p-2 text-left">
+                  <div className="flex items-center gap-2 whitespace-nowrap">
                     <img
                       src={getTeamsBadge(team?.code)}
                       alt={team?.short_name}
-                      className="h-4 w-4 object-contain"
+                      className="h-4 w-4 object-contain lg:h-5 lg:w-5"
                     />
-                    {team?.name}
+                    <p>{team?.name}</p>
                     {rankingDiff !== 0 && (
                       <span
-                        className={`text-sm ${rankingDiff > 0 ? "text-green-500" : "text-red-500"}`}
+                        className={`text-sm ${rankingDiff > 0 ? "text-green-500" : "text-red-500"} flex items-center`}
                       >
                         {rankingDiff > 0 ? (
                           <FaArrowUp className="mx-1 inline" />
@@ -105,32 +104,34 @@ const TeamsTable = () => {
                   </div>
                 </TableCell>
 
-                {/* Avg xGC */}
-                <TableCell className="px-4 py-2 text-right">
-                  {team?.avgXGC?.toFixed(2)}
-                  {xGCDiff !== 0 && (
+                <TableCell className="flex items-center justify-end p-2 text-right">
+                  <p>{team?.avg?.toFixed(2)}</p>
+                  {diff !== 0 && (
                     <span
-                      className={`text-sm ${xGCDiff < 0 ? "text-green-500" : "text-red-500"}`}
+                      className={`text-sm ${diff < 0 ? "text-green-500" : "text-red-500"} flex items-center`}
                     >
-                      {xGCDiff < 0 ? (
+                      {diff < 0 ? (
                         <FaArrowUp className="mx-1 inline" />
                       ) : (
                         <FaArrowDown className="mx-1 inline" />
                       )}
-                      {Math.abs(xGCDiff).toFixed(2)}
+                      <p>{Math.abs(diff).toFixed(2)}</p>
                     </span>
                   )}
                 </TableCell>
 
-                {/* Clean Sheets */}
-                <TableCell className="px-4 py-2 text-right">
-                  {team?.totalCleanSheets}
+                <TableCell className="p-2 text-right">
+                  {isDefensiveStats ? team?.totalCleanSheets : team?.totalGoals}
                 </TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
+
+      <p className="mt-2 text-xs italic md:text-sm">
+        * presented data is compared with the season's total
+      </p>
     </div>
   );
 };

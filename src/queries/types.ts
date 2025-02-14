@@ -158,6 +158,56 @@ export type History = {
   transfers_out: number;
 };
 
+export type Override = {
+  rules: Record<string, unknown>;
+  scoring: Record<string, unknown>;
+  element_types: unknown[];
+  pick_multiplier: number | null;
+};
+
+export type ChipPlay = {
+  chip_name: string;
+  num_played: number;
+};
+
+export type TopElementInfo = {
+  id: number;
+  points: number;
+};
+
+export type Event = {
+  id: number;
+  name: string;
+  deadline_time: string;
+  release_time: string | null;
+  average_entry_score: number;
+  finished: boolean;
+  data_checked: boolean;
+  highest_scoring_entry: number | null;
+  deadline_time_epoch: number;
+  deadline_time_game_offset: number;
+  highest_score: number;
+  is_previous: boolean;
+  is_current: boolean;
+  is_next: boolean;
+  cup_leagues_created: boolean;
+  h2h_ko_matches_created: boolean;
+  can_enter: boolean;
+  can_manage: boolean;
+  released: boolean;
+  ranked_count: number;
+  overrides: Override;
+  chip_plays: ChipPlay[];
+  most_selected: number;
+  most_transferred_in: number;
+  top_element: number;
+  top_element_info: TopElementInfo;
+  transfers_made: number;
+  most_captained: number;
+  most_vice_captained: number;
+};
+
+
 export type Fixture = {
   id: number;
   code: number;
@@ -176,7 +226,7 @@ export type Fixture = {
 };
 
 export type Footballer = Element & {
-  teams: Team[]
+  teams: Team
   history: History[],
   footballer_fixtures: Fixture[]
 }
@@ -190,4 +240,11 @@ export type TeamData = Team & {
     goals: number;
     goals_conceded: number;
   }[]
+}
+
+export enum FootballerPosition {
+  goalkeeper = 1,
+  defender = 2,
+  midfielder = 3,
+  striker = 4
 }

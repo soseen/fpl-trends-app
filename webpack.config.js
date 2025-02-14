@@ -2,6 +2,7 @@ import path from "path";
 
 import Dotenv from "dotenv-webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import webpack from "webpack";
 
 export default {
@@ -21,6 +22,7 @@ export default {
     open: true,
     hot: true,
     liveReload: true,
+    historyApiFallback: true,
   },
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
@@ -38,8 +40,13 @@ export default {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env", "@babel/preset-react"],
+            plugins: ["react-refresh/babel"],
           },
         },
+      },
+      {
+        test: /\.(png|jpe?g|gif|webp)$/i,
+        type: "asset/resource",
       },
       {
         test: /\.css$/i,
@@ -52,5 +59,7 @@ export default {
       template: path.join(process.cwd(), "public", "index.html"),
     }),
     new Dotenv(),
+    new webpack.HotModuleReplacementPlugin(),
+    new ReactRefreshWebpackPlugin(),
   ],
 };

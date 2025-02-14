@@ -1,7 +1,5 @@
 import axios from "axios";
 
-console.log("API Base URL:", process.env.API_BASE_URL);
-
 const apiConfig = {
   baseURL: process.env.API_BASE_URL,
   headers: {

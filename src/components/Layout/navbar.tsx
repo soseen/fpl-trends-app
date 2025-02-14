@@ -5,29 +5,33 @@ import {
   AppInitStatus,
   useAppInitContext,
 } from "../AppInitializer/app-initializer.context";
+import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 
 const Navbar: React.FC = () => {
   const { status } = useAppInitContext();
   return (
-    <nav className="w-full overflow-hidden border-b-2 border-secondary bg-primary pt-4 text-xs text-text md:text-lg">
-      <div className="flex w-full justify-between px-4 pb-4">
-        <Link to="/" className="text-lg font-bold">
-          FPL Trends
-        </Link>
-        <div className="space-x-4">
-          <Link to="/" className="hover:text-gray-400">
-            Home
+    <>
+      <nav className="sticky top-0 z-[1000] w-full border-b-2 border-secondary bg-primary pt-4 text-xs text-text md:text-lg">
+        <div className="flex w-full justify-between px-2 md:px-4">
+          <Link to="/" className="text-lg font-bold">
+            FPL Trends
           </Link>
-          <Link to="/players" className="hover:text-gray-400">
-            Players
-          </Link>
-          <Link to="/teams" className="hover:text-gray-400">
-            Teams
-          </Link>
+          <div className="space-x-4">
+            <Link to="/" className="hover:text-gray-400">
+              Home
+            </Link>
+            <Link to="/players" className="hover:text-gray-400">
+              Players
+            </Link>
+            <Link to="/teams" className="hover:text-gray-400">
+              Teams
+            </Link>
+          </div>
         </div>
-      </div>
+        <GameweekSlider />
+      </nav>
       {status === AppInitStatus.idle && <TransfersPanel />}
-    </nav>
+    </>
   );
 };
 

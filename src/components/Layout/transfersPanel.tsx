@@ -1,19 +1,17 @@
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { getFootballersImage } from "src/utils/images";
 import React, { useEffect, useState } from "react";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
-import { Footballer } from "src/queries/types";
 import FootballerAvatar from "../FootballerAvatar/footballer-avatar";
 import { AnimatePresence, motion } from "motion/react";
 import { roundToThousands } from "src/utils/strings";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import { isMD, isSM } from "src/utils/dimensions";
+import { useDimensions } from "src/hooks/use-dimensions";
 
 const TransfersPanel = () => {
   const { list, error, status } = useSelector((state: RootState) => state.footballers);
   const [displayMostTransferredIn, setDisplayMostTransferredIn] = useState(true);
+  const { isSM, isMD } = useDimensions();
 
   const footballersData = useMemo(() => {
     const footballersToDisplay = [...list]
@@ -22,7 +20,7 @@ const TransfersPanel = () => {
           ? b.transfers_in_event - a.transfers_in_event
           : b.transfers_out_event - a.transfers_out_event,
       )
-      .slice(0, isMD() ? 3 : 5);
+      .slice(0, isMD ? 3 : 5);
 
     return footballersToDisplay;
   }, [list, displayMostTransferredIn]);
@@ -35,12 +33,12 @@ const TransfersPanel = () => {
   }, []);
 
   return (
-    <div className="flex justify-around bg-accent2 p-2">
+    <div className="flex h-[52px] justify-around bg-accent2 p-2">
       <AnimatePresence mode="wait">
         <motion.div
-          initial={{ opacity: 0 }} // Start position
-          animate={{ opacity: 1 }} // Fade in effect
-          exit={{ opacity: 0 }} // Fade out effect
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="flex w-full justify-around"
           key={displayMostTransferredIn ? "transfers-in" : "transfers-out"}
@@ -50,8 +48,8 @@ const TransfersPanel = () => {
               key={footballer.id}
               className="flex items-center justify-center gap-1 md:gap-2"
             >
-              <FootballerAvatar footballer={footballer} size={isSM() ? 24 : 40} />
-              <p className="whitespace-nowrap text-text">{`${footballer.web_name} ${isSM() ? "" : `(${footballer.selected_by_percent}%)`}`}</p>
+              <FootballerAvatar footballer={footballer} size={isSM ? 24 : 40} />
+              <p className="whitespace-nowrap text-text">{`${footballer.web_name} ${isSM ? "" : `(${footballer.selected_by_percent}%)`}`}</p>
               {displayMostTransferredIn ? (
                 <FaArrowUp className="rotate-45 text-green-600" />
               ) : (

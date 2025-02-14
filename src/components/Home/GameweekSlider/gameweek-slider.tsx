@@ -5,7 +5,7 @@ import { RootState, AppDispatch } from "src/redux/store";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { setGameweekRange } from "src/redux/slices/gameweeksSlice";
 import { Button } from "@/components/ui/button";
-import { isSM } from "src/utils/dimensions";
+import { useDimensions } from "src/hooks/use-dimensions";
 
 const GameweekSlider = () => {
   const { startGameweek, endGameweek, maxGameweek } = useSelector(
@@ -17,6 +17,8 @@ const GameweekSlider = () => {
     startGameweek || 1,
     endGameweek || 1,
   ]);
+
+  const { isSM } = useDimensions();
 
   useEffect(() => {
     if (startGameweek && endGameweek) {
@@ -40,11 +42,11 @@ const GameweekSlider = () => {
   };
 
   return (
-    <div className="w-full flex-col items-center px-4">
-      <h1 className="mb-4 text-center text-sm text-text md:text-xl">
+    <div className="my-2 flex w-full items-center px-2 md:my-4 md:px-4 lg:my-6">
+      <h1 className="mb-1 mr-2 whitespace-nowrap text-center text-sm text-text md:mb-2 md:mr-6 md:text-xl">
         Select Gameweek Range
       </h1>
-      <div className="flex w-full items-center gap-4 md:gap-8">
+      <div className="flex w-full items-center justify-between gap-4 md:gap-8">
         <SliderPrimitive.Root
           value={currentRange}
           min={1}
@@ -74,7 +76,7 @@ const GameweekSlider = () => {
           disabled={isDisabled}
           className="bg-magenta px-2 py-1 text-sm text-text disabled:opacity-40 md:px-4 md:py-2 md:text-xl"
         >
-          {isSM() ? "Apply" : "Apply Range"}
+          {isSM ? "Apply" : "Apply Range"}
         </Button>
       </div>
     </div>
