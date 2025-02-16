@@ -21,16 +21,17 @@ type Props = {
 };
 
 // Position mapping
-const positionMap: Record<FootballerPosition, "GK" | "DEF" | "MID" | "FWD"> = {
-  [FootballerPosition.goalkeeper]: "GK",
-  [FootballerPosition.defender]: "DEF",
-  [FootballerPosition.midfielder]: "MID",
-  [FootballerPosition.striker]: "FWD",
+const positionMap: Record<FootballerPosition, "GK" | "DEF" | "MID" | "FWD" | "MGR"> = {
+  [FootballerPosition.GK]: "GK",
+  [FootballerPosition.DEF]: "DEF",
+  [FootballerPosition.MID]: "MID",
+  [FootballerPosition.FWD]: "FWD",
+  [FootballerPosition.MGR]: "MGR",
 };
 
 // Position constraints
-const MIN_REQUIREMENTS = { GK: 1, DEF: 3, MID: 3, FWD: 1 };
-const MAX_LIMITS = { GK: 1, DEF: 5, MID: 5, FWD: 3 };
+const MIN_REQUIREMENTS = { GK: 1, DEF: 3, MID: 3, FWD: 1, MGR: 0 };
+const MAX_LIMITS = { GK: 1, DEF: 5, MID: 5, FWD: 3, MGR: 0 };
 
 export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
   const { list } = useSelector((state: RootState) => state.footballers);
@@ -75,7 +76,7 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
     let selectedTeam: BestScoringFootballer[] = [];
     let footballersPool = [...bestFootballers];
     let teamCount: Record<number, number> = {};
-    let positionCount: Record<"GK" | "DEF" | "MID" | "FWD", number> = { GK: 0, DEF: 0, MID: 0, FWD: 0 };
+    let positionCount: Record<"GK" | "DEF" | "MID" | "FWD" | "MGR", number> = { GK: 0, DEF: 0, MID: 0, FWD: 0, MGR: 0 };
 
     const addPlayer = (player: BestScoringFootballer) => {
       const pos = positionMap[player.element_type as FootballerPosition];
@@ -128,10 +129,10 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
     }
 
     // ✅ **Split into separate arrays**
-    const goalkeepers = selectedTeam.filter((p) => p.element_type === FootballerPosition.goalkeeper);
-    const defenders = selectedTeam.filter((p) => p.element_type === FootballerPosition.defender);
-    const midfielders = selectedTeam.filter((p) => p.element_type === FootballerPosition.midfielder);
-    const strikers = selectedTeam.filter((p) => p.element_type === FootballerPosition.striker);
+    const goalkeepers = selectedTeam.filter((p) => p.element_type === FootballerPosition.GK);
+    const defenders = selectedTeam.filter((p) => p.element_type === FootballerPosition.DEF);
+    const midfielders = selectedTeam.filter((p) => p.element_type === FootballerPosition.MID);
+    const strikers = selectedTeam.filter((p) => p.element_type === FootballerPosition.FWD);
 
     return { goalkeepers, defenders, midfielders, strikers };
   }, [list, startGameweek, endGameweek, teamLimitationOn]);

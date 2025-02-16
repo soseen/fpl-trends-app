@@ -11,6 +11,7 @@ type AdditionalStats = {
   totalXGI: number;
   xGIPerGame: string;
   teamName: string;
+  maxOwnership: number;
 };
 
 export type FootballerWithGameweekStats = Footballer & AdditionalStats;

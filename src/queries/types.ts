@@ -243,8 +243,9 @@ export type TeamData = Team & {
 }
 
 export enum FootballerPosition {
-  goalkeeper = 1,
-  defender = 2,
-  midfielder = 3,
-  striker = 4
+  GK = 1,
+  DEF = 2,
+  MID = 3,
+  FWD = 4,
+  MGR = 5,
 }

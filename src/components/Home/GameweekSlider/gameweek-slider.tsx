@@ -1,4 +1,3 @@
-import { Slider } from "@/components/ui/slider";
 import React, { useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "src/redux/store";

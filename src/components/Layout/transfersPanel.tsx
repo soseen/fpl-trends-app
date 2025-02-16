@@ -33,7 +33,7 @@ const TransfersPanel = () => {
   }, []);
 
   return (
-    <div className="flex h-[52px] justify-around bg-accent2 p-2">
+    <div className="hidden h-[52px] justify-around bg-accent2 p-2 md:flex">
       <AnimatePresence mode="wait">
         <motion.div
           initial={{ opacity: 0 }}

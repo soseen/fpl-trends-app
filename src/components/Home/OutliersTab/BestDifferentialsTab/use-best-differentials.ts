@@ -17,13 +17,12 @@ export const useBestDifferentials = () => {
 
   const bestDifferentials: FootballerWithGameweekStats[] = useMemo(() => {
     if (!footballers.length || !events.length) return [];
-
+    
     const differentials = footballers
       .filter((footballer) => {
         const historyInRange = footballer.history.filter(
           (h) => h.round >= startGameweek && h.round <= endGameweek
         );
-
         const maxOwnership = historyInRange.reduce((max, h) => {
           const gameweekEvent = events.find((e) => e.id === h.round);
           if (!gameweekEvent) return max;
@@ -34,7 +33,7 @@ export const useBestDifferentials = () => {
         }, 0);
 
         // Player is a differential if he was always under 10% ownership
-        return maxOwnership <= 10 && Object.values(FootballerPosition).includes(footballer.element_type);
+        return maxOwnership <= 10 && footballer.element_type !== FootballerPosition.MGR;
       })
       .sort((a, b) => b.totalPoints - a.totalPoints)
       .slice(0, isMD ? 6 : 5);

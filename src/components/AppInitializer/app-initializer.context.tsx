@@ -7,6 +7,7 @@ import { fetchTotalPlayers } from "src/redux/slices/totalPlayersSlice";
 import { AppDispatch, RootState } from "src/redux/store";
 import { AsyncThunkStatus } from "src/redux/types";
 import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
+import { FootballerPosition } from "src/queries/types";
 
 type AppInitializerProvider = {
   children: React.ReactNode;
@@ -30,13 +31,15 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
   const dispatch = useDispatch<AppDispatch>();
   const { status, list } = useSelector((state: RootState) => state.footballers);
   const { status: teamsStatus } = useSelector((state: RootState) => state.teams);
-  const { status: totalPlayersStatus } = useSelector(
+  const { status: totalPlayersStatus, totalPlayers } = useSelector(
     (state: RootState) => state.totalPlayers,
   );
   const { startGameweek, endGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
-  const { status: eventsStatus } = useSelector((state: RootState) => state.events);
+  const { status: eventsStatus, events } = useSelector(
+    (state: RootState) => state.events,
+  );
   const gameweeksCount = endGameweek - startGameweek + 1;
 
   useEffect(() => {
@@ -57,38 +60,49 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
   useEffect(() => {
     if (!list.length) return;
 
-    const enrichedFootballers = list.map((footballer) => {
-      const historyInRange = footballer.history.filter(
-        (h) => h.round >= startGameweek && h.round <= endGameweek,
-      );
-      const additionalInfo = historyInRange.reduce(
-        (acc, val) => ({
-          totalPoints: acc.totalPoints + val.total_points,
-          totalGoals: acc.totalGoals + val.goals_scored,
-          totalAssists: acc.totalAssists + val.assists,
-          totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
-          totalSaves: acc.totalSaves + val.saves,
-          totalXGI: acc.totalXGI + parseFloat(val.expected_goal_involvements),
-          xGIPerGame: (
-            (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
-            gameweeksCount
-          ).toFixed(2),
-          teamName: footballer.teams.name,
-        }),
-        {
-          totalPoints: 0,
-          totalGoals: 0,
-          totalAssists: 0,
-          totalCleanSheets: 0,
-          totalSaves: 0,
-          totalXGI: 0,
-          xGIPerGame: "0.00",
-          teamName: "",
-        },
-      );
+    const enrichedFootballers = list
+      .map((footballer) => {
+        const historyInRange = footballer.history.filter(
+          (h) => h.round >= startGameweek && h.round <= endGameweek,
+        );
+        const additionalInfo = historyInRange.reduce(
+          (acc, val) => {
+            const gameweekEvent = events.find((e) => e.id === val.round);
+            const ownershipPercent =
+              (val.selected / (gameweekEvent?.ranked_count ?? totalPlayers)) * 100;
 
-      return { ...footballer, ...additionalInfo };
-    });
+            return {
+              totalPoints: acc.totalPoints + val.total_points,
+              totalGoals: acc.totalGoals + val.goals_scored,
+              totalAssists: acc.totalAssists + val.assists,
+              totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
+              totalSaves: acc.totalSaves + val.saves,
+              totalXGI: acc.totalXGI + parseFloat(val.expected_goal_involvements),
+              xGIPerGame: (
+                (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
+                gameweeksCount
+              ).toFixed(2),
+              teamName: footballer.teams.name,
+              maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
+            };
+          },
+
+          {
+            totalPoints: 0,
+            totalGoals: 0,
+            totalAssists: 0,
+            totalCleanSheets: 0,
+            totalSaves: 0,
+            totalXGI: 0,
+            xGIPerGame: "0.00",
+            teamName: "",
+            maxOwnership: 0,
+          },
+        );
+
+        return { ...footballer, ...additionalInfo };
+      })
+      .filter((f) => f.element_type !== FootballerPosition.manager);
 
     dispatch(setEnrichedFootballers(enrichedFootballers));
   }, [dispatch, list, startGameweek, endGameweek]);
