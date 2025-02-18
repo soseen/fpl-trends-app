@@ -8,7 +8,15 @@ const BestFootballersXGITab = () => {
 
   return (
     <div>
-      <OutliersHeader title="Players with the Highest xGI / game" search="?xGI" />
+      <OutliersHeader
+        title="Players with the Highest xGI / game"
+        search={new URLSearchParams({
+          sorting: JSON.stringify([
+            { id: "xGIPerGame", desc: true },
+            { id: "totalGoals", desc: true },
+          ]),
+        }).toString()}
+      />
       <div className="grid w-full grid-cols-3 gap-4 md:gap-6 lg:grid-cols-5">
         {bestXGIFootballers.map((footballer) => (
           <OutlierCard

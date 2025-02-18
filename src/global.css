@@ -21,6 +21,10 @@
     --chart-3: #274754;
     --chart-4: #e8c468;
     --chart-5: #f4a462;
+    --fixture-dif-1: #01fc7a;
+    --fixture-dif-2: #e7e7e7;
+    --fixture-dif-3: #ff1751;
+    --fixture-dif-4: #80072d;
   }
 
   /* width */
@@ -40,12 +44,8 @@
     border-radius: 8px;
   }
 
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #c71e4d99;
-  }
-
   body {
     @apply font-roboto;
   }
+  
 }

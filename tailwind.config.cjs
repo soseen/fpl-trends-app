@@ -14,6 +14,10 @@ module.exports = {
         highlight: "var(--highlight)",
         text: "var(--text)",
         chart1: "var(--chart-1)",
+        fixDif1: "var(--fixture-dif-1)",
+        fixDif2: "var(--fixture-dif-2)",
+        fixDif3: "var(--fixture-dif-3)",
+        fixDif4: "var(--fixture-dif-4)",
       },
       boxShadow: {
         large: "0 4px 6px -1px rgb(0 0 0 / 84%), 0 2px 4px 3px rgb(0 0 0 / 12%)",

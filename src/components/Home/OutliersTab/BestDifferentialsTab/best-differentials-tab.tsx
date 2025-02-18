@@ -8,7 +8,13 @@ const BestDifferentialsTab = () => {
 
   return (
     <div>
-      <OutliersHeader title="Best Differentials" search="?differential&points" />
+      <OutliersHeader
+        title="Best Differentials"
+        search={new URLSearchParams({
+          sorting: JSON.stringify([{ id: "totalPoints", desc: true }]),
+          filters: JSON.stringify([{ id: "maxOwnership", value: [0, 10] }]),
+        }).toString()}
+      />
       <div className="grid w-full grid-cols-3 gap-4 md:gap-6 lg:grid-cols-5">
         {bestDifferentials.map((footballer) => (
           <OutlierCard

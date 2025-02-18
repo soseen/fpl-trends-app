@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
   const { status } = useAppInitContext();
   return (
     <>
-      <nav className="sticky top-0 z-[1000] w-full border-b-2 border-secondary bg-primary pt-4 text-xs text-text md:text-lg">
+      <nav className="sticky top-0 z-[300] w-full border-b-2 border-secondary bg-primary pt-4 text-xs text-text md:text-lg">
         <div className="flex w-full justify-between px-2 md:px-4">
           <Link to="/" className="text-lg font-bold">
             FPL Trends

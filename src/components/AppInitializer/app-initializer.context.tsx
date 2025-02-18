@@ -40,7 +40,6 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
   const { status: eventsStatus, events } = useSelector(
     (state: RootState) => state.events,
   );
-  const gameweeksCount = endGameweek - startGameweek + 1;
 
   useEffect(() => {
     if (status === "idle") {
@@ -65,18 +64,30 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
         const historyInRange = footballer.history.filter(
           (h) => h.round >= startGameweek && h.round <= endGameweek,
         );
+        const gameweeksCount = historyInRange.filter(
+          (val) => val.team_a_score !== null && val.team_h_score !== null,
+        ).length;
+
         const additionalInfo = historyInRange.reduce(
           (acc, val) => {
             const gameweekEvent = events.find((e) => e.id === val.round);
             const ownershipPercent =
               (val.selected / (gameweekEvent?.ranked_count ?? totalPlayers)) * 100;
 
+            if (footballer.web_name === "M.Salah") {
+              console.log(historyInRange);
+            }
+
             return {
               totalPoints: acc.totalPoints + val.total_points,
+              pointsPerGame: (acc.totalPoints + val.total_points) / gameweeksCount,
               totalGoals: acc.totalGoals + val.goals_scored,
+              goalsPerGame: (acc.totalGoals + val.goals_scored) / gameweeksCount,
               totalAssists: acc.totalAssists + val.assists,
+              assistsPerGame: (acc.totalAssists + val.assists) / gameweeksCount,
               totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
               totalSaves: acc.totalSaves + val.saves,
+              savesPerGame: (acc.totalSaves + val.saves) / gameweeksCount,
               totalXGI: acc.totalXGI + parseFloat(val.expected_goal_involvements),
               xGIPerGame: (
                 (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
@@ -84,25 +95,32 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
               ).toFixed(2),
               teamName: footballer.teams.name,
               maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
+              totalMinutes: acc.totalMinutes + val.minutes,
+              minPerGame: (acc.totalMinutes + val.minutes) / gameweeksCount,
             };
           },
-
           {
             totalPoints: 0,
+            pointsPerGame: 0,
             totalGoals: 0,
+            goalsPerGame: 0,
             totalAssists: 0,
+            assistsPerGame: 0,
             totalCleanSheets: 0,
             totalSaves: 0,
+            savesPerGame: 0,
             totalXGI: 0,
             xGIPerGame: "0.00",
             teamName: "",
             maxOwnership: 0,
+            minPerGame: 0,
+            totalMinutes: 0,
           },
         );
 
         return { ...footballer, ...additionalInfo };
       })
-      .filter((f) => f.element_type !== FootballerPosition.manager);
+      .filter((f) => f.element_type !== FootballerPosition.MGR);
 
     dispatch(setEnrichedFootballers(enrichedFootballers));
   }, [dispatch, list, startGameweek, endGameweek]);

@@ -1,4 +1,5 @@
 import {
+  ColumnFilter,
   ColumnFiltersState,
   ColumnSort,
   flexRender,
@@ -8,7 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
 import {
@@ -27,11 +28,17 @@ import PlayersTableSkeleton from "./players-table.skeleton";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 import clsx from "clsx";
-import { usePlayersTable } from "./use-players-table";
+import { usePlayersTableColumns } from "./use-players-table-columns";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import PlayersTableFilters from "./players-table-filters";
+import { useSearchParams } from "react-router-dom";
+import { useTableFiltersFromParams } from "./use-table-filters-from-params";
+import { isEqual } from "lodash";
+import PlayersTablePagination from "./players-table-pagination";
 
-const filtersClearState: ColumnFiltersState = [
+const DEFAULT_SORTING = [{ desc: true, id: "totalPoints" }];
+
+export const FILTERS_DEFAULT_STATE: ColumnFiltersState = [
   { id: "web_name", value: "" },
   { id: "maxOwnership", value: [0, 100] },
   { id: "teamName", value: "" },
@@ -43,13 +50,46 @@ const PlayersTable = () => {
     (state: RootState) => state.footballersGameweekStats,
   );
   const { status } = useAppInitContext();
-  const { playersTableColumns } = usePlayersTable();
-  const [columnFilters, setColumnFilters] =
-    useState<ColumnFiltersState>(filtersClearState);
+  const { playersTableColumns } = usePlayersTableColumns();
+  const { defaultFilters, sortingFromParams } = useTableFiltersFromParams();
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultFilters);
+  const [sorting, setSorting] = useState<ColumnSort[]>(
+    sortingFromParams ?? DEFAULT_SORTING,
+  );
+  const [columnVisibility, setColumnVisibility] = useState<
+    Partial<Record<keyof FootballerWithGameweekStats, boolean>>
+  >({
+    points_per_game: false,
+    savesPerGame: false,
+    totalSaves: false,
+    teamName: false,
+    goalsPerGame: false,
+    assistsPerGame: false,
+    totalXGI: false,
+  });
 
-  const [sorting, setSorting] = useState<ColumnSort[]>([
-    { desc: true, id: "totalPoints" },
-  ]);
+  const isClearState = useMemo(() => {
+    const isDefaultSorting =
+      sorting.length === DEFAULT_SORTING.length &&
+      sorting.every((sortingValue) => {
+        const defaultSorting = DEFAULT_SORTING.find((s) => s.id === sortingValue.id);
+        return defaultSorting ? isEqual(sortingValue.desc, defaultSorting.desc) : false;
+      });
+
+    const isDefaultFilters =
+      columnFilters.length === FILTERS_DEFAULT_STATE.length &&
+      columnFilters.every((filter) => {
+        const defaultFilter = FILTERS_DEFAULT_STATE.find((f) => f.id === filter.id);
+        return defaultFilter ? isEqual(filter.value, defaultFilter.value) : false;
+      });
+
+    return isDefaultSorting && isDefaultFilters;
+  }, [sorting, columnFilters]);
+
+  const resetFilters = useCallback(() => {
+    setSorting(DEFAULT_SORTING);
+    setColumnFilters(FILTERS_DEFAULT_STATE);
+  }, [setColumnFilters]);
 
   const table = useReactTable<FootballerWithGameweekStats>({
     data: footballers,
@@ -59,20 +99,38 @@ const PlayersTable = () => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    state: { sorting, columnFilters, columnVisibility: { teamName: false } },
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 20,
+      },
+    },
     enableMultiSort: true,
     maxMultiSortColCount: 2,
   });
 
   if (status === AppInitStatus.loading) return <PlayersTableSkeleton />;
+  console.log(playersTableColumns);
 
   return (
     <div className="w-full">
       <PlayersTableFilters
         columnFilters={columnFilters}
         setColumnFilters={setColumnFilters}
+        columnVisibility={columnVisibility}
+        setColumnVisibility={setColumnVisibility}
+        resetFilters={resetFilters}
+        isClearState={isClearState}
+        playersTableColumns={playersTableColumns as any}
+        table={table}
       />
-      <div className="w-full overflow-x-auto rounded-md border-2 border-accent3 shadow-md">
+      <div className="mb-2 w-full overflow-x-auto rounded-md border-2 border-accent3 shadow-md md:mb-4">
         <Table className="max-w-[100vw] overflow-scroll bg-accent2 text-xs text-text md:text-sm lg:text-base">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -138,6 +196,9 @@ const PlayersTable = () => {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex w-full justify-end">
+        <PlayersTablePagination table={table} />
       </div>
     </div>
   );

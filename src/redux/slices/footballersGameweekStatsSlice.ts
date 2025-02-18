@@ -9,9 +9,15 @@ type AdditionalStats = {
   totalCleanSheets: number;
   totalSaves: number;
   totalXGI: number;
+  pointsPerGame: number;
+  goalsPerGame: number;
+  assistsPerGame: number;
+  savesPerGame: number;
   xGIPerGame: string;
   teamName: string;
   maxOwnership: number;
+  totalMinutes: number;
+  minPerGame: number;
 };
 
 export type FootballerWithGameweekStats = Footballer & AdditionalStats;
