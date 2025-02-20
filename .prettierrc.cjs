@@ -1,6 +1,5 @@
 const config = {
   useTabs: false,
-  useTabs: false,
   semi: true,
   singleQuote: false,
   tabWidth: 2,
@@ -9,6 +8,7 @@ const config = {
   trailingComma: "all",
   arrowParens: "always",
   plugins: ["prettier-plugin-tailwindcss"],
+  endOfLine: "auto",
 };
 
 module.exports = config;

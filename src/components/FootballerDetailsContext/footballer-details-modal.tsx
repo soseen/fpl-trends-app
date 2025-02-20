@@ -27,6 +27,7 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
   const { startGameweek, endGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
+  console.log(footballer?.history);
   return (
     <Dialog open={!!footballer} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
@@ -36,15 +37,15 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
           className="container fixed left-1/2 top-1/2 z-[99999] w-[90%] -translate-x-1/2 -translate-y-1/2 transform rounded-md bg-background px-12 py-6 text-text shadow-lg lg:px-20"
         >
           <div className="w-full flex-col items-center">
-            <div className="relative flex gap-4 lg:gap-8">
+            <div className="relative flex justify-around gap-4 lg:gap-8">
               <img
                 src={getFootballersImage(footballer?.code)}
-                className="h-auto w-48 rounded-md object-cover lg:w-64"
+                className="h-auto w-auto rounded-md object-contain md:w-48 lg:w-64"
               />
               {footballer?.in_dreamteam && (
                 <FaStar className="absolute left-2 top-2 h-6 w-6 text-yellow-500" />
               )}
-              <div className="flex flex-grow flex-col items-center gap-4 py-8 text-text">
+              <div className="flex flex-col items-center gap-4 py-8 text-text">
                 <div className="flex items-center gap-4">
                   <img
                     src={getTeamsBadge(footballer?.team_code)}
@@ -54,7 +55,7 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
                     {footballer?.first_name} {footballer?.second_name}
                   </h2>
                 </div>
-                <div className="flex w-full items-center justify-around">
+                <div className="flex w-full items-center justify-center gap-10">
                   <div className="flex-col shadow-sm">
                     <h3 className="mx-6 rounded-t-md bg-magenta px-4 pb-1 pt-1 text-center text-text">
                       Season Stats
