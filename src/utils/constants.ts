@@ -1,0 +1,1 @@
+export const TOTAL_GAMEWEEKS_COUNT = 38;

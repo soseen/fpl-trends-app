@@ -41,6 +41,8 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
     [footballer],
   );
 
+  console.log(footballer?.history);
+
   const getTeamById = useCallback(
     (teamId: number) => teams.find((team) => team.id === teamId),
     [teams],

@@ -14,7 +14,7 @@ export const useBestXGIFootballers = () => {
   const { isMD } = useDimensions();
 
   const bestXGIFootballers: FootballerWithGameweekStats[] = useMemo(
-    () => [...footballers].sort((a, b) => b.totalXGI - a.totalXGI).slice(0, isMD ? 6 : 5),
+    () => [...footballers].sort((a, b) => parseFloat(b.xGIPerGame) - parseFloat(a.xGIPerGame)).slice(0, isMD ? 6 : 5),
     [footballers, startGameweek, endGameweek, isMD],
   );
   return { bestXGIFootballers };

@@ -1,6 +1,6 @@
 import React from "react";
 import { FaFutbol, FaHandshake } from "react-icons/fa";
-import { Footballer, FootballerPosition } from "src/queries/types";
+import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
 import { getFootballersImage } from "src/utils/images";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
@@ -52,7 +52,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
             </div>
           )}
           {!!footballer.totalCleanSheets &&
-            [FootballerPosition.defender, FootballerPosition.goalkeeper].includes(
+            [FootballerPosition.DEF, FootballerPosition.GK].includes(
               footballer.element_type,
             ) && (
               <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-xs text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">

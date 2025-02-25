@@ -108,11 +108,11 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
                 <FootballerUpcomingFixtures footballer={footballer} />
               </div>
             </div>
-            <span className="bg-magenta3 flex flex-grow justify-center rounded-t-sm py-1 text-center text-lg text-text" />
+            <span className="flex flex-grow justify-center rounded-t-sm bg-magenta3 py-1 text-center text-lg text-text" />
             <FootballerDetailsHistory footballer={footballer} />
             <div className="mt-8 flex flex-col gap-4">
-              <FootballerDetailsGraph footballer={footballer} />
-              <Component />
+              {/* <FootballerDetailsGraph footballer={footballer} /> */}
+              <Component footballer={footballer} />
             </div>
           </div>
         </DialogContent>

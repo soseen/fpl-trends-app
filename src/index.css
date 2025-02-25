@@ -1,7 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "./tailwind.css";
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
+@config "../tailwind.config.cjs";
 
 @layer base {
   :root {
@@ -18,7 +17,7 @@
     --highlight: #0dc5b6;
     --text: #c9c5c5;
     --shadow-1: "4px 3px 8px 4px #00000030";
-    --chart-1: #e76e50;
+    --chart-1: #27dfff;
     --chart-2: #2a9d90;
     --chart-3: #274754;
     --chart-4: #e8c468;
@@ -48,5 +47,9 @@
 
   body {
     @apply font-roboto;
+  }
+
+  .bar-chart > svg {
+    overflow: visible;
   }
 }

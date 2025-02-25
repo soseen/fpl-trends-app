@@ -1,8 +1,19 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts";
-import React from "react";
+import {
+  Bar,
+  BarChart,
+  Brush,
+  CartesianGrid,
+  Label,
+  LabelList,
+  Legend,
+  Rectangle,
+  ReferenceLine,
+  XAxis,
+} from "recharts";
+import React, { useMemo } from "react";
 
 import {
   Card,
@@ -18,6 +29,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
   { month: "February", desktop: 305, mobile: 200 },
@@ -36,75 +48,140 @@ const chartConfig = {
     label: "Mobile",
     color: "hsl(var(--chart-2))",
   },
-  label: {
-    color: "hsl(var(--background))",
-  },
 } satisfies ChartConfig;
 
-export function Component() {
+import { ArrowUp, ArrowDown, Circle } from "lucide-react";
+import { FaFutbol, FaHandshake, FaLock } from "react-icons/fa";
+import { FootballerPosition } from "src/queries/types";
+
+const CustomXAxisTick = ({
+  x,
+  y,
+  payload,
+  footballer,
+}: {
+  x: number;
+  y: number;
+  payload: { value: number };
+  footballer: FootballerWithGameweekStats;
+}) => {
+  if (!footballer) return null;
+
+  const gameweekData = footballer?.history?.find((h) => h.round === payload.value);
+
+  const goals = gameweekData?.goals_scored ?? 0;
+  const assists = gameweekData?.assists ?? 0;
+  const cleanSheets = gameweekData?.clean_sheets ?? 0;
+
+  const events = [
+    { icon: <FaFutbol className="m-auto w-[10px]" />, value: goals },
+    { icon: <FaHandshake className="m-auto w-[10px]" />, value: assists },
+    ...([FootballerPosition.DEF, FootballerPosition.GK].includes(
+      footballer?.element_type as FootballerPosition,
+    )
+      ? [{ icon: <FaLock className="m-auto w-[10px]" />, value: cleanSheets }]
+      : []),
+  ].filter(({ value }) => value > 0);
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      {/* X-Axis Label */}
+      <text x={0} y={10} textAnchor="middle" fontSize="12" fill="var(--text)">
+        {payload.value}
+      </text>
+
+      {/* Icons Below X-Axis */}
+      {events.map((event, index) => (
+        <foreignObject key={index} x="-10" y={15 + index * 15} width="20" height="20">
+          <span className="flex w-4 items-center justify-center gap-[1px] text-text">
+            <span className="text-xs">{event.value}</span>
+            {event.icon}
+          </span>
+        </foreignObject>
+      ))}
+    </g>
+  );
+};
+
+type Props = {
+  footballer: FootballerWithGameweekStats | null;
+};
+
+export function Component({ footballer }: Props) {
+  const chartConfig: ChartConfig = {
+    xGI: { color: "var(--chart-1)", label: "xGI" },
+    returns: { color: "var(--chart-2)", label: "Returns" },
+  };
+
+  const chartData = useMemo(() => {
+    const allGameweeks = Array.from({ length: 38 }, (_, index) => ({
+      gw: index + 1,
+      xGI: "0.0",
+      returns: 0,
+      isFake: true,
+    }));
+
+    footballer?.history.forEach((h) => {
+      allGameweeks[h.round - 1] = {
+        gw: h.round,
+        xGI: h.expected_goal_involvements,
+        returns: h.goals_scored + h.assists,
+        isFake: false,
+      };
+    });
+
+    return allGameweeks;
+  }, [footballer]);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Custom Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>xGI over the gameweeks</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[350px] w-[900px]">
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            margin={{
-              right: 16,
-            }}
-          >
-            <CartesianGrid horizontal={false} />
-            <YAxis
-              dataKey="month"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              hide
-            />
-            <XAxis dataKey="desktop" type="number" hide />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+        <ChartContainer
+          config={chartConfig}
+          className="h-[350px] max-h-[450px] min-h-[200px] w-[900px] rounded-md py-4"
+        >
+          <BarChart data={chartData} className="bar-chart" margin={{ left: 0, right: 0 }}>
+            <ReferenceLine y={1} stroke="var(--accent)" className="text-magenta" />
+            <XAxis
+              dataKey="gw"
+              tick={(props) => <CustomXAxisTick {...props} footballer={footballer} />}
+              padding={{ left: 0, right: 0 }}
             />
             <Bar
-              dataKey="desktop"
-              layout="vertical"
-              fill="var(--color-desktop)"
-              radius={4}
+              dataKey="xGI"
+              fill="var(--chart-1)"
+              radius={2}
+              barSize={20}
+              activeBar={<Rectangle fill="var(--accent-3)" stroke="var(--accent)" />}
             >
               <LabelList
-                dataKey="month"
-                position="insideLeft"
-                offset={8}
-                className="fill-[--color-label]"
-                fontSize={12}
-              />
-              <LabelList
-                dataKey="desktop"
-                position="right"
-                offset={8}
-                className="fill-foreground"
-                fontSize={12}
+                dataKey="xGI"
+                position="top"
+                fill="var(--text)"
+                content={({ x, y, value, index }) =>
+                  chartData[index as number].isFake ? null : (
+                    <text
+                      x={x}
+                      y={y}
+                      dx={10}
+                      dy={-8}
+                      textAnchor="middle"
+                      fontSize="10"
+                      fill="var(--text)"
+                    >
+                      {value}
+                    </text>
+                  )
+                }
               />
             </Bar>
+            {/* <Bar dataKey="returns" fill="var(--chart-2)" radius={4} /> */}
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   );
 }

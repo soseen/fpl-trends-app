@@ -5,6 +5,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { setGameweekRange } from "src/redux/slices/gameweeksSlice";
 import { Button } from "@/components/ui/button";
 import { useDimensions } from "src/hooks/use-dimensions";
+import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 
 const GameweekSlider = () => {
   const { startGameweek, endGameweek, maxGameweek } = useSelector(
@@ -49,7 +50,7 @@ const GameweekSlider = () => {
         <SliderPrimitive.Root
           value={currentRange}
           min={1}
-          max={maxGameweek || 38}
+          max={maxGameweek || TOTAL_GAMEWEEKS_COUNT}
           step={1}
           minStepsBetweenThumbs={1}
           onValueChange={onValueChange}
