@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
 
 @layer base {
   :root {
@@ -11,8 +11,10 @@
     --accent: #36384a;
     --accent-2: #13141c;
     --accent-3: #1b1e2b;
+    --accent-4: #21243b;
     --magenta: #c71e4d;
     --magenta-2: #4e0e1f;
+    --magenta-3: #8b223e;
     --highlight: #0dc5b6;
     --text: #c9c5c5;
     --shadow-1: "4px 3px 8px 4px #00000030";
@@ -47,5 +49,4 @@
   body {
     @apply font-roboto;
   }
-  
 }

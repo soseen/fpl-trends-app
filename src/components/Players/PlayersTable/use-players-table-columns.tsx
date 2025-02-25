@@ -24,7 +24,7 @@ export const usePlayersTableColumns = () => {
             onClick={() => setFootballer(footballer)}
           >
             {imageError ? (
-              <FaUserCircle className="h-5 w-5 text-accent shadow-md md:h-[42px] md:w-[42px]" />
+              <FaUserCircle className="h-6 w-6 text-accent shadow-md md:h-[42px] md:w-[42px]" />
             ) : (
               <img
                 src={getFootballersImage(footballer.code)}

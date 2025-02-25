@@ -1,24 +1,28 @@
 import React, { useMemo } from "react";
-import { AggregatedStats, BestScoringFootballer } from "./use-best-scoring-footballers";
+import { BestScoringFootballer } from "./use-best-scoring-footballers";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import { FaFutbol, FaHandshake } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
 import clsx from "clsx";
+import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 type Props = {
   footballer: BestScoringFootballer;
 };
 
-type SelectedStats = Pick<AggregatedStats, "sumGoals" | "sumAssists" | "sumCleansheets">;
+type SelectedStats = Pick<
+  FootballerWithGameweekStats,
+  "totalGoals" | "totalAssists" | "totalCleanSheets"
+>;
 
 const getIcon = (key: keyof SelectedStats) => {
   switch (key) {
-    case "sumGoals":
+    case "totalGoals":
       return <FaFutbol />;
-    case "sumAssists":
+    case "totalAssists":
       return <FaHandshake />;
-    case "sumCleansheets":
+    case "totalCleanSheets":
       return <TbLockFilled />;
     default:
       return null;
@@ -27,24 +31,24 @@ const getIcon = (key: keyof SelectedStats) => {
 
 const PitchCard = ({ footballer }: Props) => {
   const selectedStats = useMemo(() => {
-    const stats = Object.keys(footballer.aggregatedStats)
+    const stats = Object.keys(footballer)
       .filter(
         (key) =>
-          ["sumGoals", "sumAssists", "sumCleansheets"].includes(key) &&
-          footballer.aggregatedStats[key as keyof typeof footballer.aggregatedStats] > 0,
+          ["totalGoals", "totalAssists", "totalCleanSheets"].includes(key) &&
+          (footballer[key as keyof typeof footballer] as number) > 0,
       )
       .filter(
         (key) =>
           !(
-            key === "sumCleansheets" &&
-            [FootballerPosition.midfielder, FootballerPosition.striker].includes(
+            key === "totalCleanSheets" &&
+            [FootballerPosition.MID, FootballerPosition.FWD].includes(
               footballer.element_type,
             )
           ),
       );
     return stats.map((stat) => ({
       key: stat,
-      value: footballer.aggregatedStats[stat as keyof typeof footballer.aggregatedStats],
+      value: footballer[stat as keyof typeof footballer] as number,
     }));
   }, [footballer]);
 
@@ -54,7 +58,7 @@ const PitchCard = ({ footballer }: Props) => {
         <img
           src={getFootballersImage(footballer.code)}
           alt={footballer.web_name}
-          className="xs:w-9 m-auto w-7 object-cover sm:w-12 md:w-14 lg:w-[84px]"
+          className="m-auto w-7 object-cover xs:w-9 sm:w-12 md:w-14 lg:w-[84px]"
         />
         <div className="flex items-center justify-center bg-magenta md:p-[2px]">
           <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] text-text sm:text-xs">
@@ -69,9 +73,7 @@ const PitchCard = ({ footballer }: Props) => {
               : "bg-magenta2 text-text",
           )}
         >
-          <p className="md:text-md text-[8px] sm:text-xs">
-            {footballer.aggregatedStats.sumPoints} pts
-          </p>
+          <p className="md:text-md text-[8px] sm:text-xs">{footballer.totalPoints} pts</p>
         </div>
         <div className="absolute right-0 top-[2px] z-50 flex-col gap-[2px] md:top-1">
           {selectedStats.map((stat, index) => (
@@ -85,7 +87,7 @@ const PitchCard = ({ footballer }: Props) => {
         </div>
         <img
           src={getTeamsBadge(footballer.team_code)}
-          alt={footballer.teams[0]?.short_name}
+          alt={footballer.teams?.short_name}
           className="absolute left-1 top-1 z-20 w-3 object-cover md:w-5"
         />
       </div>

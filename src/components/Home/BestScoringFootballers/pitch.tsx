@@ -34,10 +34,6 @@ const Pitch = () => {
   });
   const { status } = useAppInitContext();
 
-  console.log(goalkeepers);
-  console.log(defenders);
-  console.log(midfielders);
-
   if (status === AppInitStatus.loading) return <PitchSkeleton />;
   return (
     <div className="mt-4 flex w-full flex-col justify-center md:mt-6">

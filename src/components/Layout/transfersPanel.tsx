@@ -9,7 +9,7 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { useDimensions } from "src/hooks/use-dimensions";
 
 const TransfersPanel = () => {
-  const { list, error, status } = useSelector((state: RootState) => state.footballers);
+  const { list } = useSelector((state: RootState) => state.footballers);
   const [displayMostTransferredIn, setDisplayMostTransferredIn] = useState(true);
   const { isSM, isMD } = useDimensions();
 

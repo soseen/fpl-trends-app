@@ -64,10 +64,6 @@ const PlayersTableFilters = ({
     },
     [setColumnFilters],
   );
-  console.log("playersTableColumns: ");
-
-  // console.log(playersTableColumns[0]?.accessorKey!);
-  // console.log(playersTableColumns[0]?.id);
   const hiddenColumnKeysArray = useMemo(
     () => Object.keys(columnVisibility)?.map((key) => key),
     [columnVisibility],
@@ -75,12 +71,6 @@ const PlayersTableFilters = ({
 
   const modifyColumnVisibility = useCallback(
     (value: string[]) => {
-      // const isExistingKey = hiddenColumnKeysArray.find((key) => key === value);
-      // const newArray = isExistingKey
-      //   ? hiddenColumnKeysArray.filter((key) => key === value)
-      //   : [...hiddenColumnKeysArray, value];
-      console.log("modifyColumnVisibility valuee");
-      console.log(value);
       const modifiedColumnVisibility = value.reduce(
         (obj, key) => ({ ...obj, [key]: false }),
         {},
@@ -202,7 +192,6 @@ const PlayersTableFilters = ({
                 !IGNORED_COLUMN_VISIBILITY_KEYS.includes(col.accessorKey as string),
             )
             .map((col, index) => {
-              console.log(col);
               return (
                 <ToggleGroupItem
                   key={index}

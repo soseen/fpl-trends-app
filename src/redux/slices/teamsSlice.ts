@@ -7,7 +7,7 @@ type FootballersState = {
   list: TeamData[];
   status: AsyncThunkStatus;
   error: string | null;
-}
+};
 
 const initialState: FootballersState = {
   list: [],
@@ -43,13 +43,10 @@ const teamsSlice = createSlice({
       .addCase(fetchTeams.pending, (state) => {
         state.status = AsyncThunkStatus.loading;
       })
-      .addCase(
-        fetchTeams.fulfilled,
-        (state, action: PayloadAction<TeamData[]>) => {
-          state.status = AsyncThunkStatus.success;
-          state.list = action.payload;
-        },
-      )
+      .addCase(fetchTeams.fulfilled, (state, action: PayloadAction<TeamData[]>) => {
+        state.status = AsyncThunkStatus.success;
+        state.list = action.payload;
+      })
       .addCase(fetchTeams.rejected, (state, action) => {
         state.status = AsyncThunkStatus.failed;
         state.error = action.payload as string;

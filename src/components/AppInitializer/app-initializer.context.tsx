@@ -74,10 +74,6 @@ export const AppInitializerProvider = ({ children }: AppInitializerProvider) => 
             const ownershipPercent =
               (val.selected / (gameweekEvent?.ranked_count ?? totalPlayers)) * 100;
 
-            if (footballer.web_name === "M.Salah") {
-              console.log(historyInRange);
-            }
-
             return {
               totalPoints: acc.totalPoints + val.total_points,
               pointsPerGame: (acc.totalPoints + val.total_points) / gameweeksCount,

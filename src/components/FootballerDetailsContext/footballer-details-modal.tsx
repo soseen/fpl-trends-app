@@ -1,22 +1,22 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-// import { Dialog } from "radix-ui";
-import React from "react";
-import { FaStar } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import React, { useMemo, useState } from "react";
+import { FaArrowDown, FaArrowUp, FaStar, FaUserCircle } from "react-icons/fa";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RootState } from "src/redux/store";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import FootballerUpcomingFixtures from "./footballer-upcoming-fixtures";
+import clsx from "clsx";
+import { mapElementyTypeToPosition, roundToThousands } from "src/utils/strings";
+import FootballerDetailsStatsPanel from "./footballer-details-stats-panel";
+import { VisuallyHidden } from "radix-ui";
+import FootballerDetailsHistory from "./footballer-details-history";
+import FootballerDetailsGraph from "./footballer-details-graph";
+import { Component } from "./chart";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
@@ -24,28 +24,51 @@ type Props = {
 };
 
 const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
-  const { startGameweek, endGameweek } = useSelector(
-    (state: RootState) => state.gameweeks,
-  );
-  console.log(footballer?.history);
+  const [isError, setIsError] = useState(false);
+  const info = useMemo(() => {
+    const price = footballer?.now_cost ? footballer.now_cost / 10 : 0;
+    const position = mapElementyTypeToPosition(footballer?.element_type);
+    const isTransfersIn = !!(
+      (footballer?.transfers_in ?? 0) > (footballer?.transfers_out ?? 0)
+    );
+    const transfersCount =
+      (isTransfersIn
+        ? footballer?.transfers_in_event
+        : footballer?.transfers_out_event) || 0;
+    return {
+      price,
+      position,
+      isTransfersIn,
+      transfersCount,
+    };
+  }, [footballer]);
+
   return (
     <Dialog open={!!footballer} onOpenChange={(open) => !open && onClose()}>
       <DialogPortal>
         <DialogOverlay className="fixed inset-0 z-[9999] bg-black/60" />
+        <DialogTitle>{footballer?.web_name}</DialogTitle>
         <DialogContent
           forceMount
-          className="container fixed left-1/2 top-1/2 z-[99999] w-[90%] -translate-x-1/2 -translate-y-1/2 transform rounded-md bg-background px-12 py-6 text-text shadow-lg lg:px-20"
+          aria-describedby={undefined}
+          className="margin-auto fixed inset-0 z-[99999] w-fit justify-center self-center justify-self-center rounded-md bg-transparent text-text shadow-lg"
         >
-          <div className="w-full flex-col items-center">
-            <div className="relative flex justify-around gap-4 lg:gap-8">
-              <img
-                src={getFootballersImage(footballer?.code)}
-                className="h-auto w-auto rounded-md object-contain md:w-48 lg:w-64"
-              />
+          <div className="max-h-[80vh] w-full flex-col items-center overflow-y-auto bg-background px-12 py-6 lg:max-w-[1060px] lg:px-20">
+            <div className="relative flex items-end justify-around gap-4 lg:gap-8">
+              {isError ? (
+                <FaUserCircle className="mb-8 h-12 w-12 object-contain text-accent shadow-md md:h-64 md:w-64" />
+              ) : (
+                <img
+                  src={getFootballersImage(footballer?.code)}
+                  className="h-auto w-auto rounded-md object-contain lg:h-64 lg:w-64"
+                  onError={() => setIsError(true)}
+                />
+              )}
+
               {footballer?.in_dreamteam && (
                 <FaStar className="absolute left-2 top-2 h-6 w-6 text-yellow-500" />
               )}
-              <div className="flex flex-col items-center gap-4 py-8 text-text">
+              <div className="flex flex-col gap-4 py-8 text-text">
                 <div className="flex items-center gap-4">
                   <img
                     src={getTeamsBadge(footballer?.team_code)}
@@ -54,53 +77,42 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
                   <h2 className="text-center text-xl lg:text-3xl">
                     {footballer?.first_name} {footballer?.second_name}
                   </h2>
+                  <p className="flex items-center justify-center rounded-md bg-magenta2 p-2 shadow-md">
+                    {footballer?.selected_by_percent}%
+                  </p>
                 </div>
-                <div className="flex w-full items-center justify-center gap-10">
-                  <div className="flex-col shadow-sm">
-                    <h3 className="mx-6 rounded-t-md bg-magenta px-4 pb-1 pt-1 text-center text-text">
-                      Season Stats
-                    </h3>
-                    <div className="flex items-center gap-1 rounded-md bg-accent3 px-4 pb-2 pt-4 shadow-lg">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Points</p>
-                        <p>{footballer?.total_points}</p>
-                      </div>
-                      <span className="mx-3 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10" />
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Goals</p>
-                        <p>{footballer?.goals_scored}</p>
-                      </div>
-                      <span className="mx-3 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10" />
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Assists</p>
-                        <p>{footballer?.assists}</p>
-                      </div>
+                <div className="flex w-fit gap-4">
+                  {footballer?.now_cost && (
+                    <div className="flex flex-col items-center justify-center">
+                      <span className="">£{info.price}m</span>
                     </div>
+                  )}
+                  <div className="w-fit rounded-md bg-magenta2 px-4 py-[2px] text-sm shadow-md">
+                    {info.position}
                   </div>
-                  <div className="flex-col shadow-sm">
-                    <h3 className="mx-6 rounded-t-md bg-magenta px-4 pb-1 pt-1 text-center text-text">
-                      GW {startGameweek}-{endGameweek}
-                    </h3>
-                    <div className="flex items-center gap-1 rounded-md bg-accent3 px-4 pb-2 pt-4 shadow-lg">
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Points</p>
-                        <p>{footballer?.totalPoints}</p>
-                      </div>
-                      <span className="mx-3 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10" />
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Goals</p>
-                        <p>{footballer?.totalGoals}</p>
-                      </div>
-                      <span className="mx-3 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10" />
-                      <div className="flex flex-col items-center justify-center gap-2">
-                        <p className="text-sm">Assists</p>
-                        <p>{footballer?.totalAssists}</p>
-                      </div>
-                    </div>
-                  </div>
+                  <span
+                    className={clsx(
+                      "flex items-center gap-[2px]",
+                      info.isTransfersIn ? "text-green-600" : "text-red-600",
+                    )}
+                  >
+                    {info.isTransfersIn ? (
+                      <FaArrowUp className="mb-[1px] rotate-45" />
+                    ) : (
+                      <FaArrowDown className="mb-[1px] -rotate-45" />
+                    )}
+                    {roundToThousands(info.transfersCount)}
+                  </span>
                 </div>
-                <FootballerUpcomingFixtures />
+                <FootballerDetailsStatsPanel footballer={footballer} />
+                <FootballerUpcomingFixtures footballer={footballer} />
               </div>
+            </div>
+            <span className="bg-magenta3 flex flex-grow justify-center rounded-t-sm py-1 text-center text-lg text-text" />
+            <FootballerDetailsHistory footballer={footballer} />
+            <div className="mt-8 flex flex-col gap-4">
+              <FootballerDetailsGraph footballer={footballer} />
+              <Component />
             </div>
           </div>
         </DialogContent>

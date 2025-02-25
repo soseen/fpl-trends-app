@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./global.css";
+import "./index.css";
 import { QueryClient, QueryClientProvider } from "react-query";
-import App from "./App.tsx"
+import App from "./App.tsx";
 
 const root = document.getElementById("root");
 const queryClient = new QueryClient();

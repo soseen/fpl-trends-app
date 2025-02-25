@@ -31,7 +31,6 @@ import clsx from "clsx";
 import { usePlayersTableColumns } from "./use-players-table-columns";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import PlayersTableFilters from "./players-table-filters";
-import { useSearchParams } from "react-router-dom";
 import { useTableFiltersFromParams } from "./use-table-filters-from-params";
 import { isEqual } from "lodash";
 import PlayersTablePagination from "./players-table-pagination";
@@ -116,8 +115,6 @@ const PlayersTable = () => {
   });
 
   if (status === AppInitStatus.loading) return <PlayersTableSkeleton />;
-  console.log(playersTableColumns);
-
   return (
     <div className="w-full">
       <PlayersTableFilters
@@ -139,7 +136,7 @@ const PlayersTable = () => {
                   return (
                     <TableHead
                       key={header.id}
-                      className="border-1 cursor-pointer rounded-md border-b-2 border-accent3 p-1 md:p-2"
+                      className="border-1 cursor-pointer rounded-md border-b-2 border-accent3 px-1 py-1 md:px-2"
                       onClick={header.column.getToggleSortingHandler()}
                       style={{ width: `${header.getSize()}px` }}
                     >
@@ -176,7 +173,7 @@ const PlayersTable = () => {
                       key={cell.id}
                       className={clsx(
                         id % 2 === 0 ? "bg-primary" : "bg-accent2",
-                        "border-b-[1px] border-accent3 p-1 md:p-2",
+                        "border-b-[1px] border-accent3 px-1 py-1 md:px-2",
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

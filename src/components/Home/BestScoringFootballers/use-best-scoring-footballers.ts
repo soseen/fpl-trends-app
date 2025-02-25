@@ -1,20 +1,12 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { Footballer, FootballerPosition } from "src/queries/types";
+import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { RootState } from "src/redux/store";
 
-export type AggregatedStats = {
-  sumGoals: number;
-  sumAssists: number;
-  sumBonus: number;
-  sumPoints: number;
-  sumMinutes: number;
-  sumPenaltiesSaved: number;
-  sumSaves: number;
-  sumCleansheets: number;
+export type BestScoringFootballer = FootballerWithGameweekStats & {
+  isBestScoringPlayer?: boolean;
 };
-
-export type BestScoringFootballer = Footballer & { aggregatedStats: AggregatedStats, isBestScoringPlayer?: boolean };
 
 type Props = {
   teamLimitationOn?: boolean;
@@ -35,7 +27,12 @@ const MAX_LIMITS = { GK: 1, DEF: 5, MID: 5, FWD: 3, MGR: 0 };
 
 export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
   const { list } = useSelector((state: RootState) => state.footballers);
-  const { startGameweek, endGameweek } = useSelector((state: RootState) => state.gameweeks);
+  const { startGameweek, endGameweek } = useSelector(
+    (state: RootState) => state.gameweeks,
+  );
+  const { footballers: footballersWithGameweekStats } = useSelector(
+    (state: RootState) => state.footballersGameweekStats,
+  );
 
   const footballers = useMemo<{
     goalkeepers: BestScoringFootballer[];
@@ -47,40 +44,27 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
       return { goalkeepers: [], defenders: [], midfielders: [], strikers: [] };
     }
 
-    // Map players with aggregated stats
-    const bestFootballers = list
-      .map((footballer) => {
-        const filteredHistory = footballer.history.filter(
-          (h) => h.round >= startGameweek && h.round <= endGameweek
-        );
-
-        const aggregatedStats = filteredHistory.reduce(
-          (acc, val) => ({
-            sumGoals: acc.sumGoals + val.goals_scored,
-            sumAssists: acc.sumAssists + val.assists,
-            sumBonus: acc.sumBonus + val.bonus,
-            sumPoints: acc.sumPoints + val.total_points,
-            sumMinutes: acc.sumMinutes + val.minutes,
-            sumPenaltiesSaved: acc.sumPenaltiesSaved + val.penalties_saved,
-            sumSaves: acc.sumSaves + val.saves,
-            sumCleansheets: acc.sumCleansheets + val.clean_sheets,
-          }),
-          { sumGoals: 0, sumAssists: 0, sumBonus: 0, sumPoints: 0, sumSaves: 0, sumPenaltiesSaved: 0, sumMinutes: 0, sumCleansheets: 0 }
-        );
-
-        return { ...footballer, aggregatedStats };
-      })
-      .sort((a, b) => b.aggregatedStats.sumPoints - a.aggregatedStats.sumPoints)
-      .slice(0, 150);
+    const bestFootballers = [...footballersWithGameweekStats].sort(
+      (a, b) => b.totalPoints - a.totalPoints,
+    );
 
     let selectedTeam: BestScoringFootballer[] = [];
     let footballersPool = [...bestFootballers];
     let teamCount: Record<number, number> = {};
-    let positionCount: Record<"GK" | "DEF" | "MID" | "FWD" | "MGR", number> = { GK: 0, DEF: 0, MID: 0, FWD: 0, MGR: 0 };
+    let positionCount: Record<"GK" | "DEF" | "MID" | "FWD" | "MGR", number> = {
+      GK: 0,
+      DEF: 0,
+      MID: 0,
+      FWD: 0,
+      MGR: 0,
+    };
 
     const addPlayer = (player: BestScoringFootballer) => {
       const pos = positionMap[player.element_type as FootballerPosition];
-      selectedTeam.push({...player, isBestScoringPlayer: Object.keys(teamCount).length === 0});
+      selectedTeam.push({
+        ...player,
+        isBestScoringPlayer: Object.keys(teamCount).length === 0,
+      });
       positionCount[pos]++;
       teamCount[player.team_code] = (teamCount[player.team_code] || 0) + 1;
     };
@@ -88,26 +72,38 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
     for (const footballer of bestFootballers) {
       const pos = positionMap[footballer.element_type as FootballerPosition];
 
-      if (teamLimitationOn && ((teamCount[footballer.team_code] || 0) >= 3 || positionCount[pos] === MAX_LIMITS[pos])) continue;
+      if (
+        teamLimitationOn &&
+        ((teamCount[footballer.team_code] || 0) >= 3 ||
+          positionCount[pos] === MAX_LIMITS[pos])
+      )
+        continue;
       addPlayer(footballer);
       footballersPool = bestFootballers.filter((f) => f.id !== footballer.id);
       if (selectedTeam.length === 11) break;
     }
 
     // ✅ **Ensure minimum position requirements are met**
-    while (Object.entries(MIN_REQUIREMENTS).some(([pos, min]) => positionCount[pos as keyof typeof positionCount] < min)) {
-      const missingPosition = Object.entries(MIN_REQUIREMENTS)
-        .find(([pos, min]) => positionCount[pos as keyof typeof positionCount] < min)?.[0] as keyof typeof positionCount;
+    while (
+      Object.entries(MIN_REQUIREMENTS).some(
+        ([pos, min]) => positionCount[pos as keyof typeof positionCount] < min,
+      )
+    ) {
+      const missingPosition = Object.entries(MIN_REQUIREMENTS).find(
+        ([pos, min]) => positionCount[pos as keyof typeof positionCount] < min,
+      )?.[0] as keyof typeof positionCount;
 
       if (!missingPosition) break; // If no missing positions, exit
 
       // Find the **last added player** that is **not** from the missing position
-      const playerToRemove = [...selectedTeam].reverse().find(
-        (p) =>
-          positionMap[p.element_type as FootballerPosition] !== missingPosition &&
-          positionCount[positionMap[p.element_type as FootballerPosition]] > MIN_REQUIREMENTS[positionMap[p.element_type as FootballerPosition]]
-      );
-      
+      const playerToRemove = [...selectedTeam]
+        .reverse()
+        .find(
+          (p) =>
+            positionMap[p.element_type as FootballerPosition] !== missingPosition &&
+            positionCount[positionMap[p.element_type as FootballerPosition]] >
+              MIN_REQUIREMENTS[positionMap[p.element_type as FootballerPosition]],
+        );
 
       if (!playerToRemove) break; // No valid player to remove
 
@@ -120,7 +116,7 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
         (p) =>
           positionMap[p.element_type as FootballerPosition] === missingPosition &&
           (teamLimitationOn ? (teamCount[p.team_code] || 0) < 3 : true) &&
-          !selectedTeam.find(f => f.id === p.id)
+          !selectedTeam.find((f) => f.id === p.id),
       );
       if (replacement) {
         addPlayer(replacement);
@@ -129,16 +125,21 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
     }
 
     // ✅ **Split into separate arrays**
-    const goalkeepers = selectedTeam.filter((p) => p.element_type === FootballerPosition.GK);
-    const defenders = selectedTeam.filter((p) => p.element_type === FootballerPosition.DEF);
-    const midfielders = selectedTeam.filter((p) => p.element_type === FootballerPosition.MID);
-    const strikers = selectedTeam.filter((p) => p.element_type === FootballerPosition.FWD);
+    const goalkeepers = selectedTeam.filter(
+      (p) => p.element_type === FootballerPosition.GK,
+    );
+    const defenders = selectedTeam.filter(
+      (p) => p.element_type === FootballerPosition.DEF,
+    );
+    const midfielders = selectedTeam.filter(
+      (p) => p.element_type === FootballerPosition.MID,
+    );
+    const strikers = selectedTeam.filter(
+      (p) => p.element_type === FootballerPosition.FWD,
+    );
 
     return { goalkeepers, defenders, midfielders, strikers };
-  }, [list, startGameweek, endGameweek, teamLimitationOn]);
+  }, [list, startGameweek, endGameweek, teamLimitationOn, footballersWithGameweekStats]);
 
-  return {footballers, startGameweek, endGameweek};
+  return { footballers, startGameweek, endGameweek };
 };
-
-
-
