@@ -23,8 +23,8 @@ const Navbar: React.FC = () => {
             <Link to="/players" className="hover:text-gray-400">
               Players
             </Link>
-            <Link to="/teams" className="hover:text-gray-400">
-              Teams
+            <Link to="/compare" className="hover:text-gray-400">
+              Comparison Tool
             </Link>
           </div>
         </div>

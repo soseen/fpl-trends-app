@@ -16,6 +16,8 @@ module.exports = {
         highlight: "var(--highlight)",
         text: "var(--text)",
         chart1: "var(--chart-1)",
+        chart2: "var(--chart-2)",
+        chart3: "var(--chart-3)",
         fixDif2: "var(--fixture-dif-2)",
         fixDif3: "var(--fixture-dif-3)",
         fixDif4: "var(--fixture-dif-4)",

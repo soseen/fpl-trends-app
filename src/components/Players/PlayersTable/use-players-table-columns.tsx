@@ -1,11 +1,10 @@
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import React from "react";
-import { getFootballersImage, getTeamsBadge } from "src/utils/images";
-import { FaUserCircle } from "react-icons/fa";
 import { FootballerPosition } from "src/queries/types";
-import { useFootballerDetailsContext } from "src/components/FootballerDetailsContext/footballer-details.context";
+import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
+import FootballerImage from "src/components/FootballerImage/footballer-image";
 
 export const usePlayersTableColumns = () => {
   const { setFootballer } = useFootballerDetailsContext();
@@ -16,28 +15,13 @@ export const usePlayersTableColumns = () => {
       header: "Player",
       cell: (info) => {
         const footballer = info.row.original;
-        const [imageError, setImageError] = React.useState(false);
 
         return (
           <Button
             className="flex w-fit flex-nowrap items-center justify-center gap-4 bg-transparent p-0"
             onClick={() => setFootballer(footballer)}
           >
-            {imageError ? (
-              <FaUserCircle className="h-6 w-6 text-accent shadow-md md:h-[42px] md:w-[42px]" />
-            ) : (
-              <img
-                src={getFootballersImage(footballer.code)}
-                className="h-6 w-6 rounded-full object-contain md:h-[42px] md:w-[42px]"
-                alt={footballer.web_name}
-                onError={() => setImageError(true)}
-              />
-            )}
-            <img
-              src={getTeamsBadge(footballer.team_code)}
-              className="hidden h-6 w-6 object-contain md:block"
-              alt={footballer.web_name}
-            />
+            <FootballerImage code={footballer.code} />
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {footballer.web_name}
             </span>

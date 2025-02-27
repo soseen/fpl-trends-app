@@ -41,8 +41,6 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
     [footballer],
   );
 
-  console.log(footballer?.history);
-
   const getTeamById = useCallback(
     (teamId: number) => teams.find((team) => team.id === teamId),
     [teams],
@@ -73,8 +71,11 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
       {footballer?.history?.map((event, index) => (
         <div key={index} className="ml-4 flex flex-none flex-col items-center gap-1">
           <span className="flex flex-col items-center justify-center gap-1">
-            {getGameweekEvents(event).map(({ icon, value }) => (
-              <span className="flex items-center justify-center gap-1 text-xs">
+            {getGameweekEvents(event).map(({ icon, value }, gwIndex) => (
+              <span
+                key={`${gwIndex}-${index}`}
+                className="flex items-center justify-center gap-1 text-xs"
+              >
                 {value} {icon}
               </span>
             ))}

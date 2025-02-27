@@ -27,6 +27,7 @@ export const fetchTeams = createAsyncThunk(
   },
 );
 
+
 const teamsSlice = createSlice({
   name: "teams",
   initialState,

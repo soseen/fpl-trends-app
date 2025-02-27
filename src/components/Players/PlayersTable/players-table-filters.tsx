@@ -12,15 +12,13 @@ import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   AccessorKeyColumnDefBase,
-  ColumnDef,
   ColumnFilter,
   ColumnFiltersState,
   IdIdentifier,
   Table,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import React, { MouseEventHandler, useCallback, useMemo, useState } from "react";
-import { FaStopCircle } from "react-icons/fa";
+import React, { useCallback, useMemo } from "react";
 import { TiDelete } from "react-icons/ti";
 import { useSelector } from "react-redux";
 import { FootballerPosition } from "src/queries/types";

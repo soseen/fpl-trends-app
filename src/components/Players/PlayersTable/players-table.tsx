@@ -1,5 +1,4 @@
 import {
-  ColumnFilter,
   ColumnFiltersState,
   ColumnSort,
   flexRender,

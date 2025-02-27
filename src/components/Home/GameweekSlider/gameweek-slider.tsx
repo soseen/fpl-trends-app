@@ -74,7 +74,7 @@ const GameweekSlider = () => {
         <Button
           onClick={confirmNewRange}
           disabled={isDisabled}
-          className="bg-magenta px-2 py-1 text-sm text-text disabled:opacity-40 md:px-4 md:py-2 md:text-xl"
+          className="bg-magenta px-2 py-1 text-center text-sm text-text disabled:opacity-40 md:px-4 md:text-base"
         >
           {isSM ? "Apply" : "Apply Range"}
         </Button>

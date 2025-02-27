@@ -1,7 +1,8 @@
 import js from "@eslint/js";
-import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 import prettier from "eslint-plugin-prettier";
+import unusedImports from "eslint-plugin-unused-imports";
 
 export default [
   js.configs.recommended,
@@ -16,18 +17,22 @@ export default [
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
+      prettier,
+      "unused-imports": unusedImports,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { vars: "all", args: "after-used", ignoreRestSiblings: true }
+      ],
       "no-console": "warn",
-    },
-  },
-  {
-    plugins: { prettier },
-    rules: {
       "prettier/prettier": "error",
-      endOfLine: "auto",
       "import/no-named-as-default-member": "off",
+      "unused-imports/no-unused-imports": "warn",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" }
+      ]
     },
   },
   {

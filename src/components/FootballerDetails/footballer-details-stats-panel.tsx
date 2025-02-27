@@ -41,18 +41,15 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
       </h3>
       <div className="flex w-full items-center gap-1 rounded-md bg-accent3 px-4 pb-2 pt-4 shadow-lg">
         {seasonStats.map((stat, index) => (
-          <>
-            <div
-              key={stat.title}
-              className="flex w-[68px] flex-col items-center justify-center gap-1 whitespace-nowrap"
-            >
+          <React.Fragment key={index}>
+            <div className="flex w-[68px] flex-col items-center justify-center gap-1 whitespace-nowrap">
               <p className="text-sm">{stat.title}</p>
               <p>{stat.value}</p>
             </div>
             {index < seasonStats.length - 1 && (
               <span className="mx-3 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10" />
             )}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>

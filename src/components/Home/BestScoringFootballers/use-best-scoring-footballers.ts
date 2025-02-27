@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Footballer, FootballerPosition } from "src/queries/types";
+import { FootballerPosition } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { RootState } from "src/redux/store";
 

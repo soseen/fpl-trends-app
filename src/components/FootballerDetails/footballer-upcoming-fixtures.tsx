@@ -5,6 +5,7 @@ import { RootState } from "src/redux/store";
 import { getTeamsBadge } from "src/utils/images";
 import clsx from "clsx";
 import { Fixture } from "src/queries/types";
+import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
@@ -15,7 +16,7 @@ const FootballerUpcomingFixtures = ({ footballer }: Props) => {
 
   const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
     const start = footballer?.footballer_fixtures[0]?.event ?? 0;
-    const end = Math.min(start + 7, 38);
+    const end = Math.min(start + 7, TOTAL_GAMEWEEKS_COUNT);
 
     const footballerFixturesObject: Record<number, Fixture | undefined> = {};
     Array.from({ length: end - start + 1 }).forEach((_, i) => {
@@ -57,7 +58,7 @@ const FootballerUpcomingFixtures = ({ footballer }: Props) => {
             [fix?.team_a, fix?.team_h].find((t) => t !== footballer?.teams.id),
           );
           return (
-            <div className="flex flex-col items-center">
+            <div key={key} className="flex flex-col items-center">
               {team?.code && (
                 <img
                   src={getTeamsBadge(team?.code)}

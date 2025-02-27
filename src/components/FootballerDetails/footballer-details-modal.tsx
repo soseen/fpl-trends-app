@@ -13,10 +13,8 @@ import FootballerUpcomingFixtures from "./footballer-upcoming-fixtures";
 import clsx from "clsx";
 import { mapElementyTypeToPosition, roundToThousands } from "src/utils/strings";
 import FootballerDetailsStatsPanel from "./footballer-details-stats-panel";
-import { VisuallyHidden } from "radix-ui";
 import FootballerDetailsHistory from "./footballer-details-history";
-import FootballerDetailsGraph from "./footballer-details-graph";
-import { Component } from "./chart";
+import FootballerDetailsChart from "./FootballerDetailsChart/footballer-details-chart";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
@@ -51,16 +49,16 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
         <DialogContent
           forceMount
           aria-describedby={undefined}
-          className="margin-auto fixed inset-0 z-[99999] w-fit justify-center self-center justify-self-center rounded-md bg-transparent text-text shadow-lg"
+          className="margin-auto fixed inset-0 z-[99999] w-fit justify-center self-center justify-self-center bg-transparent text-text shadow-lg"
         >
-          <div className="max-h-[80vh] w-full flex-col items-center overflow-y-auto bg-background px-12 py-6 lg:max-w-[1060px] lg:px-20">
+          <div className="max-h-[80vh] w-full flex-col items-center overflow-y-auto rounded-md bg-background px-12 py-6 lg:max-w-[1060px] lg:px-20">
             <div className="relative flex items-end justify-around gap-4 lg:gap-8">
               {isError ? (
-                <FaUserCircle className="mb-8 h-12 w-12 object-contain text-accent shadow-md md:h-64 md:w-64" />
+                <FaUserCircle className="mb-8 h-12 w-12 object-contain text-accent shadow-md lg:h-72 lg:w-72" />
               ) : (
                 <img
                   src={getFootballersImage(footballer?.code)}
-                  className="h-auto w-auto rounded-md object-contain lg:h-64 lg:w-64"
+                  className="h-auto w-auto object-contain md:h-44 md:w-44 lg:h-72 lg:w-72"
                   onError={() => setIsError(true)}
                 />
               )}
@@ -111,8 +109,7 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
             <span className="flex flex-grow justify-center rounded-t-sm bg-magenta3 py-1 text-center text-lg text-text" />
             <FootballerDetailsHistory footballer={footballer} />
             <div className="mt-8 flex flex-col gap-4">
-              {/* <FootballerDetailsGraph footballer={footballer} /> */}
-              <Component footballer={footballer} />
+              <FootballerDetailsChart footballer={footballer} />
             </div>
           </div>
         </DialogContent>
