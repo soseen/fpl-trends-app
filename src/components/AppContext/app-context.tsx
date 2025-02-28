@@ -2,13 +2,13 @@ import { createContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import React from "react";
 
-type AppContextProvider = {
+type AppContextProviderProps = {
   children: React.ReactNode;
 };
 
 const AppContext = createContext({});
 
-export const AppContextProvider = ({ children }: AppContextProvider) => {
+export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const { pathname } = useLocation(); // Get current route
 
   useEffect(() => {

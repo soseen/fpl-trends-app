@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { FootballerPosition } from "src/queries/types";
+import { FootballerPosition, History } from "src/queries/types";
 import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 
 import CustomTooltip from "./custom-tooltip";
@@ -23,6 +23,18 @@ type Props = {
   footballer: FootballerWithGameweekStats | null;
 };
 
+export type ChartData = {
+  gw: number;
+  xGI: number;
+  xGC: number;
+  minutes: number;
+  points: number;
+  matchInfo: History;
+  team_code: string;
+  element_type: FootballerPosition;
+  isFake: boolean;
+};
+
 const FootballerDetailsChart = ({ footballer }: Props) => {
   const [displayedChartStat, setDisplayedChartStat] = useState<SelectedChartStat>(() =>
     [FootballerPosition.DEF, FootballerPosition.GK].includes(
@@ -37,7 +49,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
   };
 
   const chartData = useMemo(() => {
-    const gameweekMap = new Map<number, any>(); // Store data by gameweek
+    const gameweekMap = new Map<number, ChartData>();
 
     footballer?.history.forEach((h) => {
       const round = h.round;

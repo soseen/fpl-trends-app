@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { History } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { GiWinterGloves as GlovesIcon } from "react-icons/gi";
@@ -96,7 +96,7 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
           <span className="relative h-12 w-[1px] bg-secondary">
             {!!event?.minutes && (
               <span className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-xs">
-                {event?.minutes}'
+                {event?.minutes}&apos;
               </span>
             )}
           </span>

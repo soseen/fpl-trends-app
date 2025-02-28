@@ -9,7 +9,7 @@ import { AsyncThunkStatus } from "src/redux/types";
 import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition } from "src/queries/types";
 
-type AppInitializerProvider = {
+type AppInitializerProviderProps = {
   children: React.ReactNode;
 };
 
@@ -27,7 +27,7 @@ const AppInitializerContext = createContext<AppInitializerState>({
   status: AppInitStatus.loading,
 });
 
-export const AppInitializerProvider = ({ children }: AppInitializerProvider) => {
+export const AppInitializerProvider = ({ children }: AppInitializerProviderProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { status, list } = useSelector((state: RootState) => state.footballers);
   const { status: teamsStatus } = useSelector((state: RootState) => state.teams);
