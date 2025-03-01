@@ -89,6 +89,11 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
                 (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
                 gameweeksCount
               ).toFixed(2),
+              totalXGC: acc.totalXGC + parseFloat(val.expected_goals_conceded),
+              xGCPerGame: (
+                (acc.totalXGC + parseFloat(val.expected_goals_conceded)) /
+                gameweeksCount
+              ).toFixed(2),
               teamName: footballer.teams.name,
               maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
               totalMinutes: acc.totalMinutes + val.minutes,
@@ -107,6 +112,8 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             savesPerGame: 0,
             totalXGI: 0,
             xGIPerGame: "0.00",
+            totalXGC: 0,
+            xGCPerGame: "0.00",
             teamName: "",
             maxOwnership: 0,
             minPerGame: 0,

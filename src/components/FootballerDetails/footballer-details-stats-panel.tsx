@@ -7,7 +7,7 @@ type Props = {
 
 const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
   const seasonStats = useMemo(() => {
-    const historyLength = footballer?.history?.length ?? 0;
+    const historyLength = footballer?.history?.filter((h) => h.minutes > 0)?.length ?? 0;
 
     const baseInfo = [
       { title: "Points", value: footballer?.total_points },
@@ -15,7 +15,7 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
       { title: "Assists", value: footballer?.assists },
       {
         title: "Minutes/G",
-        value: ((footballer?.minutes ?? 1) / historyLength).toFixed(1),
+        value: ((footballer?.minutes ?? 1) / historyLength).toFixed(0) + "`",
       },
     ];
 

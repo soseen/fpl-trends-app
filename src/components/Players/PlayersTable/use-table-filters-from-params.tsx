@@ -1,5 +1,5 @@
-import { ColumnFilter, ColumnFiltersState, ColumnSort } from "@tanstack/react-table";
-import React, { useMemo } from "react";
+import { ColumnFilter, ColumnSort } from "@tanstack/react-table";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { FILTERS_DEFAULT_STATE } from "./players-table";
 

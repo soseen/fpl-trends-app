@@ -9,14 +9,16 @@ import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
+  max?: number;
 };
 
-const FootballerUpcomingFixtures = ({ footballer }: Props) => {
+const FootballerUpcomingFixtures = ({ footballer, max }: Props) => {
   const { list: teams } = useSelector((state: RootState) => state.teams);
 
   const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
     const start = footballer?.footballer_fixtures[0]?.event ?? 0;
-    const end = Math.min(start + 7, TOTAL_GAMEWEEKS_COUNT);
+    const end = Math.min(start + (max ? max - 1 : 7), TOTAL_GAMEWEEKS_COUNT);
+    console.log(end);
 
     const footballerFixturesObject: Record<number, Fixture | undefined> = {};
     Array.from({ length: end - start + 1 }).forEach((_, i) => {
@@ -62,19 +64,21 @@ const FootballerUpcomingFixtures = ({ footballer }: Props) => {
               {team?.code && (
                 <img
                   src={getTeamsBadge(team?.code)}
-                  className="mb-1 h-auto w-6 object-cover"
+                  className="mb-1 h-auto w-4 object-cover lg:w-6"
                 />
               )}
               <div
                 className={clsx(
-                  "flex w-14 items-center justify-center whitespace-nowrap rounded-sm border-none px-4 py-1 text-sm text-background",
+                  "flex w-7 items-center justify-center whitespace-nowrap rounded-sm border-none px-[2px] text-[7px] leading-4 text-background md:w-10 lg:w-[54px] lg:px-4 lg:py-1 lg:text-sm",
                   getFixtureDifficultyColor(fix?.difficulty),
                   fix?.is_home ? "uppercase" : "lowercase",
                 )}
               >
                 {team ? `${team?.short_name} (${fix?.is_home ? "H" : "A"})` : "-"}
               </div>
-              <p className="rounded-b-sm bg-gray-800 px-2 text-xs text-text">{key}</p>
+              <p className="rounded-b-sm bg-gray-800 px-[2px] text-[6px] leading-[1.8] text-text md:text-xs lg:px-2">
+                {key}
+              </p>
             </div>
           );
         })}

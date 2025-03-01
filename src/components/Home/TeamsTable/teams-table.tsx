@@ -129,7 +129,7 @@ const TeamsTable = () => {
       </Table>
 
       <p className="mt-2 text-xs italic md:text-sm">
-        * presented data is compared with the season's total
+        * presented data is compared with the season&apos;s total
       </p>
     </div>
   );

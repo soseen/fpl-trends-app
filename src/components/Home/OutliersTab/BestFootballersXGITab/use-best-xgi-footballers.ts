@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";

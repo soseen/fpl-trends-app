@@ -50,8 +50,8 @@ export const useBestScoringFootballers = ({ teamLimitationOn }: Props) => {
 
     let selectedTeam: BestScoringFootballer[] = [];
     let footballersPool = [...bestFootballers];
-    let teamCount: Record<number, number> = {};
-    let positionCount: Record<"GK" | "DEF" | "MID" | "FWD" | "MGR", number> = {
+    const teamCount: Record<number, number> = {};
+    const positionCount: Record<"GK" | "DEF" | "MID" | "FWD" | "MGR", number> = {
       GK: 0,
       DEF: 0,
       MID: 0,

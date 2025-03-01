@@ -1,8 +1,4 @@
 import React from "react";
-import {
-  AppInitStatus,
-  useAppInitContext,
-} from "src/components/AppInitializer/app-initializer.context";
 import BestFootballersXGITab from "./BestFootballersXGITab/best-footballers-xgi-tab";
 import BestDifferentialsTab from "./BestDifferentialsTab/best-differentials-tab";
 import OutliersTabRow from "./outliers-tab-row";

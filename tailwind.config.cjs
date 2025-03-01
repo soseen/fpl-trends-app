@@ -41,5 +41,5 @@ module.exports = {
     },
   },
   variants: {},
-  plugins: [require("tailwindcss-radix")()],
+  plugins: [import("tailwindcss-radix")],
 };

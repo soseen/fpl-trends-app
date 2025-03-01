@@ -5,7 +5,6 @@ import {
 } from "./use-best-scoring-footballers";
 import PitchCard from "./pitch-card";
 import { AnimatePresence, motion } from "motion/react";
-import { useSelector } from "react-redux";
 import {
   AppInitStatus,
   useAppInitContext,

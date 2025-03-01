@@ -1,5 +1,5 @@
 import api from "src/lib/axios";
-import { Team, TeamData } from "./types";
+import { TeamData } from "./types";
 
 
 export const getTeamsData = async () => {

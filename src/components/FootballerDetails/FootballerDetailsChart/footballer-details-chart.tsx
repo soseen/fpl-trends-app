@@ -29,8 +29,8 @@ export type ChartData = {
   xGC: number;
   minutes: number;
   points: number;
-  matchInfo: History;
-  team_code: string;
+  matchInfo: History[];
+  team_code: number;
   element_type: FootballerPosition;
   isFake: boolean;
 };
@@ -72,7 +72,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           minutes: h.minutes,
           points: h.total_points,
           matchInfo: [h],
-          teamCode: footballer?.team_code,
+          team_code: footballer?.team_code,
           element_type: footballer.element_type,
           isFake: false,
         });
@@ -127,7 +127,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
         <ChartContainer
           key={displayedChartStat}
           config={chartConfig}
-          className="mt-2 h-[350px] max-h-[450px] min-h-[200px] w-[890px] rounded-md bg-accent2 px-2 py-4 pb-10"
+          className="mt-2 h-[350px] max-h-[450px] min-h-[200px] w-[890px] rounded-md bg-accent2 px-2 py-4 pb-2"
         >
           <BarChart data={chartData} className="bar-chart" margin={{ left: 0, right: 0 }}>
             <XAxis

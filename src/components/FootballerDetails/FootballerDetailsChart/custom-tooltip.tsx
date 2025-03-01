@@ -1,10 +1,9 @@
 import { TooltipProps } from "recharts";
 import { Card } from "@/components/ui/card";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { getTeamsBadge } from "src/utils/images";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
-import { isEmpty } from "lodash";
 import { FootballerPosition, History } from "src/queries/types";
 import { FaClock, FaFutbol, FaHandshake, FaLock } from "react-icons/fa";
 import { TbRectangleVerticalFilled as CardIcon } from "react-icons/tb";
@@ -60,10 +59,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
       {matchInfo.map((history, index) => {
         const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
         const homeTeamBadge = getTeamsBadge(
-          history.was_home ? data?.teamCode : opponentTeamCode,
+          history.was_home ? data?.team_code : opponentTeamCode,
         );
         const awayTeamBadge = getTeamsBadge(
-          history.was_home ? opponentTeamCode : data?.teamCode,
+          history.was_home ? opponentTeamCode : data?.team_code,
         );
         const gameweekEvents = getGameweekEvents(history);
 
@@ -91,7 +90,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
                     key={index}
                     className="flex w-full flex-grow items-center justify-between gap-2"
                   >
-                    <span className="text-chart3 flex items-center gap-1 text-xs">
+                    <span className="flex items-center gap-1 text-xs text-chart3">
                       {event.key} {event.icon}
                     </span>
                     <p>{event.value}</p>

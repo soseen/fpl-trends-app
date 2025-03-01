@@ -2,18 +2,20 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "src/redux/store";
 import { Footballer } from "src/queries/types";
 
-type AdditionalStats = {
+export type AdditionalStats = {
   totalPoints: number;
   totalGoals: number;
   totalAssists: number;
   totalCleanSheets: number;
   totalSaves: number;
   totalXGI: number;
+  xGIPerGame: string;
+  totalXGC: number;
+  xGCPerGame: string;
   pointsPerGame: number;
   goalsPerGame: number;
   assistsPerGame: number;
   savesPerGame: number;
-  xGIPerGame: string;
   teamName: string;
   maxOwnership: number;
   totalMinutes: number;

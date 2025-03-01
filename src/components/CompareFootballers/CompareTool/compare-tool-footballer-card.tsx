@@ -1,0 +1,195 @@
+import clsx from "clsx";
+import React, { useMemo } from "react";
+import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { getFootballersImage, getTeamsBadge } from "src/utils/images";
+import CompareToolSearch from "./compare-tool-search";
+import { MdClose as CloseIcon } from "react-icons/md";
+import { Button } from "@/components/ui/button";
+import { COMPARE_TOOL_STAT_KEYS, RankedFootballer } from "./use-compare-tool";
+import { isNumber } from "lodash";
+import { FaChevronRight, FaFutbol, FaHandshake } from "react-icons/fa";
+import FootballerUpcomingFixtures from "src/components/FootballerDetails/footballer-upcoming-fixtures";
+import { useDimensions } from "src/hooks/use-dimensions";
+import { FootballerPosition } from "src/queries/types";
+import { TbLockFilled } from "react-icons/tb";
+
+type SelectedStats = Pick<
+  RankedFootballer,
+  "totalGoals" | "totalAssists" | "totalCleanSheets"
+>;
+
+const getIcon = (key: keyof SelectedStats) => {
+  switch (key) {
+    case "totalGoals":
+      return <FaFutbol />;
+    case "totalAssists":
+      return <FaHandshake />;
+    case "totalCleanSheets":
+      return <TbLockFilled />;
+    default:
+      return null;
+  }
+};
+
+type Props = {
+  index: number;
+  footballer: RankedFootballer | null;
+  selectedFootballers: (RankedFootballer | null)[];
+  addFootballer: (footballerToAdd: FootballerWithGameweekStats, index: number) => void;
+  removeFootballer: (footballerToRemove: RankedFootballer) => void;
+  openFootballersProfile: (footballer: RankedFootballer) => void;
+};
+
+const CompareToolFootballerCard = ({
+  index,
+  footballer,
+  selectedFootballers,
+  addFootballer,
+  removeFootballer,
+  openFootballersProfile,
+}: Props) => {
+  const { isMD } = useDimensions();
+
+  const selectedStats = useMemo(() => {
+    if (!footballer) return;
+    const stats = Object.keys(footballer)
+      .filter(
+        (key) =>
+          ["totalGoals", "totalAssists", "totalCleanSheets"].includes(key) &&
+          (footballer[key as keyof typeof footballer] as number) > 0,
+      )
+      .filter(
+        (key) =>
+          !(
+            key === "totalCleanSheets" &&
+            [FootballerPosition.MID, FootballerPosition.FWD].includes(
+              footballer.element_type,
+            )
+          ),
+      );
+    return stats.map((stat) => ({
+      key: stat,
+      value: footballer[stat as keyof typeof footballer] as number,
+    }));
+  }, [footballer]);
+
+  return (
+    <div className="w-min max-w-[110px] self-start shadow-large md:max-w-[165px] lg:max-w-[205px] xl:max-w-[268px]">
+      <div className="relative rounded-t-md border-0 border-text bg-accent2 shadow-lg">
+        {footballer && (
+          <Button
+            className="absolute -right-1 -top-2 z-50 bg-transparent p-0 hover:opacity-85 md:-right-3 md:-top-3"
+            onClick={() => removeFootballer(footballer)}
+          >
+            <CloseIcon className="box-content h-2 w-2 rounded-full bg-accent p-1 text-text md:h-6 md:w-6" />
+          </Button>
+        )}
+        <div className="relative flex aspect-[220/280] h-[140px] flex-col items-end justify-end overflow-hidden rounded-md before:absolute before:-left-[84px] before:-top-32 before:z-10 before:h-[155px] before:w-[155px] before:-rotate-[45deg] before:bg-magenta2 before:shadow-large md:h-[210px] md:before:-left-28 md:before:-top-20 lg:h-[260px] lg:before:-left-36 lg:before:-top-11 lg:before:h-[150px] lg:before:w-[255px] xl:h-[310px]">
+          {footballer ? (
+            <>
+              <img
+                src={getFootballersImage(footballer.code)}
+                className="h-auto w-full self-end object-contain px-2 pt-10 lg:px-4"
+              />
+
+              <img
+                src={getTeamsBadge(footballer.team_code)}
+                className="absolute left-2 top-2 z-40 h-4 w-4 object-contain md:h-6 md:w-6 lg:h-12 lg:w-12"
+              />
+              <div className="absolute right-0 top-4 z-50 flex flex-col gap-1 md:top-6 md:gap-2">
+                {!!selectedStats?.length &&
+                  selectedStats.map((stat, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-end gap-1 rounded-l-md bg-accent3 px-1 text-[8px] text-text shadow-md md:gap-1 md:px-2 md:text-xs lg:px-3 lg:text-base"
+                    >
+                      {stat.value} {getIcon(stat.key as keyof SelectedStats)}
+                    </div>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <span className="m-auto">
+              <CompareToolSearch
+                selectedFootballers={selectedFootballers}
+                addFootballer={addFootballer}
+                index={index}
+              />
+            </span>
+          )}
+        </div>
+        <div
+          className={
+            "flex w-full flex-col self-end text-center text-sm text-text md:text-base lg:text-lg"
+          }
+        >
+          {footballer && (
+            <>
+              <p className="w-full overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-2 text-center">
+                {footballer?.web_name}
+              </p>
+              <p className="w-full bg-magenta2 text-center">
+                {footballer?.totalPoints} pts
+              </p>
+              <div className="m-auto mb-2 md:mb-4">
+                <FootballerUpcomingFixtures
+                  max={isMD ? 3 : 4}
+                  footballer={footballer as unknown as FootballerWithGameweekStats}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {footballer && (
+        <>
+          <div className="flex flex-col flex-nowrap justify-center rounded-b-md bg-accent2 bg-accent3 text-text">
+            {COMPARE_TOOL_STAT_KEYS.map((stat, index) => {
+              const { rank, value } = footballer[stat.key];
+              return (
+                <>
+                  <div
+                    key={footballer.id + stat.key}
+                    className="flex items-center gap-1 px-1 py-1 md:px-1 md:py-2 lg:px-2"
+                  >
+                    <p className="flex flex-1 text-[10px] sm:text-xs lg:text-base">
+                      {stat.label}
+                    </p>
+                    <div
+                      className={clsx(
+                        "rounded-md, flex w-fit flex-col justify-center gap-1 rounded-md px-1 text-xs text-text lg:text-base",
+                        rank === 1
+                          ? "bg-magenta"
+                          : rank === 2
+                            ? "bg-magenta2"
+                            : "bg-secondary",
+                      )}
+                    >
+                      {isNumber(value)
+                        ? stat.key === "minPerGame"
+                          ? value.toFixed(0)
+                          : value.toFixed(2)
+                        : value}
+                    </div>
+                  </div>
+                  {index !== COMPARE_TOOL_STAT_KEYS.length - 1 && (
+                    <span className="m-auto h-[1px] w-[85%] bg-accent3" />
+                  )}
+                </>
+              );
+            })}
+          </div>
+          <Button
+            className="flex w-full items-center justify-between gap-1 rounded-t-none bg-magenta px-2 py-[2px] text-xs text-text hover:opacity-85 md:py-1 md:text-base lg:px-4"
+            onClick={() => openFootballersProfile(footballer)}
+          >
+            {isMD ? "Profile" : "View Player's Profile"} <FaChevronRight />
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CompareToolFootballerCard;
