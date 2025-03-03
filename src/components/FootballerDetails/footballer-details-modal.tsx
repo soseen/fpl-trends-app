@@ -11,7 +11,7 @@ import { FootballerWithGameweekStats } from "src/redux/slices/footballersGamewee
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import FootballerUpcomingFixtures from "./footballer-upcoming-fixtures";
 import clsx from "clsx";
-import { mapElementyTypeToPosition, roundToThousands } from "src/utils/strings";
+import { mapElementTypeToPosition, roundToThousands } from "src/utils/strings";
 import FootballerDetailsStatsPanel from "./footballer-details-stats-panel";
 import FootballerDetailsHistory from "./footballer-details-history";
 import FootballerDetailsChart from "./FootballerDetailsChart/footballer-details-chart";
@@ -25,7 +25,7 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
   const [isError, setIsError] = useState(false);
   const info = useMemo(() => {
     const price = footballer?.now_cost ? footballer.now_cost / 10 : 0;
-    const position = mapElementyTypeToPosition(footballer?.element_type);
+    const position = mapElementTypeToPosition(footballer?.element_type);
     const isTransfersIn = !!(
       (footballer?.transfers_in ?? 0) > (footballer?.transfers_out ?? 0)
     );

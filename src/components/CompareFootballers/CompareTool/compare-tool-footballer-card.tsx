@@ -5,13 +5,14 @@ import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import CompareToolSearch from "./compare-tool-search";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { COMPARE_TOOL_STAT_KEYS, RankedFootballer } from "./use-compare-tool";
+import { COMPARE_TOOL_STAT_KEYS } from "./use-compare-tool";
 import { isNumber } from "lodash";
 import { FaChevronRight, FaFutbol, FaHandshake } from "react-icons/fa";
 import FootballerUpcomingFixtures from "src/components/FootballerDetails/footballer-upcoming-fixtures";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
+import { RankedFootballer } from "./types";
 
 type SelectedStats = Pick<
   RankedFootballer,
@@ -81,10 +82,15 @@ const CompareToolFootballerCard = ({
             className="absolute -right-1 -top-2 z-50 bg-transparent p-0 hover:opacity-85 md:-right-3 md:-top-3"
             onClick={() => removeFootballer(footballer)}
           >
-            <CloseIcon className="box-content h-2 w-2 rounded-full bg-accent p-1 text-text md:h-6 md:w-6" />
+            <CloseIcon className="box-content h-2 w-2 rounded-full bg-accent p-1 text-text md:h-4 md:w-4 lg:h-6 lg:w-6" />
           </Button>
         )}
-        <div className="relative flex aspect-[220/280] h-[140px] flex-col items-end justify-end overflow-hidden rounded-md before:absolute before:-left-[84px] before:-top-32 before:z-10 before:h-[155px] before:w-[155px] before:-rotate-[45deg] before:bg-magenta2 before:shadow-large md:h-[210px] md:before:-left-28 md:before:-top-20 lg:h-[260px] lg:before:-left-36 lg:before:-top-11 lg:before:h-[150px] lg:before:w-[255px] xl:h-[310px]">
+        <div
+          className={clsx(
+            "relative flex aspect-[220/280] h-[140px] flex-col items-end justify-end overflow-hidden rounded-md before:absolute before:-left-[84px] before:-top-32 before:z-10 before:h-[155px] before:w-[155px] before:-rotate-[45deg] before:bg-magenta2 before:shadow-large md:h-[210px] md:before:-left-28 md:before:-top-20 lg:h-[260px] lg:before:-left-36 lg:before:-top-11 lg:before:h-[150px] lg:before:w-[255px] xl:h-[310px]",
+            !footballer && "before:hidden",
+          )}
+        >
           {footballer ? (
             <>
               <img
@@ -144,15 +150,12 @@ const CompareToolFootballerCard = ({
 
       {footballer && (
         <>
-          <div className="flex flex-col flex-nowrap justify-center rounded-b-md bg-accent2 bg-accent3 text-text">
+          <div className="flex flex-col flex-nowrap justify-center rounded-b-md bg-accent3 text-text">
             {COMPARE_TOOL_STAT_KEYS.map((stat, index) => {
               const { rank, value } = footballer[stat.key];
               return (
-                <>
-                  <div
-                    key={footballer.id + stat.key}
-                    className="flex items-center gap-1 px-1 py-1 md:px-1 md:py-2 lg:px-2"
-                  >
+                <div key={footballer.id + stat.key}>
+                  <div className="flex items-center gap-1 px-1 py-1 md:px-1 md:py-2 lg:px-2">
                     <p className="flex flex-1 text-[10px] sm:text-xs lg:text-base">
                       {stat.label}
                     </p>
@@ -176,12 +179,12 @@ const CompareToolFootballerCard = ({
                   {index !== COMPARE_TOOL_STAT_KEYS.length - 1 && (
                     <span className="m-auto h-[1px] w-[85%] bg-accent3" />
                   )}
-                </>
+                </div>
               );
             })}
           </div>
           <Button
-            className="flex w-full items-center justify-between gap-1 rounded-t-none bg-magenta px-2 py-[2px] text-xs text-text hover:opacity-85 md:py-1 md:text-base lg:px-4"
+            className="flex w-full items-center justify-between gap-1 rounded-t-none bg-magenta px-2 py-[2px] text-xs text-text hover:opacity-85 md:text-base lg:px-4 lg:py-2"
             onClick={() => openFootballersProfile(footballer)}
           >
             {isMD ? "Profile" : "View Player's Profile"} <FaChevronRight />

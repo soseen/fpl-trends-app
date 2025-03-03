@@ -6,8 +6,14 @@ import { setGameweekRange } from "src/redux/slices/gameweeksSlice";
 import { Button } from "@/components/ui/button";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
+import {
+  AppInitStatus,
+  useAppInitContext,
+} from "src/components/AppInitializer/app-initializer.context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const GameweekSlider = () => {
+  const { status } = useAppInitContext();
   const { startGameweek, endGameweek, maxGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
@@ -40,6 +46,13 @@ const GameweekSlider = () => {
   const confirmNewRange = () => {
     dispatch(setGameweekRange({ start: currentRange[0], end: currentRange[1] }));
   };
+
+  if (status === AppInitStatus.loading)
+    return (
+      <div className="my-2 flex h-2 w-full items-center px-2 md:my-4 md:px-4 lg:my-6">
+        <Skeleton className="h-2 w-full md:h-3" />
+      </div>
+    );
 
   return (
     <div className="my-2 flex w-full items-center px-2 md:my-4 md:px-4 lg:my-6">

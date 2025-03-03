@@ -69,12 +69,15 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
       className="flex flex-1 items-end overflow-x-auto rounded-md bg-accent2 px-2 py-3 text-text"
     >
       {footballer?.history?.map((event, index) => (
-        <div key={index} className="ml-4 flex flex-none flex-col items-center gap-1">
-          <span className="flex flex-col items-center justify-center gap-1">
+        <div
+          key={index}
+          className="ml-1 flex flex-none flex-col items-center gap-1 md:ml-4"
+        >
+          <span className="flex flex-col items-center justify-center gap-[2px] md:gap-1">
             {getGameweekEvents(event).map(({ icon, value }, gwIndex) => (
               <span
                 key={`${gwIndex}-${index}`}
-                className="flex items-center justify-center gap-1 text-xs"
+                className="flex items-center justify-center gap-[2px] text-[9px] md:gap-1 md:text-xs"
               >
                 {value} {icon}
               </span>
@@ -83,24 +86,24 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
           {event?.total_points > 0 ? (
             <span
               className={clsx(
-                "w-10 whitespace-nowrap rounded-sm py-1 text-center text-xs shadow-sm",
+                "w-9 whitespace-nowrap rounded-sm py-1 text-center text-xs shadow-sm md:w-10",
                 event?.total_points >= 9 ? "bg-magenta" : "bg-magenta2",
               )}
             >
               {event?.total_points} pts
             </span>
           ) : (
-            <span className="h-3 w-3 rounded-full bg-secondary" />
+            <span className="h-2 w-2 rounded-full bg-secondary md:h-3 md:w-3" />
           )}
 
-          <span className="relative h-12 w-[1px] bg-secondary">
+          <span className="relative h-8 w-[1px] bg-secondary md:h-12">
             {!!event?.minutes && (
               <span className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-xs">
                 {event?.minutes}&apos;
               </span>
             )}
           </span>
-          <span className="relative mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs">
+          <span className="relative mb-2 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[8px] md:h-6 md:w-6 md:text-xs">
             {event?.round}
             {index !== footballer?.history?.length - 1 && (
               <span className="absolute left-full top-1/2 h-[3px] w-8 -translate-y-1/2 bg-secondary" />
@@ -110,7 +113,7 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
             <img
               src={getTeamsBadge(getTeamById(event?.opponent_team)?.code)}
               alt="opponent team"
-              className="mb-[2px] h-5 w-5 rounded-full object-contain"
+              className="mb-[2px] h-4 w-4 rounded-full object-contain md:h-5 md:w-5"
             />
             <span
               className={clsx(

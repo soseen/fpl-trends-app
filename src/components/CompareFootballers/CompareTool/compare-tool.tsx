@@ -3,20 +3,31 @@ import CompareToolFootballerCard from "./compare-tool-footballer-card";
 import { Button } from "@/components/ui/button";
 import { FaPlus, FaTools } from "react-icons/fa";
 import { useCompareTool } from "./use-compare-tool";
+import {
+  AppInitStatus,
+  useAppInitContext,
+} from "src/components/AppInitializer/app-initializer.context";
+import CompareToolSkeleton from "./compare-tool.skeleton";
+import CompareToolRankings from "./compare-tool-rankings";
 
 const CompareTool = () => {
   const {
     footballersComparisonArray,
     setSelectedFootballers,
     canAddNewCard,
+    validFootballers,
+    bestAttributes,
     addFootballer,
     removeFootballer,
     openFootballersProfile,
   } = useCompareTool();
+  const { status } = useAppInitContext();
+
+  if (status === AppInitStatus.loading) return <CompareToolSkeleton />;
 
   return (
-    <div className="text-md mt-4 w-full rounded-sm bg-accent3 p-2 pb-4 md:text-base lg:pb-8 lg:text-xl">
-      <h1 className="flex items-center gap-2 text-text">
+    <div className="text-md mt-4 flex w-full flex-col rounded-sm bg-accent3 p-2 pb-4 text-text md:text-base lg:pb-8 lg:text-xl">
+      <h1 className="flex items-center gap-2">
         Comparison Tool <FaTools className="text-magenta" />
       </h1>
       <div className="mt-4 flex w-full items-center justify-center gap-4 lg:mt-8 lg:gap-8">
@@ -42,6 +53,12 @@ const CompareTool = () => {
           </div>
         )}
       </div>
+      {validFootballers.length >= 2 && (
+        <CompareToolRankings
+          selectedFootballers={footballersComparisonArray}
+          bestAttributes={bestAttributes}
+        />
+      )}
     </div>
   );
 };

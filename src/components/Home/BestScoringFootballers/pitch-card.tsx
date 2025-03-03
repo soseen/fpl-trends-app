@@ -6,6 +6,8 @@ import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
 import clsx from "clsx";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   footballer: BestScoringFootballer;
@@ -30,6 +32,7 @@ const getIcon = (key: keyof SelectedStats) => {
 };
 
 const PitchCard = ({ footballer }: Props) => {
+  const { setFootballer } = useFootballerDetailsContext();
   const selectedStats = useMemo(() => {
     const stats = Object.keys(footballer)
       .filter(
@@ -54,7 +57,10 @@ const PitchCard = ({ footballer }: Props) => {
 
   return (
     <div className="flex">
-      <div className="relative m-auto w-14 flex-col items-center justify-center overflow-hidden rounded-md bg-secondary pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:w-24 md:before:-left-10 md:before:-top-8 lg:w-32">
+      <Button
+        onClick={() => setFootballer(footballer)}
+        className="relative m-auto w-14 flex-col items-center justify-center overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:w-24 md:before:-left-10 md:before:-top-8 lg:w-32"
+      >
         <img
           src={getFootballersImage(footballer.code)}
           alt={footballer.web_name}
@@ -90,7 +96,7 @@ const PitchCard = ({ footballer }: Props) => {
           alt={footballer.teams?.short_name}
           className="absolute left-1 top-1 z-20 w-3 object-cover md:w-5"
         />
-      </div>
+      </Button>
     </div>
   );
 };

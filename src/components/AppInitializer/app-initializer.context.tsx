@@ -89,6 +89,11 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
                 (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
                 gameweeksCount
               ).toFixed(2),
+              totalXGS: acc.totalXGS + parseFloat(val.expected_goals),
+              xGSPerGame: (
+                (acc.totalXGS + parseFloat(val.expected_goals)) /
+                gameweeksCount
+              ).toFixed(2),
               totalXGC: acc.totalXGC + parseFloat(val.expected_goals_conceded),
               xGCPerGame: (
                 (acc.totalXGC + parseFloat(val.expected_goals_conceded)) /
@@ -112,6 +117,8 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             savesPerGame: 0,
             totalXGI: 0,
             xGIPerGame: "0.00",
+            totalXGS: 0,
+            xGSPerGame: "0.00",
             totalXGC: 0,
             xGCPerGame: "0.00",
             teamName: "",

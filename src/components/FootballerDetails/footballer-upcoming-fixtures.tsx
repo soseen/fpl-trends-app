@@ -10,9 +10,16 @@ import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 type Props = {
   footballer: FootballerWithGameweekStats | null;
   max?: number;
+  ignoreBadge?: boolean;
+  ignoreGWCount?: boolean;
 };
 
-const FootballerUpcomingFixtures = ({ footballer, max }: Props) => {
+const FootballerUpcomingFixtures = ({
+  footballer,
+  max,
+  ignoreBadge,
+  ignoreGWCount,
+}: Props) => {
   const { list: teams } = useSelector((state: RootState) => state.teams);
 
   const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
@@ -52,7 +59,7 @@ const FootballerUpcomingFixtures = ({ footballer, max }: Props) => {
   }, []);
 
   return (
-    <div className="mt-2 flex w-full items-center gap-4">
+    <div className="flex w-full items-center gap-4">
       <div className="flex items-end gap-[6px]">
         {Object.keys(upcomingFixtures).map((key) => {
           const fix = upcomingFixtures[parseInt(key)];
@@ -61,7 +68,7 @@ const FootballerUpcomingFixtures = ({ footballer, max }: Props) => {
           );
           return (
             <div key={key} className="flex flex-col items-center">
-              {team?.code && (
+              {team?.code && !ignoreBadge && (
                 <img
                   src={getTeamsBadge(team?.code)}
                   className="mb-1 h-auto w-4 object-cover lg:w-6"
@@ -69,16 +76,18 @@ const FootballerUpcomingFixtures = ({ footballer, max }: Props) => {
               )}
               <div
                 className={clsx(
-                  "flex w-7 items-center justify-center whitespace-nowrap rounded-sm border-none px-[2px] text-[7px] leading-4 text-background md:w-10 lg:w-[54px] lg:px-4 lg:py-1 lg:text-sm",
+                  "flex w-7 items-center justify-center whitespace-nowrap rounded-sm border-none px-[2px] text-[7px] leading-4 text-background md:w-10 lg:w-[54px] lg:px-4 lg:py-1 lg:text-[13px]",
                   getFixtureDifficultyColor(fix?.difficulty),
                   fix?.is_home ? "uppercase" : "lowercase",
                 )}
               >
                 {team ? `${team?.short_name} (${fix?.is_home ? "H" : "A"})` : "-"}
               </div>
-              <p className="rounded-b-sm bg-gray-800 px-[2px] text-[6px] leading-[1.8] text-text md:text-xs lg:px-2">
-                {key}
-              </p>
+              {!ignoreGWCount && (
+                <p className="rounded-b-sm bg-gray-800 px-[2px] text-[6px] leading-[1.8] text-text md:text-xs lg:px-2">
+                  {key}
+                </p>
+              )}
             </div>
           );
         })}

@@ -10,6 +10,8 @@ export type AdditionalStats = {
   totalSaves: number;
   totalXGI: number;
   xGIPerGame: string;
+  totalXGS: number;
+  xGSPerGame: string;
   totalXGC: number;
   xGCPerGame: string;
   pointsPerGame: number;

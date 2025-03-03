@@ -15,8 +15,7 @@ import { Button } from "@/components/ui/button";
 import { FaCheck, FaPlus } from "react-icons/fa";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { useDimensions } from "src/hooks/use-dimensions";
-import { RankedFootballer } from "./use-compare-tool";
-
+import { RankedFootballer } from "./types";
 type Props = {
   index: number;
   selectedFootballers: (RankedFootballer | null)[];
@@ -36,22 +35,18 @@ const CompareToolSearch = ({ index, selectedFootballers, addFootballer }: Props)
     [footballers],
   );
 
-  const suggestedFootballers = useMemo(() => {
-    return [...sortedFootballers]
-      .filter((f) => {
-        if (f.web_name === "M.Salah") {
-          console.log(f.web_name);
-          console.log(search);
-          console.log(f.web_name.includes(search));
-        }
-
-        return (
-          f.web_name.includes(search) &&
-          !selectedFootballers.find((existing) => f.id === existing?.id)
-        );
-      })
-      .slice(0, 10);
-  }, [search, sortedFootballers, selectedFootballers]);
+  const suggestedFootballers = useMemo(
+    () =>
+      [...sortedFootballers]
+        .filter((f) => {
+          return (
+            f.web_name.toLowerCase().includes(search.toLowerCase()) &&
+            !selectedFootballers.find((existing) => f.id === existing?.id)
+          );
+        })
+        .slice(0, 10),
+    [search, sortedFootballers, selectedFootballers],
+  );
 
   const onSearch = useCallback(
     (value: string) => {
@@ -99,7 +94,7 @@ const CompareToolSearch = ({ index, selectedFootballers, addFootballer }: Props)
                   >
                     <FootballerImage
                       code={f.code}
-                      className="rounded-none md:h-7 md:w-7"
+                      className="h-6 w-6 rounded-none md:h-7 md:w-7"
                     />
                     {f.web_name}
                     {isSelected && <FaCheck className="ml-auto" />}

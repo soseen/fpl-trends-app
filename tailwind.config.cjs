@@ -13,6 +13,7 @@ module.exports = {
         accent2: "var(--accent-2)",
         accent3: "var(--accent-3)",
         accent4: "var(--accent-4)",
+        accent5: "var(--accent-5)",
         highlight: "var(--highlight)",
         text: "var(--text)",
         chart1: "var(--chart-1)",

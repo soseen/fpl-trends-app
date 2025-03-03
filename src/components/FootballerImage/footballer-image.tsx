@@ -14,16 +14,13 @@ const FootballerImage = ({ code, className }: Props) => {
     <>
       {imageError ? (
         <FaUserCircle
-          className={clsx(
-            "h-6 w-6 text-accent shadow-md md:h-[42px] md:w-[42px]",
-            className,
-          )}
+          className={clsx("text-accent shadow-md md:h-[42px] md:w-[42px]", className)}
         />
       ) : (
         <img
           src={getFootballersImage(code)}
           className={clsx(
-            "h-6 w-6 rounded-full object-contain md:h-[42px] md:w-[42px]",
+            "rounded-full object-contain md:h-[42px] md:w-[42px]",
             className,
           )}
           onError={() => setImageError(true)}

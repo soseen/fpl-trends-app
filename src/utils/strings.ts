@@ -4,7 +4,7 @@ export const roundToThousands = (value: number) => {
   return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, "")}m`;
 };
 
-export const mapElementyTypeToPosition = (elementTypeId?: number) => {
+export const mapElementTypeToPosition = (elementTypeId?: number) => {
   switch (elementTypeId) {
     case 1:
       return "Goalkeeper";

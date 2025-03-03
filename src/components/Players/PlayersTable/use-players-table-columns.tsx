@@ -21,7 +21,10 @@ export const usePlayersTableColumns = () => {
             className="flex w-fit flex-nowrap items-center justify-center gap-4 bg-transparent p-0"
             onClick={() => setFootballer(footballer)}
           >
-            <FootballerImage code={footballer.code} />
+            <FootballerImage
+              code={footballer.code}
+              className="h-6 w-6 rounded-none lg:h-14 lg:w-14"
+            />
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {footballer.web_name}
             </span>
