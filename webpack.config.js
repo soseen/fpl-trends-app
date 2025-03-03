@@ -4,15 +4,19 @@ import Dotenv from "dotenv-webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import webpack from "webpack";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default {
   entry: "./src/index.js",
   mode: "development",
   output: {
-    path: path.resolve(process.cwd(), "dist"),
-    filename: "index_bundle.js",
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js",
+    publicPath: "/",
   },
-
   target: "web",
   devServer: {
     port: "5000",
