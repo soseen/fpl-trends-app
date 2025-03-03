@@ -8,10 +8,11 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isDevelopment = process.env.NODE_ENV !== "production";
 
 export default {
   entry: "./src/index.js",
-  mode: "development",
+  mode: isDevelopment ? "development" : "production",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
@@ -44,7 +45,7 @@ export default {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env", "@babel/preset-react"],
-            plugins: ["react-refresh/babel"],
+            plugins: isDevelopment ? ["react-refresh/babel"] : [],
           },
         },
       },
