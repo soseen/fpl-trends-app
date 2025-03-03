@@ -54,6 +54,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
     if (eventsStatus === "idle") {
       dispatch(fetchEvents());
     }
+    console.log("APP INITIALIZED");
   }, [dispatch, status, teamsStatus, totalPlayersStatus, eventsStatus]);
 
   useEffect(() => {
