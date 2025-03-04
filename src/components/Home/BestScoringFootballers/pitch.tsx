@@ -13,9 +13,9 @@ import PitchSkeleton from "./pitch.skeleton";
 
 const PitchRow = ({ data }: { data: BestScoringFootballer[] }) => {
   return (
-    <div className="mx-auto mb-2 flex max-w-[900px] items-center justify-center gap-4 px-4 text-text md:mb-4 lg:mb-12 lg:px-8">
+    <div className="mx-auto mb-2 flex max-w-[900px] items-center justify-center gap-4 px-4 text-text md:mb-4 lg:mb-8 lg:px-8">
       {data.map((f) => (
-        <div key={f.id} className="flex justify-center md:mx-2 lg:mx-6">
+        <div key={f.id} className="flex justify-center md:mx-2 lg:mx-2">
           <PitchCard footballer={f} />
         </div>
       ))}
@@ -39,7 +39,7 @@ const Pitch = () => {
       <h2 className="text-center text-sm text-text md:text-xl">
         {`Highest Scoring Team (gameweek ${startGameweek}-${endGameweek})`}
       </h2>
-      <div className="mt-2 min-h-[390px] w-full bg-[url(src/assets/pitch-4.png)] bg-contain bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:min-h-[860px]">
+      <div className="mt-2 min-h-[350px] w-full bg-[url(src/assets/pitch-4.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0 }}
@@ -49,7 +49,7 @@ const Pitch = () => {
             className="flex w-full justify-around"
             key={`${startGameweek}${endGameweek}`}
           >
-            <div className="mt-4 min-h-[390px] w-full sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:mt-0 lg:min-h-[860px]">
+            <div className="mb-6 mt-0 min-h-[350px] w-full sm:min-h-[550px] md:-mt-1 md:mb-0 md:min-h-[620px] lg:-mt-4 lg:min-h-[860px]">
               <PitchRow data={goalkeepers} />
               <PitchRow data={defenders} />
               <PitchRow data={midfielders} />

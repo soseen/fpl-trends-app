@@ -5,7 +5,7 @@ import OutliersTabRow from "./outliers-tab-row";
 
 const OutliersTab = () => {
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-1 md:gap-4">
       <OutliersTabRow component={<BestFootballersXGITab />} />
       <OutliersTabRow component={<BestDifferentialsTab />} />
     </div>

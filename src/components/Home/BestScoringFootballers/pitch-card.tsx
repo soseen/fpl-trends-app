@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { BestScoringFootballer } from "./use-best-scoring-footballers";
-import { getFootballersImage, getTeamsBadge } from "src/utils/images";
+import { getTeamsBadge } from "src/utils/images";
 import { FaFutbol, FaHandshake } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
+import FootballerImage from "src/components/FootballerImage/footballer-image";
 
 type Props = {
   footballer: BestScoringFootballer;
@@ -61,10 +62,9 @@ const PitchCard = ({ footballer }: Props) => {
         onClick={() => setFootballer(footballer)}
         className="relative m-auto w-14 flex-col items-center justify-center overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:w-24 md:before:-left-10 md:before:-top-8 lg:w-32"
       >
-        <img
-          src={getFootballersImage(footballer.code)}
-          alt={footballer.web_name}
-          className="m-auto w-7 object-cover xs:w-9 sm:w-12 md:w-14 lg:w-[84px]"
+        <FootballerImage
+          code={footballer.code}
+          className="m-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"
         />
         <div className="flex items-center justify-center bg-magenta md:p-[2px]">
           <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-3 text-text sm:text-xs">
@@ -87,7 +87,7 @@ const PitchCard = ({ footballer }: Props) => {
           {selectedStats.map((stat, index) => (
             <div
               key={index}
-              className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-3 md:gap-1 md:px-2 md:text-xs lg:text-sm"
+              className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm"
             >
               {stat.value} {getIcon(stat.key as keyof SelectedStats)}
             </div>

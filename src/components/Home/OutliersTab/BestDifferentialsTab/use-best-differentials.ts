@@ -36,7 +36,7 @@ export const useBestDifferentials = () => {
         return maxOwnership <= 10 && footballer.element_type !== FootballerPosition.MGR;
       })
       .sort((a, b) => b.totalPoints - a.totalPoints)
-      .slice(0, isMD ? 6 : 5);
+      .slice(0, isMD ? 4 : 5);
 
     return differentials;
   }, [footballers, startGameweek, endGameweek, isMD, events]);

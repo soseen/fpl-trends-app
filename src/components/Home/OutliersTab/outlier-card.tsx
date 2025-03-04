@@ -37,21 +37,21 @@ const OutlierCard = ({ footballer, include }: Props) => {
           className="aspect-[calc(220/280)] w-auto object-contain"
         />
       </div>
-      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-1 text-center text-sm text-text md:py-[2px] md:text-base">
+      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-1 text-center text-xs text-text md:py-[2px] md:text-base">
         {footballer?.web_name}
       </p>
-      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap rounded-b-md bg-magenta2 px-1 text-center text-sm text-text md:py-[2px] md:text-base">
+      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap rounded-b-md bg-magenta2 px-1 text-center text-xs text-text md:py-[2px] md:text-base">
         {footballer?.totalPoints} pts
       </p>
       {include?.returns && (
-        <div className="absolute right-0 top-1 flex flex-col gap-1">
+        <div className="absolute right-0 top-1 flex flex-col gap-[2px] md:gap-1">
           {!!footballer?.totalGoals && (
-            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+            <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
               <p>{footballer.totalGoals}</p> <FaFutbol />
             </div>
           )}
           {!!footballer?.totalAssists && (
-            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+            <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
               <p>{footballer?.totalAssists}</p> <FaHandshake />
             </div>
           )}
@@ -59,7 +59,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
             [FootballerPosition.DEF, FootballerPosition.GK].includes(
               footballer.element_type,
             ) && (
-              <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+              <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
                 <p>{footballer?.totalCleanSheets}</p> <TbLockFilled />
               </div>
             )}
