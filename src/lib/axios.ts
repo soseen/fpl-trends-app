@@ -9,6 +9,8 @@ const apiConfig = {
   timeout: 8000,
 };
 
+console.log(apiConfig);
+
 const api = axios.create(apiConfig);
 
 export default api;
