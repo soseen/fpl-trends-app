@@ -23,7 +23,7 @@ export const usePlayersTableColumns = () => {
           >
             <FootballerImage
               code={footballer.code}
-              className="h-6 w-6 rounded-none lg:h-14 lg:w-14"
+              className="h-7 w-7 rounded-none lg:h-14 lg:w-14"
             />
             <span className="overflow-hidden text-ellipsis whitespace-nowrap">
               {footballer.web_name}

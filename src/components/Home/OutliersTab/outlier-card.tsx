@@ -26,7 +26,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
       className="relative mb-4 flex h-auto w-full flex-col items-center justify-center gap-0 justify-self-center rounded-md border-accent2 bg-secondary p-0 pt-2 text-center shadow-lg md:pt-6"
     >
       {(include?.xGI || include?.selectedBy) && (
-        <div className="absolute -left-[10px] -top-[6px] min-w-6 rotate-[-28deg] whitespace-nowrap rounded-md bg-magenta px-[2px] py-[2px] text-[10px] text-white shadow-md md:-left-3 md:top-2 md:min-w-16 md:px-2 md:py-1 md:text-sm xl:text-base">
+        <div className="absolute -left-[2px] -top-[2px] min-w-6 rotate-[-28deg] whitespace-nowrap rounded-md bg-magenta px-1 py-[2px] text-[10px] leading-4 text-white shadow-md md:-left-3 md:top-0 md:min-w-16 md:px-2 md:py-[2px] md:text-sm xl:text-base">
           {`${include.xGI ? `${footballer?.xGIPerGame} xGI` : `${footballer?.selected_by_percent} %`}`}
         </div>
       )}

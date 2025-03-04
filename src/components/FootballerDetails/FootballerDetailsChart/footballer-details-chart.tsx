@@ -166,13 +166,12 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             <Tooltip
               content={<CustomTooltip />}
               cursor={{ fill: "var(--accent-2)" }}
-              {...(isMD && { position: { x: 1, y: 1 } })}
+              {...(isMD && { offset: 10 })}
             />
             <Bar
               dataKey={displayedChartStat}
               fill="var(--chart-1)"
               radius={2}
-              // barSize={20}
               activeBar={<Rectangle fill="var(--chart-3)" stroke="var(--accent)" />}
             >
               <LabelList

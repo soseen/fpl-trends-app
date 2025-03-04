@@ -26,7 +26,7 @@ const CompareTool = () => {
   if (status === AppInitStatus.loading) return <CompareToolSkeleton />;
 
   return (
-    <div className="text-md mt-4 flex w-full flex-col rounded-sm bg-accent3 p-2 pb-4 text-text md:text-base lg:pb-8 lg:text-xl">
+    <div className="text-md mt-4 flex w-full flex-col rounded-sm pb-4 text-text md:text-base lg:bg-accent3 lg:p-2 lg:pb-8 lg:text-xl">
       <h1 className="flex items-center gap-2">
         Comparison Tool <FaTools className="text-magenta" />
       </h1>

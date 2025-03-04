@@ -25,6 +25,7 @@ import { FootballerPosition } from "src/queries/types";
 import { RootState } from "src/redux/store";
 import PlayersTablePagination from "./players-table-pagination";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useDimensions } from "src/hooks/use-dimensions";
 
 type Props = {
   columnFilters: ColumnFilter[];
@@ -56,6 +57,8 @@ const PlayersTableFilters = ({
   playersTableColumns,
 }: Props) => {
   const { list } = useSelector((state: RootState) => state.teams);
+  const { isMD } = useDimensions();
+
   const setFilterProperty = useCallback(
     (index: number, value: string | number | number[] | string[]) => {
       setColumnFilters((prev) => prev.map((v, i) => (i === index ? { ...v, value } : v)));
@@ -94,15 +97,15 @@ const PlayersTableFilters = ({
               }
               value={columnFilters[2].value as string}
             >
-              <SelectTrigger className="h-6 w-[100px] bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
+              <SelectTrigger className="h-6 w-[106px] bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
                 <SelectValue placeholder="Team" />
               </SelectTrigger>
               <SelectContent
                 sideOffset={5}
-                className="w-[100px] cursor-pointer bg-magenta sm:w-[120px]"
+                className="w-[106px] cursor-pointer bg-magenta sm:w-[120px]"
               >
                 <SelectItem
-                  className="outline-non cursor-pointer flex-nowrap items-center px-2 py-1 text-text"
+                  className="outline-non cursor-pointer flex-nowrap items-center px-2 py-[2px] text-sm text-text hover:bg-magenta3 md:py-1"
                   value="none"
                 >
                   -----
@@ -110,7 +113,7 @@ const PlayersTableFilters = ({
                 {list.map((team) => (
                   <SelectItem
                     key={team.id}
-                    className="outline-non cursor-pointer flex-nowrap items-center px-2 py-1 text-text"
+                    className="outline-non cursor-pointer flex-nowrap items-center overflow-hidden overflow-ellipsis whitespace-nowrap px-2 py-[2px] text-sm leading-5 text-text hover:bg-magenta3 md:py-1"
                     value={team.name}
                   >
                     {team.name}
@@ -211,10 +214,14 @@ const PlayersTableFilters = ({
         </ToggleGroup>
       </div>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs italic text-text">
-          Press shift + column header to sort by multiple columns
-        </p>
-        <PlayersTablePagination table={table} />
+        {!isMD && (
+          <p className="text-xs italic text-text">
+            Press shift + column header to sort by multiple columns
+          </p>
+        )}
+        <div className="ml-auto">
+          <PlayersTablePagination table={table} />
+        </div>
       </div>
     </div>
   );

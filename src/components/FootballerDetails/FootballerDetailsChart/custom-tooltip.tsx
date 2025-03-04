@@ -55,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 
   return (
     <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
-      <p className="text-center font-bold">Gameweek {label}</p>
+      <p className="text-center text-xs font-bold">Gameweek {label}</p>
       {matchInfo.map((history, index) => {
         const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
         const homeTeamBadge = getTeamsBadge(
@@ -71,7 +71,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
             <div className="m-auto my-1 mb-2 flex w-fit items-center justify-center gap-1 text-text">
               <img
                 src={homeTeamBadge}
-                className="h-5 w-5 object-contain"
+                className="h-4 w-4 object-contain md:h-5 md:w-5"
                 alt="Home Team Badge"
               />
               <span className="m-auto mx-1">
@@ -79,18 +79,18 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
               </span>
               <img
                 src={awayTeamBadge}
-                className="h-5 w-5 object-contain"
+                className="h-4 w-4 object-contain md:h-5 md:w-5"
                 alt="Away Team Badge"
               />
             </div>
             {!!gameweekEvents.length && (
-              <div className="flex w-full flex-col items-start gap-1 rounded-md bg-secondary p-1 py-[4px] text-xs">
+              <div className="flex w-full flex-col items-start gap-[2px] rounded-md bg-secondary p-1 py-[4px] text-xs md:gap-1">
                 {gameweekEvents.map((event, index) => (
                   <div
                     key={index}
-                    className="flex w-full flex-grow items-center justify-between gap-2"
+                    className="flex w-full flex-grow items-center justify-between gap-1"
                   >
-                    <span className="flex items-center gap-1 text-xs text-chart3">
+                    <span className="flex items-center gap-1 text-[10px] text-chart3 md:gap-2 md:text-xs">
                       {event.key} {event.icon}
                     </span>
                     <p>{event.value}</p>

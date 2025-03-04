@@ -37,7 +37,7 @@
 
   /* Track */
   ::-webkit-scrollbar-track {
-    background: var(--accent-3);
+    background: transparent;
   }
 
   /* Handle */

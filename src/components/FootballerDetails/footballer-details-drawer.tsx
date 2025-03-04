@@ -48,7 +48,7 @@ const FootballerDetailsDrawer = ({ footballer, onClose }: Props) => {
 
   if (!footballer) return null;
   return (
-    <Drawer open={!!footballer} direction="right" onClose={onClose}>
+    <Drawer open={!!footballer} direction="top" onClose={onClose}>
       <DrawerContent
         className="inset-0 z-[300] h-full w-full overflow-x-hidden px-2 pt-3 text-text"
         aria-describedby={undefined}

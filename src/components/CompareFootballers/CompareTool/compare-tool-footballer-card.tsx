@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React, { useMemo } from "react";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
-import CompareToolSearch from "./compare-tool-search";
+import CompareToolSearch from "./CompareToolSearch/compare-tool-search";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { COMPARE_TOOL_STAT_KEYS } from "./use-compare-tool";
