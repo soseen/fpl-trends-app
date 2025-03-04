@@ -61,17 +61,17 @@ const FootballerDetailsDrawer = ({ footballer, onClose }: Props) => {
           <CloseIcon className="h-5 w-5 text-magenta" />
         </Button>
         <div className="w-full flex-col items-center overflow-y-auto overflow-x-hidden rounded-md px-2 py-6">
-          <div className="relative flex w-full items-center justify-around gap-4 bg-secondary px-2 pt-4">
+          <div className="relative flex w-full items-center justify-center gap-4 bg-secondary px-2 pt-4">
             <FootballerImage
               code={footballer?.code}
-              className="h-28 w-28 self-end rounded-none"
+              className="h-auto w-28 self-end rounded-none md:h-auto md:w-32"
             />
 
             {footballer?.in_dreamteam && (
               <FaStar className="absolute left-3 top-3 h-3 w-3 text-yellow-500" />
             )}
             <div className="flex flex-col gap-1 py-2 text-text">
-              <div className="flex w-min items-center gap-3">
+              <div className="flex w-min items-center gap-2">
                 <img
                   src={getTeamsBadge(footballer?.team_code)}
                   className="h-8 w-8 object-contain"
@@ -81,13 +81,13 @@ const FootballerDetailsDrawer = ({ footballer, onClose }: Props) => {
                   {footballer?.selected_by_percent}%
                 </p>
               </div>
-              <div className="flex w-fit gap-4 text-xs">
+              <div className="flex w-fit gap-2 text-xs">
                 {footballer?.now_cost && (
                   <div className="flex flex-col items-center justify-center">
                     <span className="">£{info.price}m</span>
                   </div>
                 )}
-                <div className="w-fit rounded-md bg-magenta2 px-4 py-[2px] text-sm shadow-md">
+                <div className="w-fit rounded-md bg-magenta2 px-2 py-[1px] text-xs shadow-md">
                   {info.position}
                 </div>
                 <span

@@ -39,7 +39,7 @@ const Pitch = () => {
       <h2 className="text-center text-sm text-text md:text-xl">
         {`Highest Scoring Team (gameweek ${startGameweek}-${endGameweek})`}
       </h2>
-      <div className="mt-4 min-h-[300px] w-full bg-[url(src/assets/pitch-4.png)] bg-contain bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:min-h-[920px]">
+      <div className="mt-2 min-h-[390px] w-full bg-[url(src/assets/pitch-4.png)] bg-contain bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:min-h-[860px]">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0 }}
@@ -49,7 +49,7 @@ const Pitch = () => {
             className="flex w-full justify-around"
             key={`${startGameweek}${endGameweek}`}
           >
-            <div className="mt-4 min-h-[400px] w-full sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:min-h-[920px]">
+            <div className="mt-4 min-h-[390px] w-full sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:mt-0 lg:min-h-[860px]">
               <PitchRow data={goalkeepers} />
               <PitchRow data={defenders} />
               <PitchRow data={midfielders} />

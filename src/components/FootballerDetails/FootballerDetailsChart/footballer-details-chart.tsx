@@ -11,6 +11,9 @@ import CustomTooltip from "./custom-tooltip";
 import { ToggleGroup } from "@/components/ui/toggle-group";
 import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
 import clsx from "clsx";
+import { useDimensions } from "src/hooks/use-dimensions";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
 
 enum SelectedChartStat {
   xGI = "xGI",
@@ -36,6 +39,8 @@ export type ChartData = {
 };
 
 const FootballerDetailsChart = ({ footballer }: Props) => {
+  const { isMD } = useDimensions();
+  const { maxGameweek } = useSelector((state: RootState) => state.gameweeks);
   const [displayedChartStat, setDisplayedChartStat] = useState<SelectedChartStat>(() =>
     [FootballerPosition.DEF, FootballerPosition.GK].includes(
       footballer?.element_type ?? 1,
@@ -51,57 +56,77 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
   const chartData = useMemo(() => {
     const gameweekMap = new Map<number, ChartData>();
 
-    footballer?.history.forEach((h) => {
-      const round = h.round;
-      const existing = gameweekMap.get(round);
+    if (isMD) {
+      const gameweekData: ChartData[] =
+        footballer?.history
+          .filter((h) => h.round > maxGameweek - 10)
+          .map((h) => {
+            return {
+              gw: h.round,
+              xGI: parseFloat(h.expected_goal_involvements),
+              xGC: parseFloat(h.expected_goals_conceded),
+              minutes: h.minutes,
+              points: h.total_points,
+              matchInfo: [h],
+              team_code: footballer?.team_code,
+              element_type: footballer.element_type,
+              isFake: false,
+            };
+          }) ?? [];
+      return gameweekData;
+    } else {
+      footballer?.history.forEach((h) => {
+        const round = h.round;
+        const existing = gameweekMap.get(round);
 
-      if (existing) {
-        gameweekMap.set(round, {
-          ...existing,
-          xGI: existing.xGI + parseFloat(h.expected_goal_involvements),
-          xGC: existing.xGC + parseFloat(h.expected_goals_conceded),
-          minutes: existing.minutes + h.minutes,
-          points: existing.points + h.total_points,
-          matchInfo: [...existing.matchInfo, h],
-        });
-      } else {
-        gameweekMap.set(round, {
-          gw: round,
-          xGI: parseFloat(h.expected_goal_involvements),
-          xGC: parseFloat(h.expected_goals_conceded),
-          minutes: h.minutes,
-          points: h.total_points,
-          matchInfo: [h],
-          team_code: footballer?.team_code,
-          element_type: footballer.element_type,
-          isFake: false,
-        });
-      }
-    });
-
-    const allGameweeks = Array.from({ length: 38 }, (_, index) => {
-      const round = index + 1;
-      return (
-        gameweekMap.get(round) || {
-          gw: round,
-          xGI: 0,
-          xGC: 0,
-          minutes: 0,
-          points: 0,
-          matchInfo: [],
-          isFake: true,
+        if (existing) {
+          gameweekMap.set(round, {
+            ...existing,
+            xGI: existing.xGI + parseFloat(h.expected_goal_involvements),
+            xGC: existing.xGC + parseFloat(h.expected_goals_conceded),
+            minutes: existing.minutes + h.minutes,
+            points: existing.points + h.total_points,
+            matchInfo: [...existing.matchInfo, h],
+          });
+        } else {
+          gameweekMap.set(round, {
+            gw: round,
+            xGI: parseFloat(h.expected_goal_involvements),
+            xGC: parseFloat(h.expected_goals_conceded),
+            minutes: h.minutes,
+            points: h.total_points,
+            matchInfo: [h],
+            team_code: footballer?.team_code,
+            element_type: footballer.element_type,
+            isFake: false,
+          });
         }
-      );
-    });
+      });
 
-    return allGameweeks;
+      const allGameweeks = Array.from({ length: 38 }, (_, index) => {
+        const round = index + 1;
+        return (
+          gameweekMap.get(round) || {
+            gw: round,
+            xGI: 0,
+            xGC: 0,
+            minutes: 0,
+            points: 0,
+            matchInfo: [],
+            isFake: true,
+          }
+        );
+      });
+
+      return allGameweeks;
+    }
   }, [footballer]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-4">
-          <p>Gameweek trends chart</p>
+          <p className="text-sm md:text-base">Gameweek trends chart</p>
           <ToggleGroup
             type="single"
             value={displayedChartStat}
@@ -127,35 +152,39 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
         <ChartContainer
           key={displayedChartStat}
           config={chartConfig}
-          className="mt-2 h-[350px] max-h-[450px] min-h-[200px] w-[890px] rounded-md bg-accent2 px-2 py-4 pb-2"
+          className="m-auto mt-2 h-[350px] max-h-[450px] min-h-[200px] rounded-md bg-accent2 px-2 py-4 pb-2"
         >
           <BarChart data={chartData} className="bar-chart" margin={{ left: 0, right: 0 }}>
             <XAxis
               dataKey="gw"
               padding={{ left: 0, right: 0 }}
-              tickCount={TOTAL_GAMEWEEKS_COUNT}
+              tickCount={isMD ? TOTAL_GAMEWEEKS_COUNT : 10}
               style={{ color: "var(--text)" }}
               fill="var(--text)"
               color="var(--text)"
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--accent-2)" }} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "var(--accent-2)" }}
+              {...(isMD && { position: { x: 1, y: 1 } })}
+            />
             <Bar
               dataKey={displayedChartStat}
               fill="var(--chart-1)"
               radius={2}
-              barSize={20}
+              // barSize={20}
               activeBar={<Rectangle fill="var(--chart-3)" stroke="var(--accent)" />}
             >
               <LabelList
                 dataKey={displayedChartStat}
                 position="top"
                 fill="var(--text)"
-                content={({ x, y, value, index }) =>
+                content={({ x, y, value, index, width }) =>
                   chartData[index as number].isFake ? null : (
                     <text
                       x={x}
                       y={y}
-                      dx={10}
+                      dx={(width as number) / 2}
                       dy={-8}
                       textAnchor="middle"
                       fontSize="10"

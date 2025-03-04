@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div className="flex w-full flex-col items-center">
       <Pitch />
-      <div className="my-2 grid w-full grid-cols-1 gap-6 md:my-12 lg:grid-cols-3">
+      <div className="-my-2 grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="w-full lg:col-span-2">
           <OutliersTab />
         </div>

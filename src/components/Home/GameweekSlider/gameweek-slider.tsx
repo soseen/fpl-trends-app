@@ -73,13 +73,13 @@ const GameweekSlider = () => {
           <SliderPrimitive.Track className="relative h-1 w-full grow rounded-full bg-white dark:bg-magenta">
             <SliderPrimitive.Range className="absolute h-full rounded-full bg-magenta dark:bg-white" />
           </SliderPrimitive.Track>
-          <SliderPrimitive.Thumb className="relative block h-2 w-2 rounded-full bg-magenta focus:outline-none md:h-5 md:w-5 dark:bg-white">
-            <p className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-sm text-text md:-bottom-8 md:text-base">
+          <SliderPrimitive.Thumb className="relative block h-3 w-3 rounded-full bg-magenta focus:outline-none md:h-5 md:w-5 dark:bg-white">
+            <p className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-xs text-text md:-bottom-8 md:text-base">
               {currentRange[0]}
             </p>
           </SliderPrimitive.Thumb>
-          <SliderPrimitive.Thumb className="relative block h-2 w-2 rounded-full bg-magenta focus:outline-none md:h-5 md:w-5 dark:bg-white">
-            <p className="absolute bottom-2 left-1/2 -translate-x-1/2 text-sm text-text md:-bottom-8 md:text-base">
+          <SliderPrimitive.Thumb className="relative block h-3 w-3 rounded-full bg-magenta focus:outline-none md:h-5 md:w-5 dark:bg-white">
+            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 text-xs text-text md:-bottom-8 md:text-base">
               {currentRange[1]}
             </p>
           </SliderPrimitive.Thumb>

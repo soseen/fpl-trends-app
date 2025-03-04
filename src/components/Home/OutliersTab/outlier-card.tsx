@@ -30,7 +30,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
           {`${include.xGI ? `${footballer?.xGIPerGame} xGI` : `${footballer?.selected_by_percent} %`}`}
         </div>
       )}
-      <div className="flex max-h-[180px] w-auto px-2 md:px-4 lg:px-6">
+      <div className="flex max-h-[110px] w-auto px-2 md:max-h-[180px] md:px-4 lg:px-6">
         <img
           src={getFootballersImage(footballer.code)}
           alt={footballer.web_name}
@@ -46,12 +46,12 @@ const OutlierCard = ({ footballer, include }: Props) => {
       {include?.returns && (
         <div className="absolute right-0 top-1 flex flex-col gap-1">
           {!!footballer?.totalGoals && (
-            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-xs text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
               <p>{footballer.totalGoals}</p> <FaFutbol />
             </div>
           )}
           {!!footballer?.totalAssists && (
-            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-xs text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+            <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
               <p>{footballer?.totalAssists}</p> <FaHandshake />
             </div>
           )}
@@ -59,7 +59,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
             [FootballerPosition.DEF, FootballerPosition.GK].includes(
               footballer.element_type,
             ) && (
-              <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-xs text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
+              <div className="xl-text-sm flex items-center justify-end gap-2 rounded-l-md bg-accent2 px-1 py-1 pr-2 text-[10px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
                 <p>{footballer?.totalCleanSheets}</p> <TbLockFilled />
               </div>
             )}

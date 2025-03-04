@@ -67,7 +67,7 @@ const PitchCard = ({ footballer }: Props) => {
           className="m-auto w-7 object-cover xs:w-9 sm:w-12 md:w-14 lg:w-[84px]"
         />
         <div className="flex items-center justify-center bg-magenta md:p-[2px]">
-          <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] text-text sm:text-xs">
+          <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-3 text-text sm:text-xs">
             {footballer.web_name}
           </p>
         </div>
@@ -79,13 +79,15 @@ const PitchCard = ({ footballer }: Props) => {
               : "bg-magenta2 text-text",
           )}
         >
-          <p className="md:text-md text-[8px] sm:text-xs">{footballer.totalPoints} pts</p>
+          <p className="md:text-md text-[8px] leading-3 sm:text-xs">
+            {footballer.totalPoints} pts
+          </p>
         </div>
-        <div className="absolute right-0 top-[2px] z-50 flex-col gap-[2px] md:top-1">
+        <div className="absolute right-[2px] top-1 z-50 flex-col gap-[2px] md:top-1">
           {selectedStats.map((stat, index) => (
             <div
               key={index}
-              className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm"
+              className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-3 md:gap-1 md:px-2 md:text-xs lg:text-sm"
             >
               {stat.value} {getIcon(stat.key as keyof SelectedStats)}
             </div>
