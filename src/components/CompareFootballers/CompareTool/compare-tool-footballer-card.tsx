@@ -189,7 +189,7 @@ const CompareToolFootballerCard = ({
               const maxValue = Math.max(parsedValue, seasonTotal);
 
               const isIncrease =
-                stat.key === "xGIPer90"
+                stat.key === "xGCPer90"
                   ? parsedValue < seasonTotal
                   : parsedValue > seasonTotal;
 

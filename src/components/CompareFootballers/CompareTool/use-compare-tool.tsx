@@ -13,7 +13,7 @@ export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string
   { key: "goalsPer90", label: "Goals/90" },
   { key: "assistsPer90", label: "Assists/90" },
   { key: "xGIPer90", label: "xGI/90" },
-  { key: "xGCPer90", label: "xGC/g" },
+  { key: "xGCPer90", label: "xGC/90" },
   { key: "minPerGame", label: "Min/g" },
 ];
 
@@ -151,9 +151,11 @@ export const useCompareTool = () => {
     const bestDefendersPlayers = validFootballers.filter(
       (f) => (parseFloat(f?.xGCPer90?.value as string) ?? 0) === bestDefenderValue,
     );
-    const bestAttackersPlayers = validFootballers.filter(
-      (f) => parseFloat(f?.xGSPer90 as string) ?? 0 === bestAttackerValue,
-    );
+    const bestAttackersPlayers = validFootballers.filter((f) => {
+      const xGSPer90Value = parseFloat(f?.xGSPer90 as string) || 0;
+
+      return xGSPer90Value === bestAttackerValue;
+    });
     const mostDifferentialPlayers = validFootballers.filter(
       (f) => parseFloat(f?.selected_by_percent ?? "0") === mostDifferentialValue,
     );
@@ -269,7 +271,7 @@ export const useCompareTool = () => {
     });
 
     return best;
-  }, [footballersComparisonArray]);
+  }, [footballersComparisonArray, footballers]);
 
   return {
     footballersComparisonArray,

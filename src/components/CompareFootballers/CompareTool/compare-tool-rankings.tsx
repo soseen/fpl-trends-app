@@ -155,8 +155,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                       🔥 Highest goal threat{" "}
                     </p>
                     <p className="">
-                      Accumulated <b className="text-magenta">{footballer?.xGSPerGame}</b>{" "}
-                      expected goals scored per game
+                      Accumulated <b className="text-magenta">{footballer?.xGSPer90}</b>{" "}
+                      expected goals scored per 90
                     </p>
                   </span>
                 )}
@@ -168,8 +168,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                     <p className="">
                       Plays for a defense that accumulated{" "}
-                      <b className="text-magenta">{footballer?.xGCPerGame?.value}</b>{" "}
-                      expected goals conceded per game
+                      <b className="text-magenta">{footballer?.xGCPer90?.value}</b>{" "}
+                      expected goals conceded per 90
                     </p>
                   </span>
                 )}
