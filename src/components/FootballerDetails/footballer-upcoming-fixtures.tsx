@@ -25,7 +25,6 @@ const FootballerUpcomingFixtures = ({
   const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
     const start = footballer?.footballer_fixtures[0]?.event ?? 0;
     const end = Math.min(start + (max ? max - 1 : 7), TOTAL_GAMEWEEKS_COUNT);
-    console.log(end);
 
     const footballerFixturesObject: Record<number, Fixture | undefined> = {};
     Array.from({ length: end - start + 1 }).forEach((_, i) => {

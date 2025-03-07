@@ -10,10 +10,10 @@ import { rankFinishing } from "./rankings/rankFinishing";
 import { rankFixtures } from "./rankings/rankFixtures";
 
 export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string }> = [
-  { key: "goalsPerGame", label: "Goals/g" },
-  { key: "assistsPerGame", label: "Assists/g" },
-  { key: "xGIPerGame", label: "xGI/g" },
-  { key: "xGCPerGame", label: "xGC/g" },
+  { key: "goalsPer90", label: "Goals/90" },
+  { key: "assistsPer90", label: "Assists/90" },
+  { key: "xGIPer90", label: "xGI/90" },
+  { key: "xGCPer90", label: "xGC/g" },
   { key: "minPerGame", label: "Min/g" },
 ];
 
@@ -75,67 +75,6 @@ export const useCompareTool = () => {
     [footballers],
   );
 
-  // const footballersComparisonArray: (RankedFootballer | null)[] = useMemo(() => {
-  //   const validFootballers = selectedFootballers.filter(
-  //     Boolean,
-  //   ) as FootballerWithGameweekStats[];
-
-  //   const rankedFootballers: RankedFootballer[] = validFootballers.map((footballer) => {
-  //     const updatedStats: Record<
-  //       SelectedStatKey,
-  //       { value: number | string; rank: number; label: string }
-  //     > = {} as any;
-
-  //     COMPARE_TOOL_STAT_KEYS.forEach((stat) => {
-  //       // Convert stat values to numbers for sorting
-  //       const sortedByKey = [...validFootballers].sort((a, b) => {
-  //         const aValue = parseFloat(a[stat.key] as string) || 0;
-  //         const bValue = parseFloat(b[stat.key] as string) || 0;
-
-  //         // Sort `xGCPerGame` in ascending order, others in descending order
-  //         return stat.key === "xGCPerGame" ? aValue - bValue : bValue - aValue;
-  //       });
-
-  //       // Assign ranks while handling ties
-  //       const rankMap = new Map<number, number>(); // Stores rank for each unique value
-  //       let rank = 1;
-
-  //       sortedByKey.forEach((player, index) => {
-  //         const playerValue = parseFloat(player[stat.key] as string) || 0;
-
-  //         // If the value is already ranked, reuse the rank
-  //         if (!rankMap.has(playerValue)) {
-  //           rankMap.set(playerValue, rank);
-  //         }
-
-  //         updatedStats[stat.key] = {
-  //           value: footballer[stat.key],
-  //           rank: rankMap.get(parseFloat(footballer[stat.key] as string) || 0) ?? rank,
-  //           label: stat.label,
-  //         };
-
-  //         // Increment rank only if the next value is different
-  //         if (index < sortedByKey.length - 1) {
-  //           const nextValue = parseFloat(sortedByKey[index + 1][stat.key] as string) || 0;
-  //           if (playerValue !== nextValue) {
-  //             rank++;
-  //           }
-  //         }
-  //       });
-  //     });
-
-  //     return {
-  //       ...footballer,
-  //       ...updatedStats,
-  //     };
-  //   });
-
-  //   return selectedFootballers.map((f) => {
-  //     const ranked = rankedFootballers.find((rankedF) => f?.id === rankedF?.id);
-  //     return ranked ?? null;
-  //   });
-  // }, [selectedFootballers]);
-
   const footballersComparisonArray: (RankedFootballer | null)[] = useMemo(() => {
     const rankedFootballers = validFootballers.map((footballer) => {
       const updatedStats: Record<
@@ -175,88 +114,51 @@ export const useCompareTool = () => {
     ) as RankedFootballer[];
     const best: BestAttributes = {};
 
-    const mostMinutes = [...validFootballers].sort(
-      (a, b) =>
-        ((b?.minPerGame.value as number) ?? 0) - ((a?.minPerGame.value as number) ?? 0),
-    )[0];
-    const bestFinisher = [...validFootballers].sort(
-      (a, b) => (a?.finishingRank.rank ?? 99) - (b?.finishingRank.rank ?? 99),
-    )[0];
-    const bestFixtures = [...validFootballers].sort(
-      (a, b) =>
-        (a?.fixtureDifficultyRank.rank ?? 99) - (b?.fixtureDifficultyRank.rank ?? 99),
-    )[0];
-    const bestDefender = [...validFootballers]
-      .filter(
-        (f) =>
-          f.history.filter((h) => h.round >= startGameweek && h.round <= endGameweek)
-            .length > 0,
-      )
-      ?.sort(
-        (a, b) =>
-          (parseFloat((a?.xGCPerGame?.value as string) ?? "0") ?? 0) -
-          (parseFloat(b?.xGCPerGame?.value as string) ?? "0"),
-      )[0];
-    const bestAttacker = [...validFootballers].sort(
-      (a, b) =>
-        parseFloat((b?.xGSPerGame as string) ?? 0) -
-        parseFloat((a?.xGSPerGame as string) ?? 0),
-    )[0];
-    const mostDifferential = [...validFootballers].sort(
-      (a, b) =>
-        parseFloat(a?.selected_by_percent ?? "0") -
-        parseFloat(b?.selected_by_percent ?? "0"),
-    )[0];
+    // Find max/min values for different attributes
+    const maxMinutes = Math.max(
+      ...validFootballers.map((f) => (f?.minPerGame?.value as number) ?? 0),
+    );
+    const bestFinishers = Math.min(
+      ...validFootballers.map((f) => f?.finishingRank?.rank ?? 99),
+    );
+    const bestFixtures = Math.min(
+      ...validFootballers.map((f) => f?.fixtureDifficultyRank?.rank ?? 99),
+    );
+    const bestDefenderValue = Math.min(
+      ...validFootballers
+        .filter((f) =>
+          f.history.some((h) => h.round >= startGameweek && h.round <= endGameweek),
+        )
+        .map((f) => parseFloat(f?.xGCPer90?.value as string) ?? 0),
+    );
+    const bestAttackerValue = Math.max(
+      ...validFootballers.map((f) => parseFloat(f?.xGSPer90 as string) ?? 0),
+    );
+    const mostDifferentialValue = Math.min(
+      ...validFootballers.map((f) => parseFloat(f?.selected_by_percent ?? "0")),
+    );
 
-    const highScoringGames = [...validFootballers].sort((a, b) => {
-      const aHistory = a?.history.filter(
-        (game) => game.round >= startGameweek && game.round <= endGameweek,
-      );
-      const aGoals = aHistory.length
-        ? aHistory.reduce(
-            (sum, game) => sum + ((game.team_h_score ?? 0) + (game.team_a_score ?? 0)),
-            0,
-          ) / aHistory.length
-        : 0;
+    // Find all players that match the best values
+    const mostMinutesPlayers = validFootballers.filter(
+      (f) => ((f?.minPerGame?.value as number) ?? 0) === maxMinutes,
+    );
+    const bestFinishersPlayers = validFootballers.filter(
+      (f) => (f?.finishingRank?.rank ?? 99) === bestFinishers,
+    );
+    const bestFixturesPlayers = validFootballers.filter(
+      (f) => (f?.fixtureDifficultyRank?.rank ?? 99) === bestFixtures,
+    );
+    const bestDefendersPlayers = validFootballers.filter(
+      (f) => (parseFloat(f?.xGCPer90?.value as string) ?? 0) === bestDefenderValue,
+    );
+    const bestAttackersPlayers = validFootballers.filter(
+      (f) => parseFloat(f?.xGSPer90 as string) ?? 0 === bestAttackerValue,
+    );
+    const mostDifferentialPlayers = validFootballers.filter(
+      (f) => parseFloat(f?.selected_by_percent ?? "0") === mostDifferentialValue,
+    );
 
-      const bHistory = b?.history.filter(
-        (game) => game.round >= startGameweek && game.round <= endGameweek,
-      );
-      const bGoals = bHistory.length
-        ? bHistory.reduce(
-            (sum, game) => sum + ((game.team_h_score ?? 0) + (game.team_a_score ?? 0)),
-            0,
-          ) / bHistory.length
-        : 0;
-
-      return bGoals - aGoals;
-    })[0];
-
-    const lowScoringGames = [...validFootballers].sort((a, b) => {
-      const aHistory = a?.history.filter(
-        (game) => game.round >= startGameweek && game.round <= endGameweek,
-      );
-      const aGoals = aHistory.length
-        ? aHistory.reduce(
-            (sum, game) => sum + ((game.team_h_score ?? 0) + (game.team_a_score ?? 0)),
-            0,
-          ) / aHistory.length
-        : 0;
-
-      const bHistory = b?.history.filter(
-        (game) => game.round >= startGameweek && game.round <= endGameweek,
-      );
-      const bGoals = bHistory.length
-        ? bHistory.reduce(
-            (sum, game) => sum + ((game.team_h_score ?? 0) + (game.team_a_score ?? 0)),
-            0,
-          ) / bHistory.length
-        : 0;
-
-      return aGoals - bGoals;
-    })[0];
-
-    // Count how many times a player has scored 9+ points in a game
+    // Find max haul count
     const haulsCount = validFootballers.map((footballer) => ({
       footballer,
       haulCount:
@@ -267,39 +169,59 @@ export const useCompareTool = () => {
             game.total_points >= 9,
         ).length ?? 0,
     }));
-
-    // Find max haul count
     const maxHaulCount = Math.max(...haulsCount.map((entry) => entry.haulCount));
 
-    // Find the player whose **team** scored the most goals
-    const bestAttackingTeam = [...validFootballers].sort((a, b) => {
-      const aTotalTeamGoals =
-        a?.history
+    // Find high and low scoring games
+    const calculateAvgGoals = (footballer: RankedFootballer) => {
+      const games = footballer.history.filter(
+        (game) => game.round >= startGameweek && game.round <= endGameweek,
+      );
+      return games.length
+        ? games.reduce(
+            (sum, game) => sum + ((game.team_h_score ?? 0) + (game.team_a_score ?? 0)),
+            0,
+          ) / games.length
+        : 0;
+    };
+
+    const maxHighScoringGames = Math.max(...validFootballers.map(calculateAvgGoals));
+    const minLowScoringGames = Math.min(...validFootballers.map(calculateAvgGoals));
+
+    const highScoringGamesPlayers = validFootballers.filter(
+      (f) => calculateAvgGoals(f) === maxHighScoringGames,
+    );
+    const lowScoringGamesPlayers = validFootballers.filter(
+      (f) => calculateAvgGoals(f) === minLowScoringGames,
+    );
+
+    // Find best attacking team
+    const bestAttackingTeamValue = Math.max(
+      ...validFootballers.map((f) =>
+        f?.history
           .filter((game) => game.round >= startGameweek && game.round <= endGameweek)
           .reduce(
             (sum, game) =>
               sum +
-              (a.team === game.opponent_team
+              (f.team === game.opponent_team
                 ? (game.team_a_score ?? 0)
                 : (game.team_h_score ?? 0)),
             0,
-          ) ?? 0;
-
-      const bTotalTeamGoals =
-        b?.history
+          ),
+      ),
+    );
+    const bestAttackingTeamPlayers = validFootballers.filter(
+      (f) =>
+        f?.history
           .filter((game) => game.round >= startGameweek && game.round <= endGameweek)
           .reduce(
             (sum, game) =>
               sum +
-              (b.team === game.opponent_team
+              (f.team === game.opponent_team
                 ? (game.team_a_score ?? 0)
                 : (game.team_h_score ?? 0)),
             0,
-          ) ?? 0;
-
-      return bTotalTeamGoals - aTotalTeamGoals; // More goals = better rank
-    })[0];
-
+          ) === bestAttackingTeamValue,
+    );
     haulsCount.forEach(({ footballer, haulCount }) => {
       if (!footballer) return;
 
@@ -325,16 +247,21 @@ export const useCompareTool = () => {
       );
 
       best[footballer.id] = {
-        isBestMinutes: footballer.id === mostMinutes?.id,
-        isBestFinisher: footballer.id === bestFinisher?.id,
-        isBestFixtures: footballer.id === bestFixtures?.id,
-        isBestDefender: footballer.id === bestDefender?.id,
-        isBestAttacker: footballer.id === bestAttacker?.id,
-        isDifferential: footballer.id === mostDifferential?.id,
-        isBestHighScoringGames: footballer.id === highScoringGames?.id,
-        isBestLowScoringGames: footballer.id === lowScoringGames?.id,
-        isMostHauls: { value: haulCount === maxHaulCount, count: haulCount },
-        isBestAttackingTeam: footballer.id === bestAttackingTeam?.id,
+        isBestMinutes: mostMinutesPlayers.includes(footballer),
+        isBestFinisher: bestFinishersPlayers.includes(footballer),
+        isBestFixtures: bestFixturesPlayers.includes(footballer),
+        isBestDefender: bestDefendersPlayers.includes(footballer),
+        isBestAttacker: bestAttackersPlayers.includes(footballer),
+        isDifferential: mostDifferentialPlayers.includes(footballer),
+        isBestHighScoringGames: highScoringGamesPlayers.includes(footballer),
+        isBestLowScoringGames: lowScoringGamesPlayers.includes(footballer),
+        isMostHauls: {
+          value:
+            haulsCount.find((entry) => entry.footballer === footballer)?.haulCount ===
+            maxHaulCount,
+          count: haulCount ?? 0,
+        },
+        isBestAttackingTeam: bestAttackingTeamPlayers.includes(footballer),
         avgGoalsPerGame: avgGoals,
         totalTeamGoals: totalTeamGoals,
         returns,

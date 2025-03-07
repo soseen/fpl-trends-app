@@ -20,9 +20,9 @@ export const useTeamsTable = () => {
     return [...list].map((team) => ({
       ...team,
       avgXGCFullSeason:
-        team.history.reduce((sum, gw) => sum + gw.teamXGC, 0) / team.history.length || 0,
+        team.team_history.reduce((sum, gw) => sum + gw.teamXGC, 0) / team.team_history.length || 0,
       avgXGSFullSeason:
-        team.history.reduce((sum, gw) => sum + gw.teamXGS, 0) / team.history.length || 0,
+        team.team_history.reduce((sum, gw) => sum + gw.teamXGS, 0) / team.team_history.length || 0,
       fullSeasonRank: 0
     }));
   }, [list]);
@@ -44,7 +44,7 @@ export const useTeamsTable = () => {
 
     const sortedByCurrentRange = [...sortedByFullSeason]
       .map((team) => {
-        const { history } = team as TeamData;
+        const { team_history: history } = team as TeamData;
 
         const selectedGameweeks = history.filter(
           (gw) => gw.round >= startGameweek && gw.round <= endGameweek,

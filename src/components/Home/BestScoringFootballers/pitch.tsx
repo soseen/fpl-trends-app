@@ -39,7 +39,7 @@ const Pitch = () => {
       <h2 className="text-center text-sm text-text md:text-xl">
         {`Highest Scoring Team (gameweek ${startGameweek}-${endGameweek})`}
       </h2>
-      <div className="mt-2 min-h-[350px] w-full bg-[url(src/assets/pitch-4.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
+      <div className="mt-2 min-h-[350px] w-full bg-[url(src/assets/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0 }}

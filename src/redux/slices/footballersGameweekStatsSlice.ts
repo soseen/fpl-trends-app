@@ -10,13 +10,18 @@ export type AdditionalStats = {
   totalSaves: number;
   totalXGI: number;
   xGIPerGame: string;
+  xGIPer90: string;
   totalXGS: number;
   xGSPerGame: string;
+  xGSPer90: string;
   totalXGC: number;
   xGCPerGame: string;
+  xGCPer90: string;
   pointsPerGame: number;
   goalsPerGame: number;
+  goalsPer90: number;
   assistsPerGame: number;
+  assistsPer90: number;
   savesPerGame: number;
   teamName: string;
   maxOwnership: number;

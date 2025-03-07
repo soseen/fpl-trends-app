@@ -2,7 +2,7 @@ import { AdditionalStats, FootballerWithGameweekStats } from "src/redux/slices/f
 
 export type SelectedStatKey = keyof Pick<
   AdditionalStats,
-  "xGIPerGame" | "goalsPerGame" | "assistsPerGame" | "minPerGame" | "xGCPerGame"
+  "xGIPer90" | "goalsPer90" | "assistsPer90" | "minPerGame" | "xGCPer90"
 >;
 
 export type RankedFootballer = Omit<FootballerWithGameweekStats, SelectedStatKey> & {

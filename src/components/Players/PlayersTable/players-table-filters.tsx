@@ -89,6 +89,7 @@ const PlayersTableFilters = ({
             className="h-6 w-fit min-w-[185px] bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
             onChange={(e) => setFilterProperty(0, e.target.value)}
             placeholder="Search player..."
+            value={columnFilters[0]?.value as string}
           />
           <div className="flex flex-col gap-1">
             <Select

@@ -119,7 +119,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     <p className="">
                       On average there&apos;s been{" "}
                       <b className="text-magenta">{avgGoalsPerGame.toFixed(2)}</b> goals
-                      per game in this player&apos; games
+                      per game in this player&apos;s games
                     </p>
                   </span>
                 )}

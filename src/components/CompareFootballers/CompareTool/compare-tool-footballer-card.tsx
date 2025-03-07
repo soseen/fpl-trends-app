@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import CompareToolSearch from "./CompareToolSearch/compare-tool-search";
@@ -7,7 +7,13 @@ import { MdClose as CloseIcon } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { COMPARE_TOOL_STAT_KEYS } from "./use-compare-tool";
 import { isNumber } from "lodash";
-import { FaChevronRight, FaFutbol, FaHandshake } from "react-icons/fa";
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaChevronRight,
+  FaFutbol,
+  FaHandshake,
+} from "react-icons/fa";
 import FootballerUpcomingFixtures from "src/components/FootballerDetails/footballer-upcoming-fixtures";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerPosition } from "src/queries/types";
@@ -50,6 +56,29 @@ const CompareToolFootballerCard = ({
   openFootballersProfile,
 }: Props) => {
   const { isMD } = useDimensions();
+
+  const seasonTotalComparison = useCallback(
+    (key: keyof RankedFootballer) => {
+      if (!footballer) return;
+      const gamesPer90 = footballer?.minutes / 90;
+
+      switch (key) {
+        case "goalsPer90":
+          return footballer?.goals_scored / gamesPer90;
+        case "assistsPer90":
+          return footballer?.assists / gamesPer90;
+        case "xGIPer90":
+          return footballer?.expected_goal_involvements_per_90;
+        case "xGCPer90":
+          return footballer?.expected_goals_conceded_per_90;
+        case "minPerGame":
+          return footballer?.minutes / footballer?.history?.length;
+        default:
+          return 0;
+      }
+    },
+    [footballer],
+  );
 
   const selectedStats = useMemo(() => {
     if (!footballer) return;
@@ -131,10 +160,10 @@ const CompareToolFootballerCard = ({
         >
           {footballer && (
             <>
-              <p className="w-full overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-2 text-center">
+              <p className="w-full overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-2 text-center text-xs md:text-sm lg:text-base">
                 {footballer?.web_name}
               </p>
-              <p className="w-full bg-magenta2 text-center">
+              <p className="w-full bg-magenta2 text-center text-xs md:text-sm lg:text-base">
                 {footballer?.totalPoints} pts
               </p>
               <div className="m-auto mb-2 md:mb-4">
@@ -153,12 +182,42 @@ const CompareToolFootballerCard = ({
           <div className="flex flex-col flex-nowrap justify-center rounded-b-md bg-accent3 text-text">
             {COMPARE_TOOL_STAT_KEYS.map((stat, index) => {
               const { rank, value } = footballer[stat.key];
+              const parsedValue = isNumber(value) ? value : parseFloat(value);
+              const seasonTotal = seasonTotalComparison(stat.key) ?? 0;
+
+              const minValue = Math.min(parsedValue, seasonTotal);
+              const maxValue = Math.max(parsedValue, seasonTotal);
+
+              const isIncrease =
+                stat.key === "xGIPer90"
+                  ? parsedValue < seasonTotal
+                  : parsedValue > seasonTotal;
+
+              const diff =
+                stat.key === "minPerGame"
+                  ? `${(maxValue - minValue).toFixed(0)}'`
+                  : (maxValue - minValue).toFixed(2);
+
+              const isEqual =
+                minValue === maxValue || diff === "0" || maxValue - minValue <= 0.02;
+
               return (
                 <div key={footballer.id + stat.key}>
                   <div className="flex items-center gap-1 px-1 py-1 md:px-1 md:py-2 lg:px-2">
                     <p className="flex flex-1 text-[10px] sm:text-xs lg:text-base">
                       {stat.label}
                     </p>
+                    {!isEqual && (
+                      <span className="ml-auto flex gap-1 text-xs md:text-sm">
+                        {!isMD && diff}
+                        {isIncrease ? (
+                          <FaArrowUp className="h-2 w-2 rotate-45 text-green-600 md:h-auto md:w-auto" />
+                        ) : (
+                          <FaArrowDown className="h-2 w-2 -rotate-45 text-red-600 md:h-auto md:w-auto" />
+                        )}
+                      </span>
+                    )}
+
                     <div
                       className={clsx(
                         "rounded-md, flex w-fit flex-col justify-center gap-1 rounded-md px-1 text-xs text-text lg:text-base",

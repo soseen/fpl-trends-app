@@ -231,16 +231,15 @@ export type Footballer = Element & {
   footballer_fixtures: Fixture[]
 }
 
-export type TeamData = Team & {
-  footballers: Omit<Footballer, "teams" | "footballer_fixtures">,
-  history: {
-    round: number;
-    teamXGC: number;
-    teamXGS: number;
-    goals: number;
-    goals_conceded: number;
-  }[]
+export type TeamHistory = {
+  round: number;
+  teamXGC: number;
+  teamXGS: number;
+  goals: number;
+  goals_conceded: number;
 }
+
+export type TeamData = Team & {team_history: TeamHistory[]}
 
 export enum FootballerPosition {
   GK = 1,
