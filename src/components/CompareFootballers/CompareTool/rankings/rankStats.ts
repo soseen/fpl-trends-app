@@ -10,7 +10,7 @@ export const rankStats = (
     const aValue = parseFloat(a[statKey] as string) || 0;
     const bValue = parseFloat(b[statKey] as string) || 0;
 
-    return statKey === "xGCPerGame" ? aValue - bValue : bValue - aValue;
+    return statKey === "xGCPer90" ? aValue - bValue : bValue - aValue;
   });
 
   const rankMap = new Map<number, number>();

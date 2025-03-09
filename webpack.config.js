@@ -3,6 +3,7 @@ import path from "path";
 import Dotenv from "dotenv-webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 import webpack from "webpack";
 import { fileURLToPath } from "url";
 
@@ -66,5 +67,10 @@ export default {
     new Dotenv(),
     new webpack.HotModuleReplacementPlugin(),
     new ReactRefreshWebpackPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "public", to: "", globOptions: { ignore: ["**/index.html"] } } 
+      ]
+    })
   ],
 };

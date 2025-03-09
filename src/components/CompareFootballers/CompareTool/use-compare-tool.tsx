@@ -82,15 +82,12 @@ export const useCompareTool = () => {
         { value: number | string; rank: number; label: string }
       > = {} as any;
 
-      // Rank standard stats
       COMPARE_TOOL_STAT_KEYS.forEach((stat) => {
         updatedStats[stat.key] = rankStats(validFootballers, stat.key)(footballer);
       });
 
-      // Rank finishing
       updatedStats["finishingRank"] = rankFinishing(validFootballers)(footballer);
 
-      // Rank fixtures
       updatedStats["fixtureDifficultyRank"] = rankFixtures(
         validFootballers,
         maxGameweek,
@@ -114,7 +111,6 @@ export const useCompareTool = () => {
     ) as RankedFootballer[];
     const best: BestAttributes = {};
 
-    // Find max/min values for different attributes
     const maxMinutes = Math.max(
       ...validFootballers.map((f) => (f?.minPerGame?.value as number) ?? 0),
     );

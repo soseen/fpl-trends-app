@@ -64,6 +64,7 @@
     "autoprefixer": "^10.4.20",
     "babel-loader": "^9.2.1",
     "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.1.2",
     "dotenv-webpack": "^8.1.0",
     "eslint": "^9.21.0",
