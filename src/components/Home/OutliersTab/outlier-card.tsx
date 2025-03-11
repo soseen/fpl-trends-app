@@ -2,10 +2,10 @@ import React from "react";
 import { FaFutbol, FaHandshake } from "react-icons/fa";
 import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
-import { getFootballersImage } from "src/utils/images";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
+import FootballerImage from "src/components/FootballerImage/footballer-image";
 
 type Props = {
   footballer: FootballerWithGameweekStats;
@@ -30,11 +30,10 @@ const OutlierCard = ({ footballer, include }: Props) => {
           {`${include.xGI ? `${footballer?.xGIPerGame} xGI` : `${footballer?.selected_by_percent} %`}`}
         </div>
       )}
-      <div className="flex max-h-[110px] w-auto px-2 md:max-h-[180px] md:px-4 lg:px-6">
-        <img
-          src={getFootballersImage(footballer.code)}
-          alt={footballer.web_name}
-          className="aspect-[calc(220/280)] w-auto object-contain"
+      <div className="flex max-h-[110px] w-auto flex-grow items-center justify-center px-2 md:max-h-[180px] md:px-4 lg:px-6">
+        <FootballerImage
+          code={footballer.code}
+          className="aspect-[calc(220/280)] w-auto min-w-16 rounded-none object-contain"
         />
       </div>
       <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-1 text-center text-xs text-text md:py-[2px] md:text-base">

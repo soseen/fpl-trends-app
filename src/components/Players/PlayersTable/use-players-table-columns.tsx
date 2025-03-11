@@ -5,6 +5,7 @@ import { FootballerPosition } from "src/queries/types";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
+import { removeAccents } from "src/utils/strings";
 
 export const usePlayersTableColumns = () => {
   const { setFootballer } = useFootballerDetailsContext();
@@ -33,6 +34,14 @@ export const usePlayersTableColumns = () => {
       },
       enableSorting: false,
       size: 250,
+      filterFn: (row, columnId, filterValue) => {
+        const normalizedName = removeAccents(
+          (row.getValue(columnId) as string).toLowerCase(),
+        );
+        const normalizedSearch = removeAccents(filterValue.toLowerCase());
+
+        return normalizedName.includes(normalizedSearch);
+      },
     }),
     columnHelper.accessor("totalPoints", {
       header: "Points",

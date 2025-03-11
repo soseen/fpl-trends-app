@@ -81,7 +81,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                   </span>
                 )}
-                {isBestFinisher && (
+                {isBestFinisher && !!footballer?.totalGoals && (
                   <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
                     <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1">
                       🎯 Best Finisher{" "}

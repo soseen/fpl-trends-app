@@ -60,20 +60,20 @@ const PitchCard = ({ footballer }: Props) => {
     <div className="flex">
       <Button
         onClick={() => setFootballer(footballer)}
-        className="relative m-auto w-14 flex-col items-center justify-center overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:w-24 md:before:-left-10 md:before:-top-8 lg:w-32"
+        className="relative m-auto flex h-[81px] w-14 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:h-[118px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[170px] lg:w-32"
       >
         <FootballerImage
           code={footballer.code}
           className="m-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"
         />
-        <div className="flex items-center justify-center bg-magenta md:p-[2px]">
+        <div className="flex w-full items-center justify-center bg-magenta md:p-[2px]">
           <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-3 text-text sm:text-xs">
             {footballer.web_name}
           </p>
         </div>
         <div
           className={clsx(
-            "flex items-center justify-center rounded-b-md md:p-[2px]",
+            "flex w-full items-center justify-center rounded-b-md md:p-[2px]",
             footballer?.isBestScoringPlayer
               ? "bg-highlight text-primary"
               : "bg-magenta2 text-text",
@@ -83,13 +83,16 @@ const PitchCard = ({ footballer }: Props) => {
             {footballer.totalPoints} pts
           </p>
         </div>
-        <div className="absolute right-[2px] top-1 z-50 flex-col gap-[2px] md:top-1">
+        <div className="absolute right-[2px] top-1 z-50 flex flex-col gap-[2px] md:top-1">
           {selectedStats.map((stat, index) => (
             <div
               key={index}
               className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm"
             >
-              {stat.value} {getIcon(stat.key as keyof SelectedStats)}
+              <span className="flex">{stat.value}</span>
+              <span className="flex h-2 items-center md:h-4 lg:h-5">
+                {getIcon(stat.key as keyof SelectedStats)}
+              </span>
             </div>
           ))}
         </div>

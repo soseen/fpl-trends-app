@@ -27,7 +27,7 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
     const price = footballer?.now_cost ? footballer.now_cost / 10 : 0;
     const position = mapElementTypeToPosition(footballer?.element_type);
     const isTransfersIn = !!(
-      (footballer?.transfers_in ?? 0) > (footballer?.transfers_out ?? 0)
+      (footballer?.transfers_in_event ?? 0) > (footballer?.transfers_out_event ?? 0)
     );
     const transfersCount =
       (isTransfersIn

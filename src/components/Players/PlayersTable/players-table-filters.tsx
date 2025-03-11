@@ -26,6 +26,7 @@ import { RootState } from "src/redux/store";
 import PlayersTablePagination from "./players-table-pagination";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useDimensions } from "src/hooks/use-dimensions";
+import { removeAccents } from "src/utils/strings";
 
 type Props = {
   columnFilters: ColumnFilter[];
@@ -87,7 +88,7 @@ const PlayersTableFilters = ({
         <div className="flex items-center justify-between gap-2 md:justify-start">
           <Input
             className="h-6 w-fit min-w-[185px] bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
-            onChange={(e) => setFilterProperty(0, e.target.value)}
+            onChange={(e) => setFilterProperty(0, removeAccents(e.target.value))}
             placeholder="Search player..."
             value={columnFilters[0]?.value as string}
           />

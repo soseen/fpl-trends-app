@@ -2,7 +2,7 @@ import { FootballerWithGameweekStats } from "src/redux/slices/footballersGamewee
 
 
 export const rankFinishing = (footballers: FootballerWithGameweekStats[]) => {
-    const sortedByFinishing = [...footballers].sort((a, b) => {
+    const sortedByFinishing = [...footballers].filter(f => f.totalGoals > 0)?.sort((a, b) => {
       const aFinishing = (a.totalGoals || 0) - (a.totalXGS || 0);
       const bFinishing = (b.totalGoals || 0) - (b.totalXGS || 0);
   
