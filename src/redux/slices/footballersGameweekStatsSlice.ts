@@ -27,6 +27,9 @@ export type AdditionalStats = {
   maxOwnership: number;
   totalMinutes: number;
   minPerGame: number;
+  totalDefconBonuses: number;
+  totalDefcons: number;
+  defconsPerGame: string;
 };
 
 export type FootballerWithGameweekStats = Footballer & AdditionalStats;

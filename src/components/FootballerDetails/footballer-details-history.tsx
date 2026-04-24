@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { History } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { GiWinterGloves as GlovesIcon } from "react-icons/gi";
-import { FaFutbol, FaHandshake, FaLock } from "react-icons/fa";
+import { FaFutbol, FaHandshake, FaLock, FaShieldAlt } from "react-icons/fa";
 import { getTeamsBadge } from "src/utils/images";
+import { hasDefconBonus } from "src/utils/defcon";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
@@ -36,7 +37,16 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
         }
       })();
 
-      return [...baseValues, ...additionalValues].filter(({ value }) => !!value);
+      const filtered: Array<{ icon: React.ReactNode; value?: number }> = [
+        ...baseValues,
+        ...additionalValues,
+      ].filter(({ value }) => !!value);
+
+      if (hasDefconBonus(event, footballer?.element_type)) {
+        filtered.push({ icon: <FaShieldAlt title="DefCon bonus (+2 pts)" /> });
+      }
+
+      return filtered;
     },
     [footballer],
   );
@@ -79,7 +89,8 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
                 key={`${gwIndex}-${index}`}
                 className="flex items-center justify-center gap-[2px] text-[9px] md:gap-1 md:text-xs"
               >
-                {value} {icon}
+                {value ? `${value} ` : ""}
+                {icon}
               </span>
             ))}
           </span>

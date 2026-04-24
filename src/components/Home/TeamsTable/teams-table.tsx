@@ -105,18 +105,21 @@ const TeamsTable = () => {
 
                 <TableCell className="flex items-center justify-end p-2 text-right">
                   <p>{team?.avg?.toFixed(2)}</p>
-                  {diff !== 0 && (
-                    <span
-                      className={`text-sm ${diff < 0 ? "text-green-500" : "text-red-500"} flex items-center`}
-                    >
-                      {diff < 0 ? (
-                        <FaArrowUp className="mx-1 inline" />
-                      ) : (
-                        <FaArrowDown className="mx-1 inline" />
-                      )}
-                      <p>{Math.abs(diff).toFixed(2)}</p>
-                    </span>
-                  )}
+                  {diff !== 0 && (() => {
+                    const isImproved = isDefensiveStats ? diff < 0 : diff > 0;
+                    return (
+                      <span
+                        className={`text-sm ${isImproved ? "text-green-500" : "text-red-500"} flex items-center`}
+                      >
+                        {isImproved ? (
+                          <FaArrowUp className="mx-1 inline" />
+                        ) : (
+                          <FaArrowDown className="mx-1 inline" />
+                        )}
+                        <p>{Math.abs(diff).toFixed(2)}</p>
+                      </span>
+                    );
+                  })()}
                 </TableCell>
 
                 <TableCell className="p-2 text-right">

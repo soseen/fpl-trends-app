@@ -5,8 +5,9 @@ import { getTeamsBadge } from "src/utils/images";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
 import { FootballerPosition, History } from "src/queries/types";
-import { FaClock, FaFutbol, FaHandshake, FaLock } from "react-icons/fa";
+import { FaClock, FaFutbol, FaHandshake, FaLock, FaShieldAlt } from "react-icons/fa";
 import { TbRectangleVerticalFilled as CardIcon } from "react-icons/tb";
+import { getDefconThreshold } from "src/utils/defcon";
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
   const { list: teams } = useSelector((state: RootState) => state.teams);
@@ -18,6 +19,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 
   const getGameweekEvents = useCallback(
     (history: History) => {
+      const elementType = payload![0]?.payload?.element_type;
+      const defconThreshold = getDefconThreshold(elementType);
+      const defconValue = history.defensive_contribution;
+      const hasDefcon =
+        defconThreshold !== null &&
+        typeof defconValue === "number" &&
+        defconValue > 0;
+
       const events = [
         { key: "minutes", value: history.minutes, icon: <FaClock /> },
         {
@@ -26,10 +35,20 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
           icon: <FaFutbol />,
         },
         { key: "assists", value: history.assists, icon: <FaHandshake /> },
-        ...([FootballerPosition.DEF, FootballerPosition.GK].includes(
-          payload![0]?.payload?.element_type,
-        )
+        ...([FootballerPosition.DEF, FootballerPosition.GK].includes(elementType)
           ? [{ key: "cs", value: history.clean_sheets, icon: <FaLock /> }]
+          : []),
+        ...(hasDefcon
+          ? [
+              {
+                key:
+                  defconValue >= defconThreshold!
+                    ? "defcons (+2)"
+                    : "defcons",
+                value: defconValue,
+                icon: <FaShieldAlt />,
+              },
+            ]
           : []),
         {
           key: "yellows",

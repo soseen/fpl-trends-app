@@ -1,46 +1,46 @@
 import React, { useMemo } from "react";
 import { BestScoringFootballer } from "./use-best-scoring-footballers";
 import { getTeamsBadge } from "src/utils/images";
-import { FaFutbol, FaHandshake } from "react-icons/fa";
+import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
 import clsx from "clsx";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 
 type Props = {
   footballer: BestScoringFootballer;
 };
 
-type SelectedStats = Pick<
-  FootballerWithGameweekStats,
-  "totalGoals" | "totalAssists" | "totalCleanSheets"
->;
+type StatKey =
+  | "totalGoals"
+  | "totalAssists"
+  | "totalCleanSheets"
+  | "totalDefconBonuses";
 
-const getIcon = (key: keyof SelectedStats) => {
-  switch (key) {
-    case "totalGoals":
-      return <FaFutbol />;
-    case "totalAssists":
-      return <FaHandshake />;
-    case "totalCleanSheets":
-      return <TbLockFilled />;
-    default:
-      return null;
-  }
+type SelectedStats = Pick<FootballerWithGameweekStats, StatKey>;
+
+const STAT_META: Record<StatKey, { icon: React.ReactNode; label: string }> = {
+  totalGoals: { icon: <FaFutbol />, label: "Goals" },
+  totalAssists: { icon: <FaHandshake />, label: "Assists" },
+  totalCleanSheets: { icon: <TbLockFilled />, label: "Clean sheets" },
+  totalDefconBonuses: { icon: <FaShieldAlt />, label: "Defcons" },
 };
 
 const PitchCard = ({ footballer }: Props) => {
   const { setFootballer } = useFootballerDetailsContext();
   const selectedStats = useMemo(() => {
-    const stats = Object.keys(footballer)
-      .filter(
-        (key) =>
-          ["totalGoals", "totalAssists", "totalCleanSheets"].includes(key) &&
-          (footballer[key as keyof typeof footballer] as number) > 0,
-      )
+    const keys: StatKey[] = [
+      "totalGoals",
+      "totalAssists",
+      "totalCleanSheets",
+      "totalDefconBonuses",
+    ];
+    return keys
+      .filter((key) => ((footballer[key as keyof SelectedStats] as number) ?? 0) > 0)
       .filter(
         (key) =>
           !(
@@ -49,11 +49,11 @@ const PitchCard = ({ footballer }: Props) => {
               footballer.element_type,
             )
           ),
-      );
-    return stats.map((stat) => ({
-      key: stat,
-      value: footballer[stat as keyof typeof footballer] as number,
-    }));
+      )
+      .map((key) => ({
+        key,
+        value: footballer[key as keyof SelectedStats] as number,
+      }));
   }, [footballer]);
 
   return (
@@ -84,16 +84,20 @@ const PitchCard = ({ footballer }: Props) => {
           </p>
         </div>
         <div className="absolute right-[2px] top-1 z-50 flex flex-col gap-[2px] md:top-1">
-          {selectedStats.map((stat, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm"
-            >
-              <span className="flex">{stat.value}</span>
-              <span className="flex h-2 items-center md:h-4 lg:h-5">
-                {getIcon(stat.key as keyof SelectedStats)}
-              </span>
-            </div>
+          {selectedStats.map((stat) => (
+            <Tooltip key={stat.key}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm">
+                  <span className="flex">{stat.value}</span>
+                  <span className="flex h-2 items-center md:h-4 lg:h-5">
+                    {STAT_META[stat.key].icon}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">
+                {STAT_META[stat.key].label}
+              </TooltipContent>
+            </Tooltip>
           ))}
         </div>
         <img

@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "src/redux/store";
 import { AsyncThunkStatus } from "src/redux/types";
 import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition } from "src/queries/types";
+import { hasDefconBonus } from "src/utils/defcon";
 
 type AppInitializerProviderProps = {
   children: React.ReactNode;
@@ -67,6 +68,18 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
         const gameweeksCount = historyInRange.filter(
           (val) => val.team_a_score !== null && val.team_h_score !== null,
         ).length;
+
+        const totalDefconBonuses = historyInRange.filter((h) =>
+          hasDefconBonus(h, footballer.element_type),
+        ).length;
+
+        const totalDefcons = historyInRange.reduce(
+          (sum, h) => sum + (h.defensive_contribution ?? 0),
+          0,
+        );
+        const defconsPerGame = (
+          gameweeksCount > 0 ? totalDefcons / gameweeksCount : 0
+        ).toFixed(2);
 
         const additionalInfo = historyInRange.reduce(
           (acc, val) => {
@@ -134,10 +147,10 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             savesPerGame: 0,
             totalXGI: 0,
             xGIPerGame: "0.00",
-            xGIPer90: "0.0.0",
+            xGIPer90: "0.00",
             totalXGS: 0,
             xGSPerGame: "0.00",
-            xGSPer90: "0.00.",
+            xGSPer90: "0.00",
             totalXGC: 0,
             xGCPerGame: "0.00",
             xGCPer90: "0.00",
@@ -148,7 +161,13 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
           },
         );
 
-        return { ...footballer, ...additionalInfo };
+        return {
+          ...footballer,
+          ...additionalInfo,
+          totalDefconBonuses,
+          totalDefcons,
+          defconsPerGame,
+        };
       })
       .filter((f) => f.element_type !== FootballerPosition.MGR);
 

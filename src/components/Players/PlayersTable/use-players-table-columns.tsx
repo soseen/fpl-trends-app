@@ -85,6 +85,18 @@ export const usePlayersTableColumns = () => {
       header: "Cleansheets",
       cell: (info) => <p>{info.getValue()}</p>,
     }),
+    columnHelper.accessor("defconsPerGame", {
+      header: "Defcons/g",
+      cell: (info) => <p>{info.getValue()}</p>,
+      sortingFn: (a, b, columnId) =>
+        parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
+      enableMultiSort: true,
+    }),
+    columnHelper.accessor("totalDefcons", {
+      header: "Defcons",
+      cell: (info) => <p>{info.getValue()}</p>,
+      enableMultiSort: true,
+    }),
     columnHelper.accessor("totalXGI", {
       header: "xGI",
       cell: (info) => <p>{info.getValue().toFixed(2)}</p>,

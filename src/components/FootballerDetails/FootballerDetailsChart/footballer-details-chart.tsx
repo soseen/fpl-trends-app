@@ -1,4 +1,4 @@
-import { Bar, BarChart, LabelList, Rectangle, Tooltip, XAxis } from "recharts";
+import { Bar, BarChart, LabelList, Rectangle, ReferenceLine, Tooltip, XAxis } from "recharts";
 import React, { useMemo, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition, History } from "src/queries/types";
 import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
+import { getDefconThreshold } from "src/utils/defcon";
 
 import CustomTooltip from "./custom-tooltip";
 import { ToggleGroup } from "@/components/ui/toggle-group";
@@ -20,6 +21,7 @@ enum SelectedChartStat {
   xGC = "xGC",
   minutes = "minutes",
   points = "points",
+  defcons = "defcons",
 }
 
 type Props = {
@@ -32,6 +34,7 @@ export type ChartData = {
   xGC: number;
   minutes: number;
   points: number;
+  defcons: number;
   matchInfo: History[];
   team_code: number;
   element_type: FootballerPosition;
@@ -67,6 +70,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               xGC: parseFloat(h.expected_goals_conceded),
               minutes: h.minutes,
               points: h.total_points,
+              defcons: h.defensive_contribution ?? 0,
               matchInfo: [h],
               team_code: footballer?.team_code,
               element_type: footballer.element_type,
@@ -86,6 +90,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             xGC: existing.xGC + parseFloat(h.expected_goals_conceded),
             minutes: existing.minutes + h.minutes,
             points: existing.points + h.total_points,
+            defcons: existing.defcons + (h.defensive_contribution ?? 0),
             matchInfo: [...existing.matchInfo, h],
           });
         } else {
@@ -95,6 +100,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             xGC: parseFloat(h.expected_goals_conceded),
             minutes: h.minutes,
             points: h.total_points,
+            defcons: h.defensive_contribution ?? 0,
             matchInfo: [h],
             team_code: footballer?.team_code,
             element_type: footballer.element_type,
@@ -112,6 +118,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             xGC: 0,
             minutes: 0,
             points: 0,
+            defcons: 0,
             matchInfo: [],
             isFake: true,
           }
@@ -121,6 +128,26 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       return allGameweeks;
     }
   }, [footballer]);
+
+  const defconThreshold = getDefconThreshold(footballer?.element_type);
+
+  const defconDataAvailable = useMemo(
+    () =>
+      !!footballer?.history?.some(
+        (h) => typeof h.defensive_contribution === "number",
+      ),
+    [footballer],
+  );
+
+  const availableStats = useMemo(
+    () =>
+      (Object.keys(SelectedChartStat) as SelectedChartStat[]).filter((s) => {
+        if (s !== SelectedChartStat.defcons) return true;
+        // hide the defcons tab for GK or when the field is entirely absent
+        return defconThreshold !== null && defconDataAvailable;
+      }),
+    [defconThreshold, defconDataAvailable],
+  );
 
   return (
     <Card>
@@ -133,7 +160,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             className="flex flex-nowrap items-center gap-1"
             onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
           >
-            {Object.keys(SelectedChartStat).map((stat, index) => (
+            {availableStats.map((stat, index) => (
               <ToggleGroupItem
                 key={index}
                 className={clsx(
@@ -201,6 +228,20 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                 }
               />
             </Bar>
+            {displayedChartStat === SelectedChartStat.defcons &&
+              defconThreshold !== null && (
+                <ReferenceLine
+                  y={defconThreshold}
+                  stroke="var(--chart-3)"
+                  strokeDasharray="4 4"
+                  label={{
+                    value: `+2 pts @ ${defconThreshold}`,
+                    position: "insideTopRight",
+                    fill: "var(--chart-3)",
+                    fontSize: 10,
+                  }}
+                />
+              )}
           </BarChart>
         </ChartContainer>
       </CardContent>

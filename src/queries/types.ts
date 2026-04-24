@@ -92,6 +92,8 @@ export type Element = {
   selected_rank_type: number;
   starts_per_90: number;
   clean_sheets_per_90: number;
+  defensive_contribution: number | null;
+  defensive_contribution_per_90: number | null;
 };
 
 export type Team = {
@@ -156,6 +158,7 @@ export type History = {
   selected: number;
   transfers_in: number;
   transfers_out: number;
+  defensive_contribution: number | null;
 };
 
 export type Override = {

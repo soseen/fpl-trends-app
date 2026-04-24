@@ -64,6 +64,7 @@ const PlayersTable = () => {
     goalsPerGame: false,
     assistsPerGame: false,
     totalXGI: false,
+    totalDefcons: false,
   });
 
   const isClearState = useMemo(() => {
@@ -132,10 +133,14 @@ const PlayersTable = () => {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="p-2">
                 {headerGroup.headers.map((header) => {
+                  const isSorted = !!header.column.getIsSorted();
                   return (
                     <TableHead
                       key={header.id}
-                      className="border-1 cursor-pointer rounded-md border-b-2 border-accent3 px-1 py-1 md:px-2"
+                      className={clsx(
+                        "border-1 cursor-pointer rounded-md border-b-2 border-accent3 px-1 py-1 md:px-2",
+                        isSorted && "bg-magenta3",
+                      )}
                       onClick={header.column.getToggleSortingHandler()}
                       style={{ width: `${header.getSize()}px` }}
                     >
@@ -173,6 +178,7 @@ const PlayersTable = () => {
                       className={clsx(
                         id % 2 === 0 ? "bg-primary" : "bg-accent2",
                         "border-b-[1px] border-accent3 px-1 py-1 md:px-2",
+                        cell.column.getIsSorted() && "bg-magenta3",
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
