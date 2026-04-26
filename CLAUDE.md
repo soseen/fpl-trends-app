@@ -2,6 +2,36 @@
 
 React SPA for FPL Trends. Displays Fantasy Premier League analytics with focus on outlier detection, player comparison, and gameweek-range analysis.
 
+> **For full operational detail** (local dev, build, deploy, troubleshooting), read [`Readme.md`](./Readme.md). This file is the architectural/code-level reference.
+
+## Production at a glance
+
+- Built on the production server (`~/fpl-trends-app/dist/`), served as static files by nginx at `https://fpltrends.live`
+- Bundle is `bundle.[contenthash].js` (cache-busts automatically on each build; `output.clean: true` wipes stale hashed bundles)
+- API base URL is **`/api`** (relative, baked into the bundle at build time via `dotenv-webpack`); nginx reverse-proxies `/api/*` to the Node API on port 3000
+- No restart needed after rebuilding — nginx serves the new `dist/` immediately
+
+### Quick deploy
+
+```bash
+ssh deploy@91.98.145.120
+cd ~/fpl-trends-app
+git pull
+npm install                      # only if package.json changed
+npm run build
+sudo chmod -R o+rX /home/deploy/fpl-trends-app/dist
+```
+
+## Architectural notes
+
+1. **Webpack mode detection uses the function-export form.** `webpack.config.js` exports `(env, argv) => ({ ... })` and reads `argv.mode`. Do not switch back to `process.env.NODE_ENV` — that variable isn't set at config evaluation time, only inside the bundle. The dev plugins (`HotModuleReplacementPlugin`, `ReactRefreshWebpackPlugin`) and the `react-refresh/babel` Babel plugin must stay guarded on `isDevelopment`. Leaking them into prod throws `Uncaught ReferenceError: $RefreshReg$ is not defined` and produces a blank page.
+
+2. **`API_BASE_URL` is build-time, not runtime.** Set in `.env` before `npm run build`. Production uses `/api` (relative). Switching environments requires a rebuild.
+
+3. **403 Forbidden after a fresh deploy** = nginx (running as `www-data`) can't traverse `/home/deploy/`. Run once: `sudo chmod o+x /home/deploy && sudo chmod -R o+rX /home/deploy/fpl-trends-app/dist`.
+
+4. **`bundle.[contenthash].js`** — `index.html` is regenerated on each build via `HtmlWebpackPlugin` so it always points to the right hashed bundle. Don't reference `bundle.js` directly anywhere.
+
 ## Stack
 
 React 19, TypeScript 5.7, Redux Toolkit, TanStack React Query v5, TanStack Table v8, Recharts, Tailwind CSS 3, shadcn/ui (Radix UI), Webpack 5, Babel.
@@ -206,12 +236,14 @@ Previously deployed on Heroku with static buildpack. `static.json` routes all pa
 - axios: 1.7.9
 - tailwindcss: 3.4.17
 - motion: 12.0.6
-- cmdk: 1.0.0
+- cmdk: ^1.1.1
 - lucide-react, react-icons
 - Radix UI primitives (avatar, dialog, select, slider, tooltip, toggle, popover)
 
 ## Known Issues
 
-1. Node engine requirement is 23.x (mismatched with backend's 20.x)
-2. No error boundary components for graceful failure handling
-3. React Query v3 is outdated (v5 is
+1. No error boundary components for graceful failure handling.
+2. React Query is installed but unused for data fetching — all server data flows through Redux thunks + axios. The `QueryClientProvider` wrapper in `index.js` could be removed, or the migration to React Query for data fetching could be completed.
+3. Bundle is unsplit — single ~1.4 MiB `bundle.[contenthash].js`. Route-level code-splitting via `React.lazy` is a future improvement.
+4. Large 404 GIF (~1.6 MiB) shipped with the bundle — easy win to replace.
+5. `API_BASE_URL` is baked at build time. Switching environments requires a rebuild rather than a runtime config swap.

@@ -18,8 +18,11 @@ export default (_env, argv) => {
     mode: isDevelopment ? "development" : "production",
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "bundle.js",
+      // Content-hash in production for cache-busting; stable name in dev
+      // so HMR/refresh doesn't break.
+      filename: isDevelopment ? "bundle.js" : "bundle.[contenthash].js",
       publicPath: "/",
+      clean: true, // wipe stale hashed bundles from previous builds
     },
     target: "web",
     devServer: {
