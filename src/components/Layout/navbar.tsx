@@ -7,7 +7,7 @@ import {
 } from "../AppInitializer/app-initializer.context";
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 import logo from "../../assets/logo.png";
-import { FaHome, FaTools, FaUser } from "react-icons/fa";
+import { FaChartLine, FaHome, FaTools, FaUser } from "react-icons/fa";
 
 const Navbar: React.FC = () => {
   const { status } = useAppInitContext();
@@ -38,6 +38,12 @@ const Navbar: React.FC = () => {
             <Link to="/compare" className="hover:text-gray-400">
               <span className="flex items-center gap-1 text-xs md:gap-2 md:text-base">
                 Comparison Tool <FaTools className="text-magenta" />
+              </span>
+            </Link>
+            <span className="h-4 w-[1px] bg-text opacity-40" />
+            <Link to="/my-trends" className="hover:text-gray-400">
+              <span className="flex items-center gap-1 text-xs md:gap-2 md:text-base">
+                My Trends <FaChartLine className="text-magenta" />
               </span>
             </Link>
           </div>

@@ -10,6 +10,7 @@ import Players from "./components/Players/players.route";
 import { AppContextProvider } from "./components/AppContext/app-context";
 import { FootballerDetailsProvider } from "./components/FootballerDetails/footballer-details.context";
 import CompareFootballers from "./components/CompareFootballers/compare-footballers.route";
+import MyTrends from "./components/MyTrends/my-trends.route";
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
                     <Route index element={<Home />} />
                     <Route path="players" element={<Players />} />
                     <Route path="compare" element={<CompareFootballers />} />
+                    <Route path="my-trends" element={<MyTrends />} />
                   </Route>
                 </Routes>
               </FootballerDetailsProvider>

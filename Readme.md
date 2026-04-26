@@ -13,22 +13,24 @@ Consumes the [`fpl-trends-api`](https://github.com/soseen/fpl-trends-api) backen
 3. [Project structure](#project-structure)
 4. [Routes](#routes)
 5. [State management](#state-management)
-6. [Local development](#local-development)
-7. [Production deployment](#production-deployment)
-8. [Updating production](#updating-production)
-9. [Start-of-season checklist](#start-of-season-checklist)
-10. [Troubleshooting](#troubleshooting)
-11. [Known issues](#known-issues)
+6. [My Trends feature](#my-trends-feature)
+7. [Local development](#local-development)
+8. [Production deployment](#production-deployment)
+9. [Updating production](#updating-production)
+10. [Start-of-season checklist](#start-of-season-checklist)
+11. [Troubleshooting](#troubleshooting)
+12. [Known issues](#known-issues)
 
 ---
 
 ## Overview
 
-A React 19 SPA with three views:
+A React 19 SPA with four views:
 
-- **Home** — Best XI on a pitch (greedy selection by points within a chosen GW range), differentials and xGI leader tabs, attacking/defensive teams table.
+- **Home** — Best XI on a pitch (greedy selection by points within a chosen GW range), differentials and xGI leader tabs, attacking/defensive teams table. Also surfaces an "Enter your FPL ID" prompt that links into My Trends.
 - **Players** — Full sortable / filterable / paginated table with 25+ stat columns.
 - **Compare** — Side-by-side comparison of 2–4 players with rankings on goals/90, assists/90, xGI/90, xGC/90, finishing (goals − xG), and upcoming-fixture difficulty.
+- **My Trends** — Personal rank for the selected GW range vs. season overall rank, green/red coded. The user submits their FPL ID once (persisted in `localStorage`) and a "Switch ID" button opens a dialog to change it. See [My Trends feature](#my-trends-feature).
 
 A dual-thumb gameweek slider in the navbar (GW 1–38) controls the range; all stats are recomputed client-side from each player's `history` array on change.
 
@@ -81,16 +83,21 @@ src/
 │   │       ├── rankStats.ts
 │   │       ├── rankFinishing.ts
 │   │       └── rankFixtures.ts
+│   ├── MyTrends/
+│   │   ├── my-trends.route.tsx             — Page; reads ID from localStorage, calls React Query
+│   │   ├── fpl-id-input.tsx                — Validated numeric input + submit
+│   │   ├── range-rank-card.tsx             — Overall vs range rank (green/red comparison)
+│   │   └── home-fpl-id-prompt.tsx          — Card on the home page (collapses to a link once stored)
 │   └── FootballerDetails/
 │       ├── footballer-details-context.tsx
 │       ├── footballer-details-modal.tsx    — Desktop dialog
 │       ├── footballer-details-drawer.tsx   — Mobile slide-up drawer
 │       └── FootballerDetailsChart/
 ├── redux/                                  — Store + 6 slices
-├── queries/                                — Axios API calls
-├── hooks/                                  — useBestScoringFootballers, useBestDifferentials, useBestXGIFootballers, ...
+├── queries/                                — Axios API calls (incl. getManagerSummary, getManagerRangeRank)
+├── hooks/                                  — useBestScoringFootballers, useLocalStorage, ...
 ├── utils/                                  — Constants + helpers
-├── lib/axios.ts                            — Axios instance (baseURL, 8s timeout)
+├── lib/axios.ts                            — Axios instance (baseURL, 60s timeout)
 └── assets/
 ```
 
@@ -98,11 +105,12 @@ src/
 
 ## Routes
 
-| Path       | Component          | Description                                       |
-| ---------- | ------------------ | ------------------------------------------------- |
-| `/`        | Home               | Best XI pitch, outliers, teams table              |
-| `/players` | Players            | Full data table with 25+ stat columns             |
-| `/compare` | CompareFootballers | Side-by-side player comparison (2–4 players)      |
+| Path         | Component          | Description                                                |
+| ------------ | ------------------ | ---------------------------------------------------------- |
+| `/`          | Home               | Best XI pitch, outliers, teams table, FPL ID prompt        |
+| `/players`   | Players            | Full data table with 25+ stat columns                      |
+| `/compare`   | CompareFootballers | Side-by-side player comparison (2–4 players)               |
+| `/my-trends` | MyTrends           | Personal range-rank vs season overall rank for an FPL ID   |
 
 All routes are wrapped in `<Layout>` (navbar + footer + GW slider).
 
@@ -141,6 +149,47 @@ Computed from each player's `history` array within the selected range:
 - **AppInitializerContext** — loading / error during initial fetch + enrichment
 - **FootballerDetailsContext** — controls which player's modal/drawer is open
 - **AppContextProvider** — general app-level context
+
+### TanStack React Query
+
+Bulk app data (footballers, teams, events, totals) flows through Redux thunks. **Manager data for the My Trends feature uses TanStack Query instead** — it's per-user, per-range, and request-scoped, so global Redux state would be the wrong shape. The hooks live in [`src/queries/getManagerSummary.ts`](src/queries/getManagerSummary.ts) and [`src/queries/getManagerRangeRank.ts`](src/queries/getManagerRangeRank.ts) and are used directly via `useQuery` in [`my-trends.route.tsx`](src/components/MyTrends/my-trends.route.tsx). Cache keys include the entry ID and gameweek range so changing either invalidates the cached result.
+
+---
+
+## My Trends feature
+
+Tracks how a manager performed within a chosen gameweek range vs. their season overall rank.
+
+### How it's used
+
+1. **First visit**: an "Enter your FPL ID" card appears on the home page above the pitch, and on `/my-trends` if the user navigates there directly. Submitting persists the ID to `localStorage` (key: `fpl_manager_id`) and routes to `/my-trends`.
+2. **Returning visits**: the home prompt collapses to a discreet "FPL ID 12345 · View My Trends →" link. The navbar always shows the My Trends entry.
+3. **On `/my-trends`**: the user sees their season overall rank vs. their estimated rank within the current GW slider range. The range rank is colour-coded — **green** if they ranked better than their season average in this range, **red** if worse. A "Switch ID" button opens a dialog with the same input.
+4. **Dragging the GW slider** in the navbar re-fetches the range rank on the fly (TanStack Query keyed on `[entryId, start, end]`).
+
+### How the rank is computed
+
+The frontend is a thin wrapper. The estimation work happens in the API — see [`fpl-trends-api` Readme: Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends) for the algorithm, sampling strategy, and confidence labels. The card respects the `confidence` field returned by the API:
+
+- `exact` — the user is in the top 10k (full census). Number is shown without prefix.
+- `estimated` — sample-based estimate with stratum scaling and clamp. Prefixed with `≈`.
+- `approximate` — no sample yet for this rank tier (or beyond the active range). Falls back to overall rank, prefixed with `≈`.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `src/components/MyTrends/my-trends.route.tsx` | Page. Reads ID from `useLocalStorage`, GW range from Redux, calls React Query. |
+| `src/components/MyTrends/fpl-id-input.tsx` | Reusable validated input (numeric, 1–20M). |
+| `src/components/MyTrends/range-rank-card.tsx` | Renders overall vs range rank with green/red colour logic and confidence label. |
+| `src/components/MyTrends/home-fpl-id-prompt.tsx` | Home-page card that collapses to a link once an ID is stored. |
+| `src/hooks/useLocalStorage.ts` | Generic `useState`-backed `localStorage` hook (returns `[value, setValue, clear]`). |
+| `src/queries/getManagerSummary.ts` | `GET /api/manager/:id/summary`. |
+| `src/queries/getManagerRangeRank.ts` | `GET /api/manager/:id/range-rank?start=X&end=Y`. |
+
+### Privacy
+
+The FPL `entry_id` is a public identifier visible in everyone's FPL team URL. Storing it in `localStorage` is no different from bookmarking the official FPL site. No other PII is sent to or stored by us.
 
 ---
 
@@ -292,8 +341,9 @@ Shouldn't happen — the bundle filename is `bundle.[contenthash].js` and `index
 
 ## Known issues
 
-1. **React Query is installed but unused for data fetching** — all server data flows through Redux thunks + axios. The `QueryClientProvider` wrapper in `index.js` could be removed, or the migration to React Query for data fetching could be completed.
+1. **Mixed data-fetching patterns** — bulk app data goes through Redux thunks; My Trends uses TanStack Query. Long-term we may want to consolidate, but the split is intentional (per-user request-scoped data isn't a great fit for global Redux state).
 2. **Bundle is unsplit** — single ~1.4 MiB bundle; could be code-split per route via `React.lazy`.
 3. **Large 404 GIF** (~1.6 MiB) shipped with the bundle.
 4. **No error boundaries** — a single render throw blanks the page.
 5. **`API_BASE_URL` is build-time** (via dotenv-webpack), not runtime. Switching environments requires rebuild.
+6. **My Trends precision below the top 10k depends on sample density** — see the API's [Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends) section. New servers show `confidence: "approximate"` for everyone outside the top 10k until the cron has run for several hours.

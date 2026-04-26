@@ -2,10 +2,12 @@ import React from "react";
 import TeamsTable from "./TeamsTable/teams-table";
 import Pitch from "./BestScoringFootballers/pitch";
 import OutliersTab from "./OutliersTab/outliers-tab";
+import HomeFplIdPrompt from "../MyTrends/home-fpl-id-prompt";
 
 const Home = () => {
   return (
     <div className="flex w-full flex-col items-center">
+      <HomeFplIdPrompt />
       <Pitch />
       <div className="-my-2 grid w-full grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="w-full lg:col-span-2">
