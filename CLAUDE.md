@@ -15,12 +15,10 @@ React SPA for FPL Trends. Displays Fantasy Premier League analytics with focus o
 
 ```bash
 ssh deploy@91.98.145.120
-cd ~/fpl-trends-app
-git pull
-npm install                      # only if package.json changed
-npm run build
-sudo chmod -R o+rX /home/deploy/fpl-trends-app/dist
+cd ~/fpl-trends-app && npm run deploy
 ```
+
+`npm run deploy` runs `git pull && npm install && npm run build`. nginx serves the new `dist/` immediately.
 
 ## Architectural notes
 

@@ -8,7 +8,8 @@
   "scripts": {
     "start": "serve -s dist",
     "dev": "webpack serve --mode development --open",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "deploy": "git pull && npm install && npm run build"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.2",
