@@ -69,19 +69,16 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
   // buffer above so the line doesn't kiss the top edge) and the full FPL
   // field size below — gives "where am I in the field" context without the
   // empty headroom that domain=[1, totalPlayers] would add.
-  const minRank = Math.min(
-    ...points.flatMap((p) => [p.gw_rank, p.overall_rank]),
-  );
+  const minRank = Math.min(...points.flatMap((p) => [p.gw_rank, p.overall_rank]));
   const yTop = Math.max(1, Math.floor(minRank * 0.7));
-  const yBottom = totalPlayers > 0 ? totalPlayers : Math.max(...points.map((p) => p.gw_rank));
+  const yBottom =
+    totalPlayers > 0 ? totalPlayers : Math.max(...points.map((p) => p.gw_rank));
 
   // Match the colour logic of RangeRankCard: compare overall rank entering
   // the range vs overall rank leaving it. emerald = improved, rose = worse,
   // cyan (existing chart-3) = neutral or no "before" reference.
   const before =
-    startGw > 1
-      ? (points.find((p) => p.gw === startGw - 1)?.overall_rank ?? null)
-      : null;
+    startGw > 1 ? (points.find((p) => p.gw === startGw - 1)?.overall_rank ?? null) : null;
   const after = points.find((p) => p.gw === endGw)?.overall_rank ?? null;
   let highlightColor = "var(--chart-3)";
   if (before !== null && after !== null) {
@@ -92,10 +89,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
   return (
     <div className="h-72 w-full sm:h-72 md:h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart
-          data={points}
-          margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-        >
+        <ComposedChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="rankFill" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
@@ -147,9 +141,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
             baseValue="dataMax"
             isAnimationActive={false}
             dot={
-              isSM
-                ? false
-                : { r: 2.5, fill: "var(--chart-1)", stroke: "var(--chart-1)" }
+              isSM ? false : { r: 2.5, fill: "var(--chart-1)", stroke: "var(--chart-1)" }
             }
             activeDot={{ r: 4.5, fill: highlightColor, stroke: "var(--text)" }}
           />

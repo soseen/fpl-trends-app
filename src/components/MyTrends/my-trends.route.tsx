@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,8 +16,16 @@ import {
   getManagerTrajectory,
   type ManagerTrajectory,
 } from "src/queries/getManagerTrajectory";
+import {
+  getManagerComparison,
+  type ManagerComparison,
+} from "src/queries/getManagerComparison";
 import FplIdInput from "./fpl-id-input";
 import RangeRankCard from "./range-rank-card";
+import RankTrajectoryChart from "./rank-trajectory-chart";
+import ManagerComparisonTable from "./manager-comparison-table";
+import MyTrendsSection from "./my-trends-section";
+import AccuracyMeter from "./accuracy-meter";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -47,6 +55,14 @@ const MyTrends: React.FC = () => {
     queryFn: () => getManagerTrajectory(entryId as number),
     enabled: typeof entryId === "number",
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  const comparisonQuery = useQuery<ManagerComparison>({
+    queryKey: ["manager-comparison", entryId, startGameweek, endGameweek],
+    queryFn: () => getManagerComparison(entryId as number, startGameweek, endGameweek),
+    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    staleTime: 60 * 1000,
     retry: 1,
   });
 
@@ -110,22 +126,48 @@ const MyTrends: React.FC = () => {
         </Card>
       )}
 
-      {rangeRankQuery.isPending && !rangeRankQuery.data && (
-        <Card className="border-secondary bg-primary p-4">
-          <CardContent className="space-y-2 p-0">
-            <Skeleton className="h-5 w-32 bg-secondary" />
-            <Skeleton className="h-8 w-48 bg-secondary" />
-          </CardContent>
-        </Card>
+      {(rangeRankQuery.data || rangeRankQuery.isPending) && (
+        <MyTrendsSection
+          title="My rank"
+          headerRight={
+            <AccuracyMeter
+              stratum={rangeRankQuery.data?.stratum_used ?? null}
+              sampleSize={rangeRankQuery.data?.sample_size ?? 0}
+              isLoading={rangeRankQuery.isPending || trajectoryQuery.isPending}
+            />
+          }
+        >
+          {rangeRankQuery.data ? (
+            <RangeRankCard
+              data={rangeRankQuery.data}
+              startGw={startGameweek}
+              endGw={endGameweek}
+            />
+          ) : (
+            <div className="grid grid-cols-9 gap-2">
+              <Skeleton className="col-span-4 h-24 bg-accent3" />
+              <div className="col-span-1" />
+              <Skeleton className="col-span-4 h-24 bg-accent3" />
+            </div>
+          )}
+          {trajectoryQuery.data && trajectoryQuery.data.gws.length > 0 ? (
+            <RankTrajectoryChart
+              data={trajectoryQuery.data}
+              startGw={startGameweek}
+              endGw={endGameweek}
+            />
+          ) : (
+            trajectoryQuery.isPending && (
+              <Skeleton className="h-72 w-full bg-accent3 md:h-80" />
+            )
+          )}
+        </MyTrendsSection>
       )}
 
-      {rangeRankQuery.data && (
-        <RangeRankCard
-          data={rangeRankQuery.data}
-          trajectory={trajectoryQuery.data}
-          startGw={startGameweek}
-          endGw={endGameweek}
-        />
+      {comparisonQuery.data && (
+        <MyTrendsSection title="How you compare">
+          <ManagerComparisonTable data={comparisonQuery.data} />
+        </MyTrendsSection>
       )}
 
       <Dialog open={switchOpen} onOpenChange={setSwitchOpen}>
