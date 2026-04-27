@@ -5,6 +5,8 @@ export type ManagerRangeRank = {
   overall_rank: number | null;
   range_rank: number | null;
   range_total: number;
+  overall_rank_before: number | null;
+  overall_rank_after: number | null;
   start_gw: number;
   end_gw: number;
   stratum_used: 1 | 2 | 3 | null;
