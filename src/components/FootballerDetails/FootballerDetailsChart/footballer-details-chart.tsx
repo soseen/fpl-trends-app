@@ -206,7 +206,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                 position="top"
                 fill="var(--text)"
                 content={({ x, y, value, index, width }) =>
-                  chartData[index as number].isFake ? null : (
+                  chartData[index as number]?.isFake ? null : (
                     <text
                       x={x}
                       y={y}

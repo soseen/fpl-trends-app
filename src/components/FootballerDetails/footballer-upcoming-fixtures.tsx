@@ -53,7 +53,7 @@ const FootballerUpcomingFixtures = ({
       case 5:
         return "bg-fixDif5";
       default:
-        return "bg-gray-600 text-text";
+        return "bg-fixDif3";
     }
   }, []);
 

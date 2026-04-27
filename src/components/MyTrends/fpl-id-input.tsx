@@ -15,9 +15,7 @@ const FplIdInput: React.FC<Props> = ({
   submitLabel = "Submit",
   autoFocus,
 }) => {
-  const [raw, setRaw] = useState<string>(
-    initialValue ? String(initialValue) : "",
-  );
+  const [raw, setRaw] = useState<string>(initialValue ? String(initialValue) : "");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,8 +35,8 @@ const FplIdInput: React.FC<Props> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2">
-      <div className="flex w-full items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-2">
+      <div className="flex w-fit items-center gap-2">
         <Input
           type="text"
           inputMode="numeric"
@@ -47,19 +45,19 @@ const FplIdInput: React.FC<Props> = ({
           placeholder="Your FPL ID"
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          className="bg-secondary text-text"
+          className="h-9 w-full bg-white px-2 text-accent2 focus:outline-none md:w-auto md:min-w-[420px]"
         />
-        <Button
-          type="submit"
-          className="bg-magenta text-white hover:bg-magenta/90"
-        >
+        <Button type="submit" className="hover:bg-magenta/90 h-9 bg-magenta text-white">
           {submitLabel}
         </Button>
       </div>
       {error && <p className="text-xs text-rose-400">{error}</p>}
-      <p className="text-xs text-text/60">
-        You can find your FPL ID in the official FPL site URL when viewing your
-        team (e.g. <code>fantasy.premierleague.com/entry/<b>1234567</b>/event/30</code>).
+      <p className="text-center text-xs italic text-text">
+        You can find your FPL ID in the official FPL site URL (e.g.{" "}
+        <code>
+          fantasy.premierleague.com/entry/<b>1234567</b>/event/30
+        </code>
+        ).
       </p>
     </form>
   );

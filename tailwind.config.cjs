@@ -19,6 +19,7 @@ module.exports = {
         chart1: "var(--chart-1)",
         chart2: "var(--chart-2)",
         chart3: "var(--chart-3)",
+        fixDif1: "var(--fixture-dif-1)",
         fixDif2: "var(--fixture-dif-2)",
         fixDif3: "var(--fixture-dif-3)",
         fixDif4: "var(--fixture-dif-4)",
@@ -27,18 +28,9 @@ module.exports = {
       boxShadow: {
         large: "0 4px 6px -1px rgb(0 0 0 / 84%), 0 2px 4px 3px rgb(0 0 0 / 12%)",
       },
-      keyframes: {
-        fadeIn: {
-          "0%": { opacity: 0 },
-          "100%": { opacity: 1 },
-        },
-      },
-      fontFamily: {
-        roboto: ["Roboto", "sans-serif"],
-      },
-      screens: {
-        xs: "510px",
-      },
+      keyframes: { fadeIn: { "0%": { opacity: 0 }, "100%": { opacity: 1 } } },
+      fontFamily: { roboto: ["Roboto", "sans-serif"] },
+      screens: { xs: "510px" },
     },
   },
   variants: {},

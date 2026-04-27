@@ -38,7 +38,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
             returns,
           } = bestAttributes[footballer.id] || {};
 
-          const contribution = (returns / totalTeamGoals) * 100;
+          const contribution = ((returns ?? 0) / (totalTeamGoals ?? 0)) * 100;
           const isTalisman = contribution >= 40;
 
           return (
@@ -118,7 +118,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                     <p className="">
                       On average there&apos;s been{" "}
-                      <b className="text-magenta">{avgGoalsPerGame.toFixed(2)}</b> goals
+                      <b className="text-magenta">{avgGoalsPerGame?.toFixed(2)}</b> goals
                       per game in this player&apos;s games
                     </p>
                   </span>
@@ -136,7 +136,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                   </span>
                 )}
 
-                {isMostHauls.value && (
+                {isMostHauls?.value && (
                   <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
                     <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1 pr-4">
                       💥 Most Hauls{" "}

@@ -3,25 +3,18 @@ import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { selectGameweekRange } from "src/redux/slices/gameweeksSlice";
 import { useLocalStorage } from "src/hooks/useLocalStorage";
-import {
-  getManagerSummary,
-  type ManagerSummary,
-} from "src/queries/getManagerSummary";
+import { getManagerSummary, type ManagerSummary } from "src/queries/getManagerSummary";
 import {
   getManagerRangeRank,
   type ManagerRangeRank,
 } from "src/queries/getManagerRangeRank";
 import FplIdInput from "./fpl-id-input";
 import RangeRankCard from "./range-rank-card";
+import { Separator } from "@radix-ui/react-select";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -40,14 +33,8 @@ const MyTrends: React.FC = () => {
 
   const rangeRankQuery = useQuery<ManagerRangeRank>({
     queryKey: ["manager-range-rank", entryId, startGameweek, endGameweek],
-    queryFn: () =>
-      getManagerRangeRank(
-        entryId as number,
-        startGameweek,
-        endGameweek,
-      ),
-    enabled:
-      typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    queryFn: () => getManagerRangeRank(entryId as number, startGameweek, endGameweek),
+    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
   });
@@ -61,9 +48,8 @@ const MyTrends: React.FC = () => {
     return (
       <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 p-4">
         <h1 className="text-xl font-semibold text-text">My Trends</h1>
-        <p className="text-sm text-text/70">
-          Enter your FPL ID to see how you've performed in the selected gameweek
-          range.
+        <p className="text-text/70 text-sm">
+          Enter your FPL ID to see how you've performed in the selected gameweek range.
         </p>
         <Card className="w-full border-secondary bg-primary p-4 shadow-lg">
           <FplIdInput onSubmit={handleSubmitId} autoFocus />
@@ -73,33 +59,41 @@ const MyTrends: React.FC = () => {
   }
 
   const summary = summaryQuery.data;
-  const summaryError =
-    summaryQuery.isError ? (summaryQuery.error as Error) : null;
+  const summaryError = summaryQuery.isError ? (summaryQuery.error as Error) : null;
+  const rangeLabel =
+    startGameweek === endGameweek
+      ? `GW ${startGameweek}`
+      : `GWs ${startGameweek}–${endGameweek}`;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4">
-      <div className="flex items-center justify-between gap-2">
+    <div className="container mx-auto flex w-full flex-col gap-4 rounded-md p-4">
+      <h1 className="text-xl font-semibold text-text md:text-3xl">My Trends</h1>
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-text">My Trends</h1>
           {summary && (
-            <p className="truncate text-sm text-text/70">
-              {summary.player_first_name} {summary.player_last_name} ·{" "}
-              <span className="text-text">{summary.name}</span> · ID{" "}
-              {entryId}
-            </p>
+            <>
+              <p className="truncate text-sm text-text md:text-base">
+                {summary.player_first_name} {summary.player_last_name} ·{" "}
+                <span className="text-text">{summary.name}</span>
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="w-fit rounded-md bg-magenta2 px-2 py-[2px] text-sm text-text shadow-md">
+                  ID {entryId}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSwitchOpen(true)}
+                  className="text-md border-secondary bg-transparent text-text underline hover:bg-none"
+                >
+                  Switch ID
+                </Button>
+              </div>
+            </>
           )}
-          {!summary && summaryQuery.isPending && (
-            <Skeleton className="mt-1 h-4 w-48" />
-          )}
+
+          {!summary && summaryQuery.isPending && <Skeleton className="mt-1 h-5 w-64" />}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setSwitchOpen(true)}
-          className="border-secondary bg-secondary text-text hover:bg-secondary/80"
-        >
-          Switch ID
-        </Button>
       </div>
 
       {summaryError && (
@@ -124,12 +118,6 @@ const MyTrends: React.FC = () => {
           endGw={endGameweek}
         />
       )}
-
-      <Card className="border-secondary bg-primary p-4 text-xs text-text/60">
-        Range rank is estimated from a sample of FPL managers and gradually
-        gets sharper as more data is collected. Use the gameweek slider above
-        to change the range.
-      </Card>
 
       <Dialog open={switchOpen} onOpenChange={setSwitchOpen}>
         <DialogContent className="border-secondary bg-primary text-text">

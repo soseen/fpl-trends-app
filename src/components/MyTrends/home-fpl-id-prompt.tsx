@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useLocalStorage } from "src/hooks/useLocalStorage";
 import FplIdInput from "./fpl-id-input";
 import { FPL_ID_STORAGE_KEY } from "./my-trends.route";
+import { FaChartLine } from "react-icons/fa";
 
 const HomeFplIdPrompt: React.FC = () => {
   const [entryId, setEntryId] = useLocalStorage<number>(FPL_ID_STORAGE_KEY);
@@ -11,21 +12,23 @@ const HomeFplIdPrompt: React.FC = () => {
 
   if (entryId !== null) {
     return (
-      <div className="mb-2 flex w-full items-center justify-end gap-2 px-1 text-sm text-text/70">
-        <span>FPL ID {entryId}</span>
-        <Link
-          to="/my-trends"
-          className="font-medium text-magenta hover:underline"
-        >
-          View My Trends →
-        </Link>
+      <div className="mb-2 flex w-full items-center justify-end gap-2 rounded-sm px-1 py-1 text-sm text-text md:px-4 md:text-lg">
+        <div className="flex items-center gap-2 rounded-md bg-accent3 px-2 py-1 text-xs text-text shadow-md md:px-4 md:py-2 md:text-sm">
+          <span className="rounded-md bg-magenta3 p-2 text-lg">
+            <FaChartLine className="text-text" />
+          </span>
+          <span>FPL ID: {entryId}</span>
+          <Link to="/my-trends" className="font-medium text-magenta hover:underline">
+            View My Trends →
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <Card className="mb-4 w-full border-secondary bg-primary p-4 shadow-lg">
-      <p className="mb-2 text-sm text-text">
+    <div className="my-4 w-full flex-col items-center">
+      <p className="mb-2 text-center text-sm text-text md:text-xl">
         Enter your FPL ID to see your rank in the selected gameweek range.
       </p>
       <FplIdInput
@@ -35,7 +38,7 @@ const HomeFplIdPrompt: React.FC = () => {
         }}
         submitLabel="See my rank"
       />
-    </Card>
+    </div>
   );
 };
 
