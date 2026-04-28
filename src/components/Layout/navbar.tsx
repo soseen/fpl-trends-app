@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Link } from "react-router-dom";
 import TransfersPanel from "./transfersPanel";
 import {
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
             <span className="h-4 w-[1px] bg-text opacity-40" />
             <Link to="/compare" className="hover:text-gray-400">
               <span className="flex items-center gap-1 text-xs md:gap-2 md:text-base">
-                Comparison Tool <FaTools className="text-magenta" />
+                Compare <FaTools className="text-magenta" />
               </span>
             </Link>
             <span className="h-4 w-[1px] bg-text opacity-40" />

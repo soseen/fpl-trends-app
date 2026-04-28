@@ -1,6 +1,5 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import React from "react";
+import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition } from "src/queries/types";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ export const usePlayersTableColumns = () => {
 
         return (
           <Button
-            className="flex w-fit flex-nowrap items-center justify-center gap-4 bg-transparent p-0"
+            className="flex h-fit w-fit flex-nowrap items-center justify-center gap-4 bg-transparent p-0"
             onClick={() => setFootballer(footballer)}
           >
             <FootballerImage

@@ -1,5 +1,5 @@
-import React from "react";
-import { Footballer } from "src/queries/types";
+import type React from "react";
+import type { Footballer } from "src/queries/types";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getFootballersImage } from "src/utils/images";
 
@@ -11,8 +11,8 @@ type Props = {
 
 const FootballerAvatar = ({ footballer, size, styles }: Props) => (
   <Avatar
-    className={`justify-center, flex`}
-    style={{ height: "size ? size : 12", width: size ? size : 12, ...styles }}
+    className="flex justify-center"
+    style={{ height: size ?? 12, width: size ?? 12, ...styles }}
   >
     <AvatarImage
       className="rounded-lg object-cover object-top"

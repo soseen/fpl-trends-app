@@ -39,11 +39,11 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
   return (
     <div className="grid grid-cols-9 gap-2">
       <div className="col-span-4">
-        <div className="px-2text-center w-fit self-center justify-self-center rounded-t-md bg-magenta text-sm text-text md:px-8 md:pt-1 md:text-sm lg:px-12 lg:text-base">
+        <div className="w-fit self-center justify-self-center rounded-t-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pt-1 md:text-sm lg:px-12 lg:text-base">
           Overall
         </div>
         <div className="w-fit min-w-[80%] flex-col items-center self-center justify-self-center rounded-md bg-accent3 px-8 py-4 text-center shadow-sm md:py-6 lg:px-16">
-          <p className="text-lg font-semibold md:mb-2 md:text-5xl">
+          <p className="text-base font-semibold md:mb-2 md:text-5xl">
             {formatRank(overall)}
           </p>
           <p className="text-text/60 text-xs md:text-sm">Top {percentageOverall}%</p>
@@ -58,7 +58,9 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
           {rangeLabel}
         </div>
         <div className="w-fit min-w-[80%] flex-col items-center self-center justify-self-center rounded-md bg-accent3 px-8 py-4 text-center shadow-sm md:py-6 lg:px-16">
-          <p className={`text-lg font-semibold md:mb-2 md:text-5xl ${colorClass}`}>
+          <p
+            className={`flex-nowrap text-base font-semibold md:mb-2 md:text-5xl ${colorClass}`}
+          >
             {prefix}
             {formatRank(range)}
           </p>

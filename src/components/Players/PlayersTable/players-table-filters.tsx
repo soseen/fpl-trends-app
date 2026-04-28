@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
+import type {
   AccessorKeyColumnDefBase,
   ColumnFilter,
   ColumnFiltersState,
@@ -18,13 +18,14 @@ import {
   Table,
 } from "@tanstack/react-table";
 import clsx from "clsx";
-import React, { useCallback, useMemo } from "react";
+import type React from "react";
+import { useCallback, useMemo } from "react";
 import { TiDelete } from "react-icons/ti";
 import { useSelector } from "react-redux";
 import { FootballerPosition } from "src/queries/types";
-import { RootState } from "src/redux/store";
+import type { RootState } from "src/redux/store";
 import PlayersTablePagination from "./players-table-pagination";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { removeAccents } from "src/utils/strings";
 
@@ -87,7 +88,7 @@ const PlayersTableFilters = ({
       <div className="mb-2 flex w-full flex-col gap-2 text-text md:mb-4 md:flex-row md:gap-4 lg:items-end">
         <div className="flex items-center justify-between gap-2 md:justify-start">
           <Input
-            className="h-6 w-fit min-w-[185px] bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
+            className="h-6 w-fit min-w-[185px] border-transparent bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
             onChange={(e) => setFilterProperty(0, removeAccents(e.target.value))}
             placeholder="Search player..."
             value={columnFilters[0]?.value as string}
@@ -99,12 +100,12 @@ const PlayersTableFilters = ({
               }
               value={columnFilters[2].value as string}
             >
-              <SelectTrigger className="h-6 w-[106px] bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
+              <SelectTrigger className="h-6 w-[106px] border-transparent bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
                 <SelectValue placeholder="Team" />
               </SelectTrigger>
               <SelectContent
                 sideOffset={5}
-                className="w-[106px] cursor-pointer bg-magenta sm:w-[120px]"
+                className="w-[106px] cursor-pointer border-transparent bg-magenta sm:w-[120px]"
               >
                 <SelectItem
                   className="outline-non cursor-pointer flex-nowrap items-center px-2 py-[2px] text-sm text-text hover:bg-magenta3 md:py-1"

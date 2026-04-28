@@ -28,17 +28,33 @@
     --fixture-dif-3: #e7e7e7;
     --fixture-dif-4: #ff1751;
     --fixture-dif-5: #80072d;
+
+    /* shadcn/ui primitives (Card, Input, ToggleGroup, etc.) reference these
+       custom properties via classes like `border`, `border-input`, `bg-card`,
+       `ring-ring`. They were never defined in this project, so Tailwind 3
+       fell back to `currentColor` for borders — which is the light text color
+       (#c9c5c5) — producing white-ish 1px outlines on every shadcn primitive.
+       Default them to transparent / theme-matching so primitives blend in,
+       without removing the option for a component to opt back into a visible
+       border via an explicit class. */
+    --border: transparent;
+    --input: transparent;
+    --ring: var(--magenta);
+    --card: var(--accent-2);
+    --card-foreground: var(--text);
+    --muted-foreground: rgb(201 197 197 / 0.6);
   }
 
-  /* width */
+  /* Width — applies to page and any nested overflow-scroll containers. */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
 
-  /* Track */
+  /* Track — was `transparent`, which let the browser's default white gutter
+     show through when the page body has no background colour applied. */
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--accent-3);
   }
 
   /* Handle */
@@ -47,8 +63,19 @@
     border-radius: 8px;
   }
 
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--magenta-3);
+  }
+
+  /* Firefox equivalent — order is `thumb track`. */
+  html {
+    scrollbar-color: var(--accent) var(--accent-3);
+  }
+
   body {
     @apply font-roboto;
+    background: var(--background);
+    color: var(--text);
   }
 
   .bar-chart > svg {

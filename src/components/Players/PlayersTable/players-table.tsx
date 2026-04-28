@@ -1,6 +1,5 @@
+import type { ColumnFiltersState, ColumnSort } from "@tanstack/react-table";
 import {
-  ColumnFiltersState,
-  ColumnSort,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -8,9 +7,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
+import type { RootState } from "src/redux/store";
 import {
   Table,
   TableBody,
@@ -24,7 +23,7 @@ import {
   useAppInitContext,
 } from "src/components/AppInitializer/app-initializer.context";
 import PlayersTableSkeleton from "./players-table.skeleton";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 import clsx from "clsx";
 import { usePlayersTableColumns } from "./use-players-table-columns";
