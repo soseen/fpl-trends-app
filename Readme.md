@@ -85,8 +85,12 @@ src/
 │   │       └── rankFixtures.ts
 │   ├── MyTrends/
 │   │   ├── my-trends.route.tsx             — Page; reads ID from localStorage, calls React Query
+│   │   ├── my-trends-section.tsx           — Section wrapper: rank card + trajectory chart + comparison table
 │   │   ├── fpl-id-input.tsx                — Validated numeric input + submit
 │   │   ├── range-rank-card.tsx             — Overall vs range rank (green/red comparison)
+│   │   ├── rank-trajectory-chart.tsx       — Recharts line chart of cumulative rank per GW
+│   │   ├── manager-comparison-table.tsx    — Stat rows × (You / Average / Top 10k / Diff) with text variant for "Most captained"
+│   │   ├── accuracy-meter.tsx              — Three-bar meter showing how complete the stratum sample is
 │   │   └── home-fpl-id-prompt.tsx          — Card on the home page (collapses to a link once stored)
 │   └── FootballerDetails/
 │       ├── footballer-details-context.tsx
@@ -158,34 +162,58 @@ Bulk app data (footballers, teams, events, totals) flows through Redux thunks. *
 
 ## My Trends feature
 
-Tracks how a manager performed within a chosen gameweek range vs. their season overall rank.
+A four-pane personal dashboard at `/my-trends` combining range-rank estimation, rank trajectory, and head-to-head stat comparison against the overall sample plus the current top-10k cohort.
 
 ### How it's used
 
 1. **First visit**: an "Enter your FPL ID" card appears on the home page above the pitch, and on `/my-trends` if the user navigates there directly. Submitting persists the ID to `localStorage` (key: `fpl_manager_id`) and routes to `/my-trends`.
 2. **Returning visits**: the home prompt collapses to a discreet "FPL ID 12345 · View My Trends →" link. The navbar always shows the My Trends entry.
-3. **On `/my-trends`**: the user sees their season overall rank vs. their estimated rank within the current GW slider range. The range rank is colour-coded — **green** if they ranked better than their season average in this range, **red** if worse. A "Switch ID" button opens a dialog with the same input.
-4. **Dragging the GW slider** in the navbar re-fetches the range rank on the fly (TanStack Query keyed on `[entryId, start, end]`).
+3. **On `/my-trends`**, four panes render together:
+   - **Range rank card** — season overall rank vs. estimated rank within the current GW slider range, colour-coded green/red against the rank entering and leaving the range.
+   - **Accuracy meter** — three-bar indicator showing how complete the stratum sample is. Tooltip exposes the raw probe count.
+   - **Rank trajectory chart** — line chart of cumulative overall rank per GW within the range (data straight from the FPL `/entry/{id}/history/` payload).
+   - **Comparison table** — stat-by-stat: You vs. Average (overall sampled) vs. Top 10k vs. Diff. Diff column compares user to average; the colour on "You" mirrors that comparison.
+4. **Dragging the GW slider** re-fetches all four panes (TanStack Query keyed on `[entryId, start, end]`).
+5. A "Switch ID" button opens a dialog with the same input.
 
 ### How the rank is computed
 
-The frontend is a thin wrapper. The estimation work happens in the API — see [`fpl-trends-api` Readme: Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends) for the algorithm, sampling strategy, and confidence labels. The card respects the `confidence` field returned by the API:
+The frontend is a thin wrapper around the API endpoints. The actual rank estimation, captain-bonus aggregation, and top-10k SQL all run server-side — see [`fpl-trends-api` Readme: Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends) and [Manager comparison](../fpl-trends-api/Readme.md#manager-comparison-sample-averages--top-10k).
 
-- `exact` — the user is in the top 10k (full census). Number is shown without prefix.
-- `estimated` — sample-based estimate with stratum scaling and clamp. Prefixed with `≈`.
-- `approximate` — no sample yet for this rank tier (or beyond the active range). Falls back to overall rank, prefixed with `≈`.
+The range-rank card respects the `confidence` field returned by the API:
+
+- `exact` — user is in the top 10k *and* stratum 1 is fully sampled. Number shown without prefix.
+- `estimated` — sample-based extrapolation (cross-stratum sum × Bernoulli-urn scaling). Prefixed with `≈`.
+- `approximate` — no sample yet anywhere. Falls back to overall rank, prefixed with `≈`.
+
+### Comparison table
+
+Built on `/api/manager/:id/comparison`. Rows render one of two shapes:
+
+- **Numeric/chip** — number (or "Used / Not used" / "%" for chips). Diff column shows `+N` or `-N` against the overall average. Direction ("high-good" / "low-good" / "neutral") drives the green/red colour.
+- **Text** — currently only "Most captained". Cells show player names (e.g. "Salah") instead of a number; no diff arithmetic, no colouring.
+
+Mobile layout (sm and below) collapses to **You + Top 10k** to keep the table readable; the Average and Diff columns are hidden but the colour on "You" still reflects the user-vs-average comparison.
+
+If `notes.captain_average_partial` (or `hits_average_partial` / `bench_average_partial`) is true — typically while the picks/history backfills are still in flight — the corresponding average cell shows `≈` to flag that the number isn't fully baked yet.
 
 ### Files
 
 | File | Purpose |
 |---|---|
-| `src/components/MyTrends/my-trends.route.tsx` | Page. Reads ID from `useLocalStorage`, GW range from Redux, calls React Query. |
+| `src/components/MyTrends/my-trends.route.tsx` | Page. Reads ID from `useLocalStorage`, GW range from Redux, fans out four React Query hooks. |
+| `src/components/MyTrends/my-trends-section.tsx` | Section wrapper combining the four panes. |
 | `src/components/MyTrends/fpl-id-input.tsx` | Reusable validated input (numeric, 1–20M). |
 | `src/components/MyTrends/range-rank-card.tsx` | Renders overall vs range rank with green/red colour logic and confidence label. |
+| `src/components/MyTrends/rank-trajectory-chart.tsx` | Recharts line chart — cumulative overall rank per GW, derived from the FPL history payload. |
+| `src/components/MyTrends/manager-comparison-table.tsx` | Stat × cohort table (You / Average / Top 10k / Diff). Renders both numeric and text rows. |
+| `src/components/MyTrends/accuracy-meter.tsx` | Three-bar meter; lights up as the stratum sample target fills. |
 | `src/components/MyTrends/home-fpl-id-prompt.tsx` | Home-page card that collapses to a link once an ID is stored. |
-| `src/hooks/useLocalStorage.ts` | Generic `useState`-backed `localStorage` hook (returns `[value, setValue, clear]`). |
+| `src/hooks/useLocalStorage.ts` | Generic `useState`-backed `localStorage` hook. |
 | `src/queries/getManagerSummary.ts` | `GET /api/manager/:id/summary`. |
 | `src/queries/getManagerRangeRank.ts` | `GET /api/manager/:id/range-rank?start=X&end=Y`. |
+| `src/queries/getManagerTrajectory.ts` | `GET /api/manager/:id/trajectory?start=X&end=Y`. |
+| `src/queries/getManagerComparison.ts` | `GET /api/manager/:id/comparison?start=X&end=Y`. |
 
 ### Privacy
 
