@@ -3,6 +3,7 @@ import api from "src/lib/axios";
 export type ManagerRangeRank = {
   entry_id: number;
   overall_rank: number | null;
+  total_points: number | null;
   range_rank: number | null;
   range_total: number;
   overall_rank_before: number | null;
@@ -19,9 +20,8 @@ export const getManagerRangeRank = async (
   startGw: number,
   endGw: number,
 ): Promise<ManagerRangeRank> => {
-  const { data } = await api.get<ManagerRangeRank>(
-    `manager/${entryId}/range-rank`,
-    { params: { start: startGw, end: endGw } },
-  );
+  const { data } = await api.get<ManagerRangeRank>(`manager/${entryId}/range-rank`, {
+    params: { start: startGw, end: endGw },
+  });
   return data;
 };
