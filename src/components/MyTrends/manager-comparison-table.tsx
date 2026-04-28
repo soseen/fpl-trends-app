@@ -29,6 +29,7 @@ type TextRow = {
   user: string | null;
   average: string | null;
   top10k: string | null;
+  top100k: string | null;
 };
 
 type Row = NumericRow | TextRow;
@@ -54,11 +55,12 @@ const formatChipAverage = (avg: number | null): string => {
 
 const captainNameOrDash = (
   s: CaptainSummary,
-  side: "user" | "average" | "top10k",
+  side: "user" | "average" | "top10k" | "top100k",
 ): string => {
   if (side === "user") return s.user_player_name ?? "—";
   if (side === "average") return s.average_player_name ?? "—";
-  return s.top10k_player_name ?? "—";
+  if (side === "top10k") return s.top10k_player_name ?? "—";
+  return s.top100k_player_name ?? "—";
 };
 
 const buildRows = (data: ManagerComparison): Row[] => [
@@ -87,6 +89,7 @@ const buildRows = (data: ManagerComparison): Row[] => [
     user: captainNameOrDash(data.most_captained, "user"),
     average: captainNameOrDash(data.most_captained, "average"),
     top10k: captainNameOrDash(data.most_captained, "top10k"),
+    top100k: captainNameOrDash(data.most_captained, "top100k"),
   },
   {
     kind: "numeric",
@@ -139,19 +142,6 @@ const diffColor = (
   return userIsBetter ? "text-emerald-400" : "text-rose-400";
 };
 
-const formatDiff = (
-  user: number,
-  comparator: number | null,
-  kind: "numeric" | "chip",
-): string => {
-  if (comparator === null || kind === "chip") return "—";
-  const diff = user - comparator;
-  const rounded = Math.abs(diff) < 1 ? diff.toFixed(1) : Math.round(diff);
-  const num = Number(rounded);
-  if (num === 0) return "0";
-  return num > 0 ? `+${rounded}` : `${rounded}`;
-};
-
 const formatComparator = (
   value: number | null,
   decimals: number,
@@ -175,10 +165,10 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
           {!isSM && (
             <TableHead className="text-text/70 h-8 px-2 text-right">Average</TableHead>
           )}
-          <TableHead className="text-text/70 h-8 px-2 text-right">Top 10k</TableHead>
           {!isSM && (
-            <TableHead className="text-text/70 h-8 px-2 text-right">Diff</TableHead>
+            <TableHead className="text-text/70 h-8 px-2 text-right">Top 100k</TableHead>
           )}
+          <TableHead className="text-text/70 h-8 px-2 text-right">Top 10k</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -198,20 +188,23 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
                     {row.average ?? "—"}
                   </TableCell>
                 )}
+                {!isSM && (
+                  <TableCell className="text-text/80 px-2 py-2 text-right">
+                    {row.top100k ?? "—"}
+                  </TableCell>
+                )}
                 <TableCell className="text-text/80 px-2 py-2 text-right">
                   {row.top10k ?? "—"}
                 </TableCell>
-                {!isSM && (
-                  <TableCell className="px-2 py-2 text-right text-text">—</TableCell>
-                )}
               </TableRow>
             );
           }
 
           // numeric / chip row
-          // Diff column compares user to the AVERAGE (overall sample); the
-          // colour on "You" mirrors that comparison so mobile readers can
-          // still tell whether they're above or below the field.
+          // The "You" cell on mobile mirrors a comparison against the overall
+          // average (green if better, rose if worse) — useful because mobile
+          // hides the Average column. On desktop, the Average column is
+          // visible alongside, so "You" stays neutral.
           const userAvgColor =
             row.stat.average === null || row.kind === "chip"
               ? "text-text"
@@ -244,6 +237,19 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
                       )}
                 </TableCell>
               )}
+              {!isSM && (
+                <TableCell className="text-text/80 px-2 py-2 text-right">
+                  {row.kind === "chip"
+                    ? formatChipAverage(row.stat.top100k_average)
+                    : formatComparator(
+                        row.stat.top100k_average,
+                        row.stat.top100k_average !== null && row.stat.top100k_average < 10
+                          ? 1
+                          : 0,
+                        false,
+                      )}
+                </TableCell>
+              )}
               <TableCell className="text-text/80 px-2 py-2 text-right">
                 {row.kind === "chip"
                   ? formatChipAverage(row.stat.top10k_average)
@@ -255,11 +261,6 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
                       false,
                     )}
               </TableCell>
-              {!isSM && (
-                <TableCell className={`px-2 py-2 text-right font-medium ${userAvgColor}`}>
-                  {formatDiff(row.stat.user, row.stat.average, row.kind)}
-                </TableCell>
-              )}
             </TableRow>
           );
         })}

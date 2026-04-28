@@ -4,6 +4,7 @@ export type ComparisonStat = {
   user: number;
   average: number | null;
   top10k_average: number | null;
+  top100k_average: number | null;
 };
 
 export type CaptainSummary = {
@@ -13,6 +14,8 @@ export type CaptainSummary = {
   average_player_name: string | null;
   top10k_player_id: number | null;
   top10k_player_name: string | null;
+  top100k_player_id: number | null;
+  top100k_player_name: string | null;
 };
 
 export type ManagerComparison = {
