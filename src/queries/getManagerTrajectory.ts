@@ -6,6 +6,8 @@ export type ManagerTrajectoryPoint = {
   gw_rank: number;
   points: number;
   total_points: number;
+  event_transfers: number;
+  event_transfers_cost: number; // -4 hits per transfer over the free one (0/4/8/…)
 };
 
 export type ManagerTrajectory = {
@@ -16,8 +18,6 @@ export type ManagerTrajectory = {
 export const getManagerTrajectory = async (
   entryId: number,
 ): Promise<ManagerTrajectory> => {
-  const { data } = await api.get<ManagerTrajectory>(
-    `manager/${entryId}/trajectory`,
-  );
+  const { data } = await api.get<ManagerTrajectory>(`manager/${entryId}/trajectory`);
   return data;
 };

@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { PlayerImpact } from "src/queries/getTeamImpact";
-import { formatRankDelta, rankImpactColorClass } from "./format";
+import { formatRankDelta, rankImpactColorClass, POINTS_HAUL_THRESHOLD } from "./format";
 
 type Props = {
   player: PlayerImpact;
@@ -67,7 +67,16 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
               <TableCell className="px-1.5 py-1.5 text-right text-text sm:px-2">
                 {multiplierLabel(row.multiplier)}
               </TableCell>
-              <TableCell className="px-1.5 py-1.5 text-right font-semibold text-text sm:px-2">
+              <TableCell
+                className={`px-1.5 py-1.5 text-right font-semibold sm:px-2 ${
+                  row.points >= POINTS_HAUL_THRESHOLD ? "text-emerald-400" : "text-text"
+                }`}
+                title={
+                  row.points >= POINTS_HAUL_THRESHOLD
+                    ? `Big GW haul (${POINTS_HAUL_THRESHOLD}+ pts)`
+                    : undefined
+                }
+              >
                 {row.points}
               </TableCell>
               <TableCell className="text-text/80 px-1.5 py-1.5 text-right sm:px-2">

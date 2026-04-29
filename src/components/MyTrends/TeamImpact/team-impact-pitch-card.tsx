@@ -5,6 +5,7 @@ import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { getTeamsBadge } from "src/utils/images";
 import type { TeamImpactTile } from "src/queries/getTeamImpact";
 import { formatRankDelta, rankImpactColorClass } from "./format";
+import { useOpenPlayerDetails } from "./use-open-player-details";
 
 type Props = {
   tile: TeamImpactTile;
@@ -22,11 +23,21 @@ type Props = {
 //
 // Visually mirrors Home/BestScoringFootballers/pitch-card.tsx so the
 // pitch reads consistently. The middle row is the only structural change.
+//
+// Tile is clickable: opens the global FootballerDetails modal/drawer (the
+// same one Players table, Compare tool, and Home Best XI use). We look up
+// the enriched-stats version of the player by id; if it's missing (rare,
+// e.g. mid-season transfer out of the league), the click is a no-op
+// rather than throwing.
 const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
   const rankColor = rankImpactColorClass(tile.rank_impact);
+  const openDetails = useOpenPlayerDetails();
   return (
     <div className="flex">
-      <Button className="relative m-auto flex h-[92px] w-14 cursor-default flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large hover:bg-secondary sm:w-20 md:h-[136px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[188px] lg:w-32">
+      <Button
+        onClick={() => openDetails(tile.player_id)}
+        className="relative m-auto flex h-[92px] w-14 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:h-[136px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[188px] lg:w-32"
+      >
         <FootballerImage
           code={tile.code}
           className="m-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"

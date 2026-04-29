@@ -34,3 +34,17 @@ export const rankImpactPillClass = (n: number): string => {
   }
   return n > 0 ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300";
 };
+
+// FPL haul threshold: a single-GW score worth highlighting. 9+ pts is the
+// canonical "did well" line — captaincy bonus on a 5-pt return, double
+// digits on a clean sheet for a defender, etc. Used by the per-GW
+// breakdown to flag the user's actual scoring weeks.
+export const POINTS_HAUL_THRESHOLD = 9;
+
+// Defcon bonus = "the player crossed FPL's defensive-contribution threshold
+// in this GW", awarded as a +2 in their score. Any defcon bonus > 0 over
+// the range is worth a green tint as a "this stat earned you points" cue.
+//
+// Returns the colour class, or null when there's nothing to highlight.
+export const defconHighlightClass = (count: number): string | null =>
+  count > 0 ? "text-emerald-400" : null;

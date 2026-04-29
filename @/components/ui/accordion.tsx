@@ -12,7 +12,11 @@ const AccordionItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
-    className={cn("border-accent4/40 border-b", className)}
+    // Subtle bottom-border separator using the existing accent-4 token at
+    // low opacity. The default "border-b" (no color) was rendering as the
+    // browser default white, which clashed with the dark theme — explicit
+    // border-color fixes that.
+    className={cn("border-accent4/20 border-b last:border-b-0", className)}
     {...props}
   />
 ));

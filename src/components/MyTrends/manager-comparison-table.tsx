@@ -148,28 +148,40 @@ const formatComparator = (
 // Ticks sit on top of both the fill and the empty track at half the bar's
 // height so they remain visible on either side, giving the bar a
 // "ruler-like" feel without clutter.
+//
+// `copyLabel` ("1st" / "2nd") shows up to the left of the bar when both
+// halves are rendered, so the user can tell which copy of the chip the
+// rate refers to. Empty when only one half is active for the range.
 const TICK_POSITIONS = [20, 40, 60, 80] as const;
 
-const ChipBarSegment: React.FC<{ pct: number; tooltip: string }> = ({ pct, tooltip }) => (
-  <div
-    className="bg-accent4/40 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm sm:max-w-[90px]"
-    title={tooltip}
-  >
-    <div
-      className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
-      style={{ width: `${pct}%` }}
-    />
-    {TICK_POSITIONS.map((t) => (
+const ChipBarSegment: React.FC<{
+  pct: number;
+  tooltip: string;
+  copyLabel?: string;
+}> = ({ pct, tooltip, copyLabel }) => (
+  <div className="flex items-center gap-1.5" title={tooltip}>
+    {copyLabel && (
+      <span className="text-text/60 w-5 shrink-0 text-right text-[9px] font-semibold sm:text-[10px]">
+        {copyLabel}
+      </span>
+    )}
+    <div className="border-accent4/60 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:max-w-[90px]">
       <div
-        key={t}
-        className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
-        style={{ left: `${t}%` }}
-        aria-hidden
+        className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
+        style={{ width: `${pct}%` }}
       />
-    ))}
-    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
-      {pct}%
-    </span>
+      {TICK_POSITIONS.map((t) => (
+        <div
+          key={t}
+          className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
+          style={{ left: `${t}%` }}
+          aria-hidden
+        />
+      ))}
+      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
+        {pct}%
+      </span>
+    </div>
   </div>
 );
 
@@ -207,11 +219,13 @@ const ChipCell: React.FC<{
     <div className="ml-auto flex flex-col items-end gap-1">
       <ChipBarSegment
         pct={h1Pct}
-        tooltip={`${label} (1st half, GW 1–19): ${h1Pct}% of sampled managers`}
+        copyLabel="1st"
+        tooltip={`${label} (1st copy, GW 1–19): ${h1Pct}% of sampled managers`}
       />
       <ChipBarSegment
         pct={h2Pct}
-        tooltip={`${label} (2nd half, GW 20–38): ${h2Pct}% of sampled managers`}
+        copyLabel="2nd"
+        tooltip={`${label} (2nd copy, GW 20–38): ${h2Pct}% of sampled managers`}
       />
     </div>
   );
