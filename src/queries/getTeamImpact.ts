@@ -23,6 +23,17 @@ export type PlayerImpactGwBreakdown = {
   eo: number;
   excess: number;
   rank_impact_gw: number;
+  // Match events for this GW — populated by the backend SUM-aggregating
+  // history rows across DGW fixtures. Used in the per-player accordion's
+  // breakdown table to show WHY a given GW score was what it was.
+  minutes: number;
+  goals: number;
+  assists: number;
+  clean_sheets: number;
+  goals_conceded: number;
+  defensive_contribution: number;
+  saves: number;
+  bonus: number;
 };
 
 export type PlayerImpact = {
