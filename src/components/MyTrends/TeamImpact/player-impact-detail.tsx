@@ -1,5 +1,14 @@
 import type React from "react";
 import {
+  FaFutbol,
+  FaHandshake,
+  FaShieldAlt,
+  FaStar,
+  FaRegHandPaper,
+} from "react-icons/fa";
+import { TbLockFilled } from "react-icons/tb";
+import { GiSoccerKick } from "react-icons/gi";
+import {
   Table,
   TableBody,
   TableCell,
@@ -27,24 +36,29 @@ const ELEMENT_TYPE_FWD = 4;
 const defconThreshold = (elementType: number): number =>
   elementType === ELEMENT_TYPE_DEF ? 10 : 12;
 
-// Tiny inline stat chip used to render the per-GW match-event breakdown.
-// Same visual rhythm as the row-level stat chips on `player-impact-row`,
-// so the eye reads them as the same kind of data.
-const Chip: React.FC<{
-  label: string;
+// Icon + count chip used to render the per-GW match-event breakdown.
+// Mirrors the icon vocabulary used by the home-page pitch card
+// (`Home/BestScoringFootballers/pitch-card.tsx`) so the same visual
+// shorthand reads consistently across the app: ball = goals, handshake
+// = assists, lock = clean sheet, shield = defcon, star = bonus,
+// open hand = saves, kick = goal conceded. Tooltip explains the FPL
+// scoring rule on hover. Tone defaults to muted; pass an explicit
+// `tone` for "this earned points" emerald or "this lost points" rose.
+const IconChip: React.FC<{
+  icon: React.ReactNode;
   value: number;
   tone?: string;
   title: string;
-}> = ({ label, value, tone, title }) => (
+}> = ({ icon, value, tone, title }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <span
-        className={`inline-flex items-center gap-1 rounded-sm bg-accent3/60 px-1.5 py-[1px] text-[10px] ${
-          tone ?? "text-text/80"
+        className={`inline-flex items-center gap-0.5 text-[11px] sm:gap-1 sm:text-xs ${
+          tone ?? "text-text/70"
         }`}
       >
-        <span className="text-[9px] uppercase text-text/50">{label}</span>
-        <span className="font-semibold">{value}</span>
+        <span className="font-semibold tabular-nums">{value}</span>
+        <span className="flex h-3 items-center sm:h-3.5">{icon}</span>
       </span>
     </TooltipTrigger>
     <TooltipContent>{title}</TooltipContent>
@@ -53,10 +67,11 @@ const Chip: React.FC<{
 
 // Renders the relevant match events for a GW. Shows only what's
 // position-relevant and non-zero: a forward who didn't get any defcons
-// just won't have a D chip, a defender who got a CS will have CS:1, etc.
-// The defcon chip is the only one that always renders for outfielders
-// (it's the headline FPL stat now), and turns green when the threshold
-// for the player's position was met (= +2 bonus awarded).
+// just won't have a D chip, a defender who got a CS will have a lock
+// icon. The defcon chip is the only one that always renders for
+// outfielders (it's the headline FPL stat now), and turns emerald
+// when the threshold for the player's position was met (= +2 bonus
+// awarded).
 const EventChips: React.FC<{
   row: PlayerImpactGwBreakdown;
   elementType: number;
@@ -74,34 +89,34 @@ const EventChips: React.FC<{
   const defconMet = isOutfield && defconCount >= defconThreshold(elementType);
 
   return (
-    <div className="flex flex-wrap items-center gap-1">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
       {row.goals > 0 && (
-        <Chip
-          label="G"
+        <IconChip
+          icon={<FaFutbol />}
           value={row.goals}
           tone="text-emerald-400"
           title={`${row.goals} goal${row.goals === 1 ? "" : "s"}`}
         />
       )}
       {row.assists > 0 && (
-        <Chip
-          label="A"
+        <IconChip
+          icon={<FaHandshake />}
           value={row.assists}
-          tone="text-emerald-400"
+          tone="text-cyan-300"
           title={`${row.assists} assist${row.assists === 1 ? "" : "s"}`}
         />
       )}
       {(isGk || isDef) && row.clean_sheets > 0 && (
-        <Chip
-          label="CS"
+        <IconChip
+          icon={<TbLockFilled />}
           value={row.clean_sheets}
           tone="text-emerald-400"
           title="Clean sheet (+4 pts)"
         />
       )}
       {isMid && row.clean_sheets > 0 && (
-        <Chip
-          label="CS"
+        <IconChip
+          icon={<TbLockFilled />}
           value={row.clean_sheets}
           tone="text-emerald-400"
           title="Clean sheet (+1 pt for midfielders)"
@@ -109,10 +124,10 @@ const EventChips: React.FC<{
       )}
       {/* Forwards: clean sheets don't earn pts, so we don't show the chip. */}
       {isOutfield && (
-        <Chip
-          label="D"
+        <IconChip
+          icon={<FaShieldAlt />}
           value={defconCount}
-          tone={defconMet ? "text-emerald-400" : "text-text/60"}
+          tone={defconMet ? "text-emerald-400" : "text-text/40"}
           title={
             defconMet
               ? `Defensive contributions: ${defconCount} (≥ ${defconThreshold(elementType)} threshold met → +2 bonus)`
@@ -121,10 +136,10 @@ const EventChips: React.FC<{
         />
       )}
       {isGk && row.saves > 0 && (
-        <Chip
-          label="Sv"
+        <IconChip
+          icon={<FaRegHandPaper />}
           value={row.saves}
-          tone={row.saves >= 3 ? "text-emerald-400" : "text-text/60"}
+          tone={row.saves >= 3 ? "text-emerald-400" : "text-text/40"}
           title={
             row.saves >= 3
               ? `${row.saves} saves (every 3 = +1 pt)`
@@ -133,16 +148,16 @@ const EventChips: React.FC<{
         />
       )}
       {(isGk || isDef) && row.goals_conceded >= 2 && (
-        <Chip
-          label="GC"
+        <IconChip
+          icon={<GiSoccerKick />}
           value={row.goals_conceded}
           tone="text-rose-400"
           title="Goals conceded (every 2 = -1 pt)"
         />
       )}
       {row.bonus > 0 && (
-        <Chip
-          label="B"
+        <IconChip
+          icon={<FaStar />}
           value={row.bonus}
           tone="text-amber-400"
           title="Bonus points (BPS top 3)"
