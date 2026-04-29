@@ -26,6 +26,7 @@ import RankTrajectoryChart from "./rank-trajectory-chart";
 import ManagerComparisonTable from "./manager-comparison-table";
 import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
+import TeamImpactView from "./TeamImpact/team-impact";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -167,6 +168,12 @@ const MyTrends: React.FC = () => {
       {comparisonQuery.data && (
         <MyTrendsSection title="How you compare">
           <ManagerComparisonTable data={comparisonQuery.data} />
+        </MyTrendsSection>
+      )}
+
+      {typeof entryId === "number" && (
+        <MyTrendsSection title="Team impact">
+          <TeamImpactView entryId={entryId} />
         </MyTrendsSection>
       )}
 
