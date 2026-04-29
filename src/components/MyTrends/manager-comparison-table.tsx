@@ -185,7 +185,7 @@ const ChipCell: React.FC<{
   const h2Pct = rateToPct(h2Rate);
 
   if (h1Pct === null && h2Pct === null) {
-    return <span className="text-text/60">—</span>;
+    return <div className="text-text/60 text-right">—</div>;
   }
 
   const showBoth = h1Pct !== null && h2Pct !== null;
