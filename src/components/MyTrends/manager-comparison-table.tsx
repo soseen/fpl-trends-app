@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import type {
   CaptainSummary,
+  ChipUsageStat,
   ComparisonStat,
   ManagerComparison,
 } from "src/queries/getManagerComparison";
@@ -25,7 +26,7 @@ type NumericRow = {
 type ChipRow = {
   kind: "chip";
   label: string;
-  stat: ComparisonStat;
+  stat: ChipUsageStat;
 };
 
 type TextRow = {
@@ -49,24 +50,14 @@ const formatNumber = (n: number, decimals = 0): string =>
     maximumFractionDigits: decimals,
   });
 
-// Each chip type comes with two copies per season — one in the first half
-// (GW1–19), one after the mid-season reset (GW20–38). For ranges that span
-// the reset, the per-manager max is 2; otherwise 1. Bars are normalized
-// against this max so 100% always means "every sampled manager used every
-// available copy in this range" regardless of which half is being viewed.
-const maxChipsForRange = (startGw: number, endGw: number): 1 | 2 =>
-  startGw <= 19 && endGw >= 20 ? 2 : 1;
-
-// Convert backend chip rate (raw plays / managers) to a [0..100] bar
-// percentage normalized by the per-manager max for the current range.
-const chipRateToPct = (
-  rate: number | null,
-  startGw: number,
-  endGw: number,
-): number | null => {
+// Each chip type has two copies per season — one usable in the first half
+// (GW1–19), one in the second half (GW20–38). The backend reports each
+// half's usage as a fraction (0..1) of sampled managers who played that
+// copy, so a single half's rate translates directly to a 0–100% bar
+// without any per-range normalization.
+const rateToPct = (rate: number | null): number | null => {
   if (rate === null) return null;
-  const max = maxChipsForRange(startGw, endGw);
-  return Math.max(0, Math.min(100, Math.round((rate / max) * 100)));
+  return Math.max(0, Math.min(100, Math.round(rate * 100)));
 };
 
 const captainNameOrDash = (
@@ -153,36 +144,81 @@ const formatComparator = (
   return `${prefix}${formatNumber(value, decimals)}`;
 };
 
-// Inline magenta progress bar for chip-usage rates. Renders the percentage
-// label centered on top of the bar so the cell stays compact even on
-// narrow phone screens.
-const ChipBar: React.FC<{ pct: number | null; label?: string }> = ({ pct, label }) => {
-  if (pct === null) {
+// Single magenta progress bar with 4 tick-mark breakpoints at 20/40/60/80%.
+// Ticks sit on top of both the fill and the empty track at half the bar's
+// height so they remain visible on either side, giving the bar a
+// "ruler-like" feel without clutter.
+const TICK_POSITIONS = [20, 40, 60, 80] as const;
+
+const ChipBarSegment: React.FC<{ pct: number; tooltip: string }> = ({ pct, tooltip }) => (
+  <div
+    className="bg-accent4/40 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm sm:max-w-[90px]"
+    title={tooltip}
+  >
+    <div
+      className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
+      style={{ width: `${pct}%` }}
+    />
+    {TICK_POSITIONS.map((t) => (
+      <div
+        key={t}
+        className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
+        style={{ left: `${t}%` }}
+        aria-hidden
+      />
+    ))}
+    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
+      {pct}%
+    </span>
+  </div>
+);
+
+// Renders the chip-usage cell. Two bars stacked vertically when the range
+// spans the GW20 reset (top bar = first-half copy, bottom bar = second-half
+// copy); otherwise a single bar for whichever half is active.
+const ChipCell: React.FC<{
+  label: string;
+  h1Rate: number | null;
+  h2Rate: number | null;
+}> = ({ label, h1Rate, h2Rate }) => {
+  const h1Pct = rateToPct(h1Rate);
+  const h2Pct = rateToPct(h2Rate);
+
+  if (h1Pct === null && h2Pct === null) {
     return <span className="text-text/60">—</span>;
   }
-  const display = label ?? `${pct}%`;
-  return (
-    <div className="ml-auto flex items-center justify-end">
-      <div
-        className="bg-accent4/40 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm sm:max-w-[90px]"
-        title={`${pct}% of available chip usage in this range`}
-      >
-        <div
-          className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
-          style={{ width: `${pct}%` }}
+
+  const showBoth = h1Pct !== null && h2Pct !== null;
+
+  if (!showBoth) {
+    const onlyPct = h1Pct ?? h2Pct ?? 0;
+    const half = h1Pct !== null ? "GW 1–19" : "GW 20–38";
+    return (
+      <div className="ml-auto flex items-center justify-end">
+        <ChipBarSegment
+          pct={onlyPct}
+          tooltip={`${label} ${half}: ${onlyPct}% of sampled managers used this chip`}
         />
-        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
-          {display}
-        </span>
       </div>
+    );
+  }
+
+  return (
+    <div className="ml-auto flex flex-col items-end gap-1">
+      <ChipBarSegment
+        pct={h1Pct}
+        tooltip={`${label} (1st half, GW 1–19): ${h1Pct}% of sampled managers`}
+      />
+      <ChipBarSegment
+        pct={h2Pct}
+        tooltip={`${label} (2nd half, GW 20–38): ${h2Pct}% of sampled managers`}
+      />
     </div>
   );
 };
 
 const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
   const rows = buildRows(data);
-  const startGw = data.start_gw;
-  const endGw = data.end_gw;
 
   return (
     <Table className="text-[11px] sm:text-xs md:text-sm">
@@ -246,15 +282,25 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
                   {row.stat.user}
                 </TableCell>
                 <TableCell className="px-1.5 py-2 sm:px-2">
-                  <ChipBar pct={chipRateToPct(row.stat.average, startGw, endGw)} />
-                </TableCell>
-                <TableCell className="px-1.5 py-2 sm:px-2">
-                  <ChipBar
-                    pct={chipRateToPct(row.stat.top100k_average, startGw, endGw)}
+                  <ChipCell
+                    label={row.label}
+                    h1Rate={row.stat.h1?.average ?? null}
+                    h2Rate={row.stat.h2?.average ?? null}
                   />
                 </TableCell>
                 <TableCell className="px-1.5 py-2 sm:px-2">
-                  <ChipBar pct={chipRateToPct(row.stat.top10k_average, startGw, endGw)} />
+                  <ChipCell
+                    label={row.label}
+                    h1Rate={row.stat.h1?.top100k_average ?? null}
+                    h2Rate={row.stat.h2?.top100k_average ?? null}
+                  />
+                </TableCell>
+                <TableCell className="px-1.5 py-2 sm:px-2">
+                  <ChipCell
+                    label={row.label}
+                    h1Rate={row.stat.h1?.top10k_average ?? null}
+                    h2Rate={row.stat.h2?.top10k_average ?? null}
+                  />
                 </TableCell>
               </TableRow>
             );
