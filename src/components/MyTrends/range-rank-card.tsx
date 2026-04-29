@@ -46,7 +46,7 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
           <p className="text-base font-semibold md:mb-2 md:text-5xl">
             {formatRank(overall)}
           </p>
-          <p className="text-text/60 text-xs md:text-sm">Top {percentageOverall}%</p>
+          <p className="text-xs text-text/60 md:text-sm">Top {percentageOverall}%</p>
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
           {(data.total_points ?? 0).toLocaleString("en-GB")} pts
@@ -64,7 +64,21 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
             {prefix}
             {formatRank(range)}
           </p>
-          <p className="text-text/60 text-xs md:text-sm">Top {percentageRange}%</p>
+          <p className="text-xs text-text/60 md:text-sm">Top {percentageRange}%</p>
+          {/* Side-by-side ground-truth: FPL publishes the cumulative
+              overall rank at end_gw for any startGw=1 query, so the
+              estimator's `range_rank` should converge on it as the
+              sample matures. Showing both lets the operator eyeball
+              estimator quality without leaving the page. Hidden when
+              FPL hasn't published one (partial ranges, unranked user). */}
+          {data.range_rank_official !== null && data.range_rank_official !== range && (
+            <p
+              className="mt-1 text-[10px] text-text/50 md:text-xs"
+              title="Cumulative overall rank reported directly by FPL for the end of the range. Treat this as the ground-truth our estimator is trying to match."
+            >
+              FPL: {formatRank(data.range_rank_official)}
+            </p>
+          )}
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
           {data.range_total.toLocaleString("en-GB")} pts
