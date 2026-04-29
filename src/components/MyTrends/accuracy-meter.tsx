@@ -22,10 +22,17 @@ const TARGET_SAMPLE: Record<1 | 2 | 3, number> = {
   3: 150_000,
 };
 
+// Cap at 99 deliberately. Hitting the design sample target doesn't mean the
+// estimate is *exactly* right — there's always residual stratum-3 sampling
+// noise plus a slight stale-tag drift between cron passes. Showing "100%"
+// would over-promise accuracy we cannot guarantee. 99% is the honest
+// ceiling: "as good as our pipeline gets, never literally perfect."
+const ACCURACY_CAP = 99;
+
 const computeAccuracy = (stratum: 1 | 2 | 3 | null, sampleSize: number): number => {
   if (stratum === null || sampleSize <= 0) return 0;
   const ratio = sampleSize / TARGET_SAMPLE[stratum];
-  return Math.min(100, Math.round(ratio * 100));
+  return Math.min(ACCURACY_CAP, Math.round(ratio * 100));
 };
 
 const bucketFor = (pct: number): 1 | 2 | 3 => {
