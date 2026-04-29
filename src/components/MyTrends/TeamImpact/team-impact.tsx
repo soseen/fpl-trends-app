@@ -59,7 +59,7 @@ const TeamImpactView: React.FC<Props> = ({ entryId }) => {
         </Card>
       )}
 
-      <div className="border-accent4/40 rounded-md border bg-primary p-2 sm:p-3">
+      <div className="rounded-md border border-accent4 bg-primary p-2 sm:p-3">
         <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
           <h3 className="text-sm font-semibold text-text sm:text-base">
             Player breakdown

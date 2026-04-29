@@ -17,6 +17,31 @@
     --magenta-3: #8b223e;
     --highlight: #0dc5b6;
     --text: #c9c5c5;
+
+    /* RGB-channel companions of the hex vars above. Tailwind needs raw
+       "R G B" numbers (no rgb() wrapper, no commas) so that color classes
+       can compose with alpha modifiers — `bg-accent4/20` compiles to
+       `rgb(var(--accent-4-rgb) / 0.2)`, which only works if the var holds
+       three space-separated numbers.
+       Without these, alpha-modified utilities silently dropped to the
+       preflight default (#e5e7eb gray-200), producing the white-ish 1px
+       phantom outlines that were appearing on tables, cards, accordion
+       row dividers, etc. The hex vars are kept for direct SVG / CSS
+       consumers (chart fills, recharts strokes) that hand a colour
+       string straight to the browser. */
+    --background-rgb: 19 23 32;
+    --primary-rgb: 21 22 34;
+    --secondary-rgb: 29 32 44;
+    --accent-rgb: 54 56 74;
+    --accent-2-rgb: 19 20 28;
+    --accent-3-rgb: 27 30 43;
+    --accent-4-rgb: 33 36 59;
+    --accent-5-rgb: 22 23 34;
+    --magenta-rgb: 199 30 77;
+    --magenta-2-rgb: 78 14 31;
+    --magenta-3-rgb: 139 34 62;
+    --highlight-rgb: 13 197 182;
+    --text-rgb: 201 197 197;
     --shadow-1: "4px 3px 8px 4px #00000030";
     --chart-1: #27dfff;
     --chart-2: #2a9d90;

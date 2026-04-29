@@ -29,7 +29,7 @@ const multiplierLabel = (mult: number): string => {
 const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
   return (
     <div className="overflow-x-auto">
-      <Table className="text-[11px] sm:text-xs">
+      <Table className="border-transparent text-[11px] sm:text-xs">
         <TableHeader>
           <TableRow className="border-b border-accent4 hover:bg-transparent">
             <TableHead className="text-text/70 h-7 px-1.5 sm:px-2">GW</TableHead>
@@ -59,7 +59,7 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
           {player.per_gw.map((row) => (
             <TableRow
               key={row.gw}
-              className="border-accent4/40 border-b hover:bg-transparent"
+              className="border-b border-accent4 hover:bg-transparent"
             >
               <TableCell className="text-text/80 px-1.5 py-1.5 sm:px-2">
                 {row.gw}
@@ -80,10 +80,10 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
                 {row.points}
               </TableCell>
               <TableCell className="text-text/80 px-1.5 py-1.5 text-right sm:px-2">
-                {(row.ownership_pct * 100).toFixed(1)}
+                {(row.ownership_pct * 100).toFixed(1)}%
               </TableCell>
               <TableCell className="text-text/80 px-1.5 py-1.5 text-right sm:px-2">
-                {row.eo.toFixed(2)}
+                {(row.eo * 100).toFixed(1)}%
               </TableCell>
               <TableCell
                 className={`px-1.5 py-1.5 text-right sm:px-2 ${
