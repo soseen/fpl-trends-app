@@ -40,38 +40,51 @@ const defconThreshold = (elementType: number): number =>
 // Mirrors the icon vocabulary used by the home-page pitch card
 // (`Home/BestScoringFootballers/pitch-card.tsx`) so the same visual
 // shorthand reads consistently across the app: ball = goals, handshake
-// = assists, lock = clean sheet, shield = defcon, star = bonus,
-// open hand = saves, kick = goal conceded. Tooltip explains the FPL
-// scoring rule on hover. Tone defaults to muted; pass an explicit
-// `tone` for "this earned points" emerald or "this lost points" rose.
+// = assists, lock = clean sheet, shield = defcon (only shown when
+// threshold met), star = bonus, open hand = saves, kick = goal
+// conceded. Tooltip explains the FPL scoring rule on hover.
+//
+// Rendered as a proper chip — rounded background tile, subtle border
+// matching the icon tone — instead of a bare icon + number. The tile
+// makes each event read as one discrete "thing earned points" unit and
+// keeps the row compact when several events stack up.
 const IconChip: React.FC<{
   icon: React.ReactNode;
   value: number;
-  tone?: string;
+  tone: string;
   title: string;
 }> = ({ icon, value, tone, title }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <span
-        className={`inline-flex items-center gap-0.5 text-[11px] sm:gap-1 sm:text-xs ${
-          tone ?? "text-text/70"
-        }`}
+        className={`inline-flex items-center gap-1 rounded-md bg-accent3/70 px-1.5 py-[2px] text-[11px] ring-1 ring-inset sm:text-xs ${tone}`}
       >
-        <span className="font-semibold tabular-nums">{value}</span>
         <span className="flex h-3 items-center sm:h-3.5">{icon}</span>
+        <span className="font-semibold tabular-nums">{value}</span>
       </span>
     </TooltipTrigger>
     <TooltipContent>{title}</TooltipContent>
   </Tooltip>
 );
 
+// Tone palette for the chips. Bundles foreground text colour and inset
+// ring colour so each event type reads as a distinct family of points.
+// Greens = "this earned points", cyan = assists, amber = bonus, rose =
+// goals conceded (cost points).
+const TONE = {
+  good: "text-emerald-400 ring-emerald-400/40",
+  assist: "text-cyan-300 ring-cyan-300/40",
+  bonus: "text-amber-400 ring-amber-400/40",
+  bad: "text-rose-400 ring-rose-400/40",
+} as const;
+
 // Renders the relevant match events for a GW. Shows only what's
-// position-relevant and non-zero: a forward who didn't get any defcons
-// just won't have a D chip, a defender who got a CS will have a lock
-// icon. The defcon chip is the only one that always renders for
-// outfielders (it's the headline FPL stat now), and turns emerald
-// when the threshold for the player's position was met (= +2 bonus
-// awarded).
+// position-relevant AND scoring-relevant — a chip appears when the
+// player actually earned (or lost) points from that event. So a
+// midfielder who got 8 defcons (under the 12 threshold) won't have a
+// shield chip; only when the +2 bonus was awarded does the shield
+// show up. Same logic for saves (only at 3+) and goals conceded
+// (only at 2+).
 const EventChips: React.FC<{
   row: PlayerImpactGwBreakdown;
   elementType: number;
@@ -89,12 +102,12 @@ const EventChips: React.FC<{
   const defconMet = isOutfield && defconCount >= defconThreshold(elementType);
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+    <div className="flex flex-wrap items-center gap-1.5">
       {row.goals > 0 && (
         <IconChip
           icon={<FaFutbol />}
           value={row.goals}
-          tone="text-emerald-400"
+          tone={TONE.good}
           title={`${row.goals} goal${row.goals === 1 ? "" : "s"}`}
         />
       )}
@@ -102,7 +115,7 @@ const EventChips: React.FC<{
         <IconChip
           icon={<FaHandshake />}
           value={row.assists}
-          tone="text-cyan-300"
+          tone={TONE.assist}
           title={`${row.assists} assist${row.assists === 1 ? "" : "s"}`}
         />
       )}
@@ -110,7 +123,7 @@ const EventChips: React.FC<{
         <IconChip
           icon={<TbLockFilled />}
           value={row.clean_sheets}
-          tone="text-emerald-400"
+          tone={TONE.good}
           title="Clean sheet (+4 pts)"
         />
       )}
@@ -118,40 +131,37 @@ const EventChips: React.FC<{
         <IconChip
           icon={<TbLockFilled />}
           value={row.clean_sheets}
-          tone="text-emerald-400"
+          tone={TONE.good}
           title="Clean sheet (+1 pt for midfielders)"
         />
       )}
       {/* Forwards: clean sheets don't earn pts, so we don't show the chip. */}
-      {isOutfield && (
+      {/* Defcon shield only renders when the threshold was met for the
+          player's position (+2 bonus awarded). Below threshold the chip
+          is just visual noise — the points didn't change. */}
+      {defconMet && (
         <IconChip
           icon={<FaShieldAlt />}
           value={defconCount}
-          tone={defconMet ? "text-emerald-400" : "text-text/40"}
-          title={
-            defconMet
-              ? `Defensive contributions: ${defconCount} (≥ ${defconThreshold(elementType)} threshold met → +2 bonus)`
-              : `Defensive contributions: ${defconCount} (threshold ${defconThreshold(elementType)} not met)`
-          }
+          tone={TONE.good}
+          title={`Defensive contributions: ${defconCount} (≥ ${defconThreshold(elementType)} threshold met → +2 bonus)`}
         />
       )}
-      {isGk && row.saves > 0 && (
+      {/* Saves chip only when 3+ (= +1 pt). Below that, it didn't score. */}
+      {isGk && row.saves >= 3 && (
         <IconChip
           icon={<FaRegHandPaper />}
           value={row.saves}
-          tone={row.saves >= 3 ? "text-emerald-400" : "text-text/40"}
-          title={
-            row.saves >= 3
-              ? `${row.saves} saves (every 3 = +1 pt)`
-              : `${row.saves} save${row.saves === 1 ? "" : "s"} (3+ = +1 pt)`
-          }
+          tone={TONE.good}
+          title={`${row.saves} saves (every 3 = +1 pt)`}
         />
       )}
+      {/* Goals conceded penalty only kicks in at 2+ (-1 pt for GK/DEF). */}
       {(isGk || isDef) && row.goals_conceded >= 2 && (
         <IconChip
           icon={<GiSoccerKick />}
           value={row.goals_conceded}
-          tone="text-rose-400"
+          tone={TONE.bad}
           title="Goals conceded (every 2 = -1 pt)"
         />
       )}
@@ -159,7 +169,7 @@ const EventChips: React.FC<{
         <IconChip
           icon={<FaStar />}
           value={row.bonus}
-          tone="text-amber-400"
+          tone={TONE.bonus}
           title="Bonus points (BPS top 3)"
         />
       )}
