@@ -22,6 +22,7 @@ import {
   useAppInitContext,
 } from "src/components/AppInitializer/app-initializer.context";
 import TeamsTableSkeleton from "./teams-table.skeleton";
+import clsx from "clsx";
 
 const TeamsTable = () => {
   const { teams, isDefensiveStats, onSelectValueChange } = useTeamsTable();
@@ -34,7 +35,7 @@ const TeamsTable = () => {
       <div className="mb-4 flex flex-shrink flex-grow-0 items-center justify-between">
         <h2 className="text-xs text-text md:text-lg">Team Rankings</h2>
         <Select defaultValue="defensive" onValueChange={onSelectValueChange}>
-          <SelectTrigger className="w-[120px] bg-magenta px-2 py-1 text-text">
+          <SelectTrigger className="h-auto w-[120px] border-transparent bg-magenta px-2 py-1 text-text">
             <SelectValue placeholder="Stats Type" />
           </SelectTrigger>
           <SelectContent sideOffset={5} className="w-[120px] cursor-pointer bg-magenta">
@@ -56,7 +57,7 @@ const TeamsTable = () => {
 
       <Table className="rounded-md bg-secondary px-4 py-6 text-sm shadow-xl md:px-6 md:text-base">
         <TableHeader>
-          <TableRow>
+          <TableRow className="border-transparent">
             <TableHead className="w-[50px] p-2">#</TableHead>
             <TableHead className="p-2">Team</TableHead>
             <TableHead className="p-2 text-right">
@@ -77,7 +78,14 @@ const TeamsTable = () => {
             const rankingDiff = (team.fullSeasonRank ?? 0) - (index + 1);
 
             return (
-              <TableRow className={index % 2 === 0 ? "bg-accent3" : ""} key={team?.name}>
+              // <TableRow className={index % 2 === 0 ? "bg-accent3" : ""} key={team?.name}>
+              <TableRow
+                className={clsx(
+                  "border-transparent",
+                  `${index % 2 === 0 ? "bg-accent3" : ""}`,
+                )}
+                key={team?.name}
+              >
                 <TableCell className="p-2 text-left font-medium">{index + 1}</TableCell>
 
                 <TableCell className="p-2 text-left">
@@ -105,21 +113,22 @@ const TeamsTable = () => {
 
                 <TableCell className="flex items-center justify-end p-2 text-right">
                   <p>{team?.avg?.toFixed(2)}</p>
-                  {diff !== 0 && (() => {
-                    const isImproved = isDefensiveStats ? diff < 0 : diff > 0;
-                    return (
-                      <span
-                        className={`text-sm ${isImproved ? "text-green-500" : "text-red-500"} flex items-center`}
-                      >
-                        {isImproved ? (
-                          <FaArrowUp className="mx-1 inline" />
-                        ) : (
-                          <FaArrowDown className="mx-1 inline" />
-                        )}
-                        <p>{Math.abs(diff).toFixed(2)}</p>
-                      </span>
-                    );
-                  })()}
+                  {diff !== 0 &&
+                    (() => {
+                      const isImproved = isDefensiveStats ? diff < 0 : diff > 0;
+                      return (
+                        <span
+                          className={`text-sm ${isImproved ? "text-green-500" : "text-red-500"} flex items-center`}
+                        >
+                          {isImproved ? (
+                            <FaArrowUp className="mx-1 inline" />
+                          ) : (
+                            <FaArrowDown className="mx-1 inline" />
+                          )}
+                          <p>{Math.abs(diff).toFixed(2)}</p>
+                        </span>
+                      );
+                    })()}
                 </TableCell>
 
                 <TableCell className="p-2 text-right">
