@@ -242,11 +242,23 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           className="overflow-x-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          <div style={isMD ? { minWidth: 38 * MOBILE_BAR_WIDTH } : undefined}>
+          <div
+            // On desktop we want the chart to stretch to the column width
+            // (`w-full`); on mobile the parent <div ref=scrollRef> handles
+            // horizontal scroll, so the inner div carries the explicit
+            // 38-bars-wide minWidth instead.
+            className={isMD ? undefined : "w-full"}
+            style={isMD ? { minWidth: 38 * MOBILE_BAR_WIDTH } : undefined}
+          >
             <ChartContainer
               key={displayedChartStat}
               config={chartConfig}
-              className="m-auto mt-2 h-[350px] max-h-[450px] min-h-[200px] rounded-md bg-accent2 px-2 py-4 pb-2"
+              // shadcn's ChartContainer ships with `aspect-video` (16/9)
+              // which, combined with our fixed h-[350px], computes width
+              // as ~622px and leaves the chart short of the modal's
+              // edges. Force `aspect-auto w-full` so width tracks the
+              // parent and height stays at 350px.
+              className="mt-2 aspect-auto h-[350px] max-h-[450px] min-h-[200px] w-full rounded-md bg-accent2 px-2 py-4 pb-2"
             >
               <BarChart
                 data={chartData}
