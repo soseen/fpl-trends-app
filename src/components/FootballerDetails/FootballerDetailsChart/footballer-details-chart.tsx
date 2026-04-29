@@ -1,21 +1,20 @@
 import {
   Bar,
   BarChart,
+  CartesianGrid,
   LabelList,
   Rectangle,
   ReferenceLine,
   Tooltip,
   XAxis,
+  YAxis,
 } from "recharts";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ChartConfig } from "@/components/ui/chart";
-import { ChartContainer } from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import type { History } from "src/queries/types";
-import { FootballerPosition } from "src/queries/types";
-import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
+import { FootballerPosition, type History } from "src/queries/types";
 import { getDefconThreshold } from "src/utils/defcon";
 
 import CustomTooltip from "./custom-tooltip";
@@ -67,6 +66,49 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
   const chartConfig: ChartConfig = {
     xGI: { color: "var(--chart-1)", label: "xGI" },
   };
+
+  // Per-stat colour palette. Cyan/magenta tones tie back to the brand
+  // accents already used elsewhere; rose is reserved for "stat-bad-when-
+  // higher" (xGC = expected goals conceded) so a defender's chart reads
+  // intuitively (red = bad). Each stat also gets a distinct gradient
+  // ID so the SVG fills don't clash.
+  const STAT_COLORS: Record<
+    SelectedChartStat,
+    { stroke: string; gradientFrom: string; gradientTo: string; activeFill: string }
+  > = {
+    [SelectedChartStat.xGI]: {
+      stroke: "#27dfff",
+      gradientFrom: "#27dfff",
+      gradientTo: "rgba(39, 223, 255, 0.15)",
+      activeFill: "#7ce9ff",
+    },
+    [SelectedChartStat.xGC]: {
+      stroke: "#fb7185",
+      gradientFrom: "#fb7185",
+      gradientTo: "rgba(251, 113, 133, 0.15)",
+      activeFill: "#fda4af",
+    },
+    [SelectedChartStat.minutes]: {
+      stroke: "#0dc5b6",
+      gradientFrom: "#0dc5b6",
+      gradientTo: "rgba(13, 197, 182, 0.15)",
+      activeFill: "#5eead4",
+    },
+    [SelectedChartStat.points]: {
+      stroke: "#c71e4d",
+      gradientFrom: "#c71e4d",
+      gradientTo: "rgba(199, 30, 77, 0.15)",
+      activeFill: "#f0598c",
+    },
+    [SelectedChartStat.defcons]: {
+      stroke: "#fbbf24",
+      gradientFrom: "#fbbf24",
+      gradientTo: "rgba(251, 191, 36, 0.15)",
+      activeFill: "#fcd34d",
+    },
+  };
+  const palette = STAT_COLORS[displayedChartStat];
+  const gradientId = `chart-grad-${displayedChartStat}`;
 
   // One row per gameweek (1..38). Real GWs sum across double-GWs; missing
   // rounds (future or unplayed) are zeroed and flagged isFake so labels and
@@ -181,8 +223,10 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               <ToggleGroupItem
                 key={index}
                 className={clsx(
-                  "flex-grow rounded-md p-1 text-sm text-text",
-                  stat === displayedChartStat ? "bg-magenta" : "bg-magenta2",
+                  "flex-grow rounded-md px-2.5 py-1 text-xs font-semibold transition-all sm:text-sm",
+                  stat === displayedChartStat
+                    ? "bg-magenta text-text shadow-[0_0_0_1px_rgb(var(--magenta-rgb)/0.6)]"
+                    : "bg-magenta2/60 text-text/70 hover:bg-magenta2",
                 )}
                 value={stat}
               >
@@ -207,26 +251,74 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               <BarChart
                 data={chartData}
                 className="bar-chart"
-                margin={{ left: 0, right: 0 }}
+                margin={{ top: 20, left: 4, right: 12, bottom: 4 }}
               >
+                {/* Per-stat vertical gradient (top-saturated → bottom-faded)
+                    so each bar reads as a 'building up from the floor'
+                    quantity rather than a flat block. */}
+                <defs>
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="0%"
+                      stopColor={palette.gradientFrom}
+                      stopOpacity={0.95}
+                    />
+                    <stop offset="100%" stopColor={palette.gradientTo} stopOpacity={1} />
+                  </linearGradient>
+                </defs>
+                {/* Horizontal grid lines give the eye something to anchor
+                    against — without them, a 0.86 vs a 1.27 are basically
+                    indistinguishable in a 200px-tall chart. */}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--accent-4)"
+                  opacity={0.5}
+                  vertical={false}
+                />
                 <XAxis
                   dataKey="gw"
-                  padding={{ left: 0, right: 0 }}
-                  tickCount={isMD ? TOTAL_GAMEWEEKS_COUNT : 10}
-                  style={{ color: "var(--text)" }}
-                  fill="var(--text)"
-                  color="var(--text)"
+                  padding={{ left: 4, right: 4 }}
+                  interval={isMD ? 0 : "preserveStartEnd"}
+                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.75 }}
+                  stroke="var(--accent-4)"
+                  tickLine={false}
+                  axisLine={{ stroke: "var(--accent-4)" }}
+                />
+                <YAxis
+                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.6 }}
+                  stroke="var(--accent-4)"
+                  tickLine={false}
+                  axisLine={false}
+                  width={32}
+                  tickCount={5}
+                  // xGI / xGC are floats; everything else is integer counts.
+                  tickFormatter={(v: number) =>
+                    [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
+                      displayedChartStat,
+                    )
+                      ? v.toFixed(1)
+                      : `${v}`
+                  }
                 />
                 <Tooltip
                   content={<CustomTooltip />}
-                  cursor={{ fill: "var(--accent-2)" }}
+                  cursor={{ fill: palette.stroke, fillOpacity: 0.08 }}
                   {...(isMD && { offset: 10 })}
                 />
                 <Bar
                   dataKey={displayedChartStat}
-                  fill="var(--chart-1)"
-                  radius={2}
-                  activeBar={<Rectangle fill="var(--chart-3)" stroke="var(--accent)" />}
+                  fill={`url(#${gradientId})`}
+                  stroke={palette.stroke}
+                  strokeOpacity={0.5}
+                  strokeWidth={1}
+                  radius={[3, 3, 0, 0]}
+                  activeBar={
+                    <Rectangle
+                      fill={palette.activeFill}
+                      stroke={palette.stroke}
+                      strokeWidth={1.5}
+                    />
+                  }
                 >
                   <LabelList
                     dataKey={displayedChartStat}
@@ -238,9 +330,10 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                           x={x}
                           y={y}
                           dx={(width as number) / 2}
-                          dy={-8}
+                          dy={-6}
                           textAnchor="middle"
-                          fontSize="10"
+                          fontSize="11"
+                          fontWeight="600"
                           fill="var(--text)"
                         >
                           {value === 0
@@ -259,13 +352,15 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                   defconThreshold !== null && (
                     <ReferenceLine
                       y={defconThreshold}
-                      stroke="var(--chart-3)"
+                      stroke={palette.stroke}
                       strokeDasharray="4 4"
+                      strokeOpacity={0.7}
                       label={{
                         value: `+2 pts @ ${defconThreshold}`,
                         position: "insideTopRight",
-                        fill: "var(--chart-3)",
-                        fontSize: 10,
+                        fill: palette.stroke,
+                        fontSize: 11,
+                        fontWeight: 600,
                       }}
                     />
                   )}
