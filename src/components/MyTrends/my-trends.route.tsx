@@ -22,8 +22,11 @@ import {
 } from "src/queries/getManagerComparison";
 import FplIdInput from "./fpl-id-input";
 import RangeRankCard from "./range-rank-card";
+import RangeRankCardSkeleton from "./range-rank-card.skeleton";
 import RankTrajectoryChart from "./rank-trajectory-chart";
+import RankTrajectoryChartSkeleton from "./rank-trajectory-chart.skeleton";
 import ManagerComparisonTable from "./manager-comparison-table";
+import ManagerComparisonTableSkeleton from "./manager-comparison-table.skeleton";
 import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
 import TeamImpactView from "./TeamImpact/team-impact";
@@ -145,11 +148,7 @@ const MyTrends: React.FC = () => {
               endGw={endGameweek}
             />
           ) : (
-            <div className="grid grid-cols-9 gap-2">
-              <Skeleton className="col-span-4 h-24 bg-accent3" />
-              <div className="col-span-1" />
-              <Skeleton className="col-span-4 h-24 bg-accent3" />
-            </div>
+            <RangeRankCardSkeleton />
           )}
           {trajectoryQuery.data && trajectoryQuery.data.gws.length > 0 ? (
             <RankTrajectoryChart
@@ -158,16 +157,18 @@ const MyTrends: React.FC = () => {
               endGw={endGameweek}
             />
           ) : (
-            trajectoryQuery.isPending && (
-              <Skeleton className="h-72 w-full bg-accent3 md:h-80" />
-            )
+            trajectoryQuery.isPending && <RankTrajectoryChartSkeleton />
           )}
         </MyTrendsSection>
       )}
 
-      {comparisonQuery.data && (
+      {(comparisonQuery.data || comparisonQuery.isPending) && (
         <MyTrendsSection title="How you compare">
-          <ManagerComparisonTable data={comparisonQuery.data} />
+          {comparisonQuery.data ? (
+            <ManagerComparisonTable data={comparisonQuery.data} />
+          ) : (
+            <ManagerComparisonTableSkeleton />
+          )}
         </MyTrendsSection>
       )}
 

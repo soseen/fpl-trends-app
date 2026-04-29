@@ -1,12 +1,12 @@
 import type React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
 import { selectGameweekRange } from "src/redux/slices/gameweeksSlice";
 import { getTeamImpact, type TeamImpact } from "src/queries/getTeamImpact";
 import TeamImpactPitch from "./team-impact-pitch";
 import PlayerImpactAccordion from "./player-impact-accordion";
+import TeamImpactSkeleton from "./team-impact.skeleton";
 
 type Props = {
   entryId: number;
@@ -28,12 +28,7 @@ const TeamImpactView: React.FC<Props> = ({ entryId }) => {
   });
 
   if (teamImpactQuery.isPending) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-72 w-full bg-accent3 sm:h-[480px] md:h-[600px]" />
-        <Skeleton className="h-64 w-full bg-accent3" />
-      </div>
-    );
+    return <TeamImpactSkeleton />;
   }
 
   if (teamImpactQuery.isError || !teamImpactQuery.data) {
