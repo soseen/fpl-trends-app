@@ -168,7 +168,7 @@ const ChipBarSegment: React.FC<{
             {copyLabel}
           </span>
         )}
-        <div className="border-accent4/60 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:max-w-[90px]">
+        <div className="border-accent4/60 relative h-4 w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:w-[90px]">
           <div
             className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
             style={{ width: `${pct}%` }}

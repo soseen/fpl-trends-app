@@ -89,7 +89,7 @@ const MyTrends: React.FC = () => {
     return (
       <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 p-4">
         <h1 className="text-xl font-semibold text-text">My Trends</h1>
-        <p className="text-text/70 text-sm">
+        <p className="text-sm text-text/70">
           Enter your FPL ID to see how you&apos;ve performed in the selected gameweek
           range.
         </p>
@@ -104,7 +104,7 @@ const MyTrends: React.FC = () => {
   const summaryError = summaryQuery.isError ? (summaryQuery.error as Error) : null;
 
   return (
-    <div className="container mx-auto flex w-full flex-col gap-4 rounded-md p-4">
+    <div className="flex w-full flex-col gap-4">
       <h1 className="text-xl font-semibold text-text md:text-3xl">My Trends</h1>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

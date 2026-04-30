@@ -15,17 +15,16 @@ type Props = {
   footballer: BestScoringFootballer;
 };
 
-type StatKey =
-  | "totalGoals"
-  | "totalAssists"
-  | "totalCleanSheets"
-  | "totalDefconBonuses";
+type StatKey = "totalGoals" | "totalAssists" | "totalCleanSheets" | "totalDefconBonuses";
 
 type SelectedStats = Pick<FootballerWithGameweekStats, StatKey>;
 
 const STAT_META: Record<StatKey, { icon: React.ReactNode; label: string }> = {
-  totalGoals: { icon: <FaFutbol />, label: "Goals" },
-  totalAssists: { icon: <FaHandshake />, label: "Assists" },
+  totalGoals: { icon: <FaFutbol className="h-2 w-2 md:h-4 md:w-4" />, label: "Goals" },
+  totalAssists: {
+    icon: <FaHandshake className="h-2 w-2 md:h-4 md:w-4" />,
+    label: "Assists",
+  },
   totalCleanSheets: { icon: <TbLockFilled />, label: "Clean sheets" },
   totalDefconBonuses: { icon: <FaShieldAlt />, label: "Defcons" },
 };
@@ -83,16 +82,16 @@ const PitchCard = ({ footballer }: Props) => {
             {footballer.totalPoints} pts
           </p>
         </div>
-        <div className="absolute right-[2px] top-1 z-50 flex flex-col gap-[2px] md:top-1">
+        <div className="absolute right-0 top-1 z-50 flex flex-col items-end gap-[2px]">
           {selectedStats.map((stat) => (
             <Tooltip key={stat.key}>
               <TooltipTrigger asChild>
-                <div className="flex items-center justify-end gap-[1px] rounded-r-md px-[2px] text-[7px] leading-[8px] md:gap-1 md:px-2 md:text-xs lg:text-sm">
-                  <span className="flex">{stat.value}</span>
-                  <span className="flex h-2 items-center md:h-4 lg:h-5">
+                <span className="inline-flex items-center gap-0.5 rounded-l-md bg-accent2 px-1 py-[1px] text-[7px] font-semibold leading-[9px] text-text shadow-md [&_svg]:!size-2 sm:gap-1 sm:text-[9px] sm:[&_svg]:!size-2.5 md:text-[10px] md:[&_svg]:!size-3">
+                  <span>{stat.value}</span>
+                  <span className="text-text/80 flex items-center">
                     {STAT_META[stat.key].icon}
                   </span>
-                </div>
+                </span>
               </TooltipTrigger>
               <TooltipContent>{STAT_META[stat.key].label}</TooltipContent>
             </Tooltip>

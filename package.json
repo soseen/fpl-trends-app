@@ -9,7 +9,7 @@
     "start": "serve -s dist",
     "dev": "webpack serve --mode development --open",
     "build": "webpack --mode production",
-    "deploy": "git pull && npm install && npm run build"
+    "deploy": "git pull && npm install && NODE_OPTIONS=--max-old-space-size=1536 npm run build"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

@@ -169,9 +169,12 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
         })}
       </div>
 
-      <div className="h-72 w-full sm:h-72 md:h-80">
+      <div className="h-80 w-full sm:h-72 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={points} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <ComposedChart
+            data={points}
+            margin={{ top: 8, right: 8, left: isSM ? -4 : 0, bottom: 0 }}
+          >
             <defs>
               <linearGradient id="rankFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.55} />
@@ -185,11 +188,16 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               tick={{ fill: "var(--text)", fontSize: isSM ? 10 : 11, opacity: 0.7 }}
               stroke="var(--accent-4)"
               tickLine={false}
+              // Mobile: show every 4th GW (≈ 9–10 ticks across a season).
+              // Desktop: let recharts auto-pick start/end + a few intermediates.
               interval={isSM ? 3 : "preserveStartEnd"}
-              minTickGap={isSM ? 8 : 4}
+              minTickGap={isSM ? 12 : 4}
             />
-            {/* Primary axis: rank (log-scale). Always present so the chart
-                grid stays consistent even when only transfers are enabled. */}
+            {/* Primary axis: rank (log-scale). Mobile uses an explicit
+                tick set so recharts doesn't crowd 7 labels on a narrow
+                axis (which was overlapping into an unreadable column).
+                The fixed ticks span the typical FPL rank range, anchored
+                to powers of 10. Out-of-range ticks just don't render. */}
             <YAxis
               yAxisId="rank"
               reversed
@@ -199,9 +207,10 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               tickFormatter={compactRank}
               tick={{ fill: "var(--text)", fontSize: isSM ? 10 : 11, opacity: 0.7 }}
               stroke="var(--accent-4)"
-              width={isSM ? 36 : 48}
+              width={isSM ? 38 : 48}
               tickLine={false}
-              tickCount={isSM ? 4 : 6}
+              ticks={isSM ? [10_000, 100_000, 1_000_000, 6_000_000] : undefined}
+              tickCount={isSM ? undefined : 6}
             />
             {/* Right-hand axis for transfers. Hidden when off so we don't
                 waste horizontal space on a phantom scale. */}

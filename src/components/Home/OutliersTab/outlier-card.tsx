@@ -1,7 +1,7 @@
 import React from "react";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
-import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
+import { FootballerPosition } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,32 @@ type Props = {
     defcons?: boolean;
     totalPoints?: boolean;
   };
+};
+
+type ReturnStat = { icon: React.ReactNode; label: string; value: number };
+
+const buildReturnStats = (f: FootballerWithGameweekStats): ReturnStat[] => {
+  const stats: ReturnStat[] = [];
+  if (f.totalGoals)
+    stats.push({ icon: <FaFutbol />, label: "Goals", value: f.totalGoals });
+  if (f.totalAssists)
+    stats.push({ icon: <FaHandshake />, label: "Assists", value: f.totalAssists });
+  if (
+    f.totalCleanSheets &&
+    [FootballerPosition.DEF, FootballerPosition.GK].includes(f.element_type)
+  )
+    stats.push({
+      icon: <TbLockFilled />,
+      label: "Clean sheets",
+      value: f.totalCleanSheets,
+    });
+  if (f.totalDefconBonuses)
+    stats.push({
+      icon: <FaShieldAlt />,
+      label: "Defcons",
+      value: f.totalDefconBonuses,
+    });
+  return stats;
 };
 
 const getTopLeftBadge = (
@@ -69,50 +95,18 @@ const OutlierCard = ({ footballer, include }: Props) => {
         {footballer?.totalPoints} pts
       </p>
       {include?.returns && (
-        <div className="absolute right-0 top-1 flex flex-col gap-[2px] md:gap-1">
-          {!!footballer?.totalGoals && (
-            <Tooltip>
+        <div className="absolute right-0 top-1 flex flex-col items-end gap-[2px] md:gap-1">
+          {buildReturnStats(footballer).map((stat) => (
+            <Tooltip key={stat.label}>
               <TooltipTrigger asChild>
-                <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
-                  <p>{footballer.totalGoals}</p> <FaFutbol />
-                </div>
+                <span className="inline-flex items-center gap-0.5 rounded-l-md bg-accent2 px-1 py-[1px] text-[8px] font-semibold leading-[10px] text-text shadow-md [&_svg]:!size-2 sm:gap-1 sm:px-1.5 sm:py-[2px] sm:text-[10px] sm:[&_svg]:!size-2.5 lg:text-xs lg:[&_svg]:!size-3">
+                  <span>{stat.value}</span>
+                  <span className="text-text/80 flex items-center">{stat.icon}</span>
+                </span>
               </TooltipTrigger>
-              <TooltipContent>Goals</TooltipContent>
+              <TooltipContent>{stat.label}</TooltipContent>
             </Tooltip>
-          )}
-          {!!footballer?.totalAssists && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
-                  <p>{footballer?.totalAssists}</p> <FaHandshake />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Assists</TooltipContent>
-            </Tooltip>
-          )}
-          {!!footballer.totalCleanSheets &&
-            [FootballerPosition.DEF, FootballerPosition.GK].includes(
-              footballer.element_type,
-            ) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
-                    <p>{footballer?.totalCleanSheets}</p> <TbLockFilled />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>Clean sheets</TooltipContent>
-              </Tooltip>
-            )}
-          {!!footballer?.totalDefconBonuses && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="xl-text-sm flex items-center justify-end gap-1 rounded-l-md bg-accent2 px-1 py-[2px] pr-1 text-[9px] leading-3 text-text shadow-md md:text-sm lg:gap-1 lg:py-[2px] lg:pr-1 lg:text-xs xl:gap-2 xl:py-1 xl:pl-2 xl:pr-4 xl:text-base">
-                  <p>{footballer.totalDefconBonuses}</p> <FaShieldAlt />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>Defcons</TooltipContent>
-            </Tooltip>
-          )}
+          ))}
         </div>
       )}
     </Button>

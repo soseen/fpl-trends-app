@@ -45,7 +45,7 @@ const StatChip: React.FC<{
 }> = ({ label, value, tone, tooltip }) => {
   const chip = (
     <span
-      className={`border-accent/40 inline-flex items-center gap-1 rounded-md border bg-accent4 px-2 py-[2px] text-xs sm:text-sm ${
+      className={`border-accent/40 inline-flex items-center gap-0.5 rounded-md border bg-accent4 px-1.5 py-[1px] text-[10px] sm:gap-1 sm:px-2 sm:py-[2px] sm:text-xs md:text-sm ${
         tone ?? "text-text"
       }`}
     >
@@ -93,15 +93,20 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
   const isRankKiller = player.played_count === 0;
   const pointsValue = isRankKiller ? player.raw_points : player.points_for_user;
 
-  // rank-gain per start: how many places gained on average each time the
-  // user fielded this player. Use played_count rather than starts so
-  // autosubs (multiplier becomes 1) count, matching the points figure.
-  const ranksPerStart =
-    player.played_count > 0 ? player.rank_impact / player.played_count : 0;
+  // rank impact per appearance. For owned players we use played_count
+  // (autosubs count, matching the points figure). For rank killers — who
+  // by definition have played_count === 0 — we count GWs where the
+  // player actually took the field (minutes > 0), i.e. the games where
+  // they had any chance to drag the user's relative rank.
+  const appearances = isRankKiller
+    ? player.per_gw.filter((r) => r.minutes > 0).length
+    : player.played_count;
+  const ranksPerAppearance =
+    appearances > 0 ? player.rank_impact / appearances : 0;
 
   const rankPill = showRankImpact ? (
     <span
-      className={`min-w-[3.75rem] rounded-md px-2 py-1 text-center text-sm font-semibold sm:min-w-[5rem] sm:text-base md:min-w-[5.5rem] md:text-lg ${rankImpactPillClass(
+      className={`min-w-[3.5rem] rounded-md px-2 py-0.5 text-center text-xs font-semibold sm:min-w-[5rem] sm:py-1 sm:text-base md:min-w-[5.5rem] md:text-lg ${rankImpactPillClass(
         player.rank_impact,
       )}`}
     >
@@ -115,7 +120,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
     // avatar and right-side block sit at the row's actual vertical
     // center (with `items-center`) — the prior two-row layout pushed
     // them into the upper half of the row, which read as misaligned.
-    <div className="flex w-full items-center gap-3 px-2 py-5 sm:gap-4 sm:px-3">
+    <div className="flex w-full items-center gap-2 px-2 py-4 sm:gap-4 sm:px-3 sm:py-5">
       <button
         type="button"
         onClick={(e) => {
@@ -125,7 +130,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
           e.stopPropagation();
           openDetails(player.player_id);
         }}
-        className="hover:ring-magenta/60 relative h-12 w-10 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 sm:h-14 sm:w-12 md:h-16 md:w-14"
+        className="hover:ring-magenta/60 relative h-14 w-12 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 sm:h-14 sm:w-12 md:h-16 md:w-14"
         aria-label={`Open ${player.web_name} details`}
       >
         <FootballerImage code={player.code} className="h-full w-full object-contain" />
@@ -173,7 +178,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
           )}
         </div>
         {stats && (
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
             <StatChip
               label="G"
               value={stats.totalGoals ?? 0}
@@ -216,9 +221,13 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
         )}
       </div>
 
-      <div className="ml-auto flex items-center gap-3 sm:gap-4">
+      {/* Right side: stacks the pts block on top of the rank pill on
+          mobile (vertical = narrower footprint, frees horizontal space
+          for the stats chips in the middle column). Switches to a
+          side-by-side layout from `sm:` upward where there's room. */}
+      <div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex flex-col items-end leading-tight">
-          <span className="text-text/60 text-xs sm:text-sm">pts</span>
+          <span className="text-text/60 text-[10px] sm:text-sm">pts</span>
           <span className="text-base font-semibold text-text sm:text-lg md:text-2xl">
             {pointsValue}
           </span>
@@ -226,11 +235,12 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
         {rankPill && (
           <div className="flex flex-col items-end leading-tight">
             {rankPill}
-            {player.played_count > 0 && (
+            {appearances > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="mt-0.5 text-[10px] text-text/60 sm:text-xs">
-                    {formatRankDelta(ranksPerStart)}/start
+                  <span className="mt-0.5 hidden text-[10px] text-text/60 sm:inline sm:text-xs">
+                    {formatRankDelta(ranksPerAppearance)}
+                    {isRankKiller ? "/game" : "/start"}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>Average rank impact per appearance</TooltipContent>
