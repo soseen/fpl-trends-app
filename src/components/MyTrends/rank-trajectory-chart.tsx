@@ -159,7 +159,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               size="sm"
               pressed={on}
               onPressedChange={(p) => setEnabled((prev) => ({ ...prev, [s.key]: p }))}
-              className={`border-accent4/40 data-[state=on]:bg-accent3/60 h-7 rounded-md border bg-transparent px-2 text-[11px] data-[state=on]:text-text sm:text-xs ${
+              className={`border-accent4/40 h-7 rounded-md border bg-transparent px-2 text-[11px] data-[state=on]:bg-magenta2 data-[state=on]:text-text sm:text-xs ${
                 on ? s.activeColor : "text-text/60 hover:bg-accent3/40"
               }`}
             >

@@ -18,7 +18,7 @@ const App: React.FC = () => {
       <AppInitializerProvider>
         <BrowserRouter>
           <AppContextProvider>
-            <TooltipProvider>
+            <TooltipProvider delayDuration={150} skipDelayDuration={300}>
               <FootballerDetailsProvider>
                 <Routes>
                   <Route path="/" element={<Layout />}>

@@ -12,21 +12,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 // (4 / 2 / 2 / 2 / 2) to mimic that proportion roughly.
 const HeaderRow: React.FC = () => (
   <div className="grid grid-cols-12 items-center gap-2 border-b border-accent4 py-2">
-    <Skeleton className="col-span-4 h-3 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3 w-10 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3 w-10 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3 w-10 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3 w-10 bg-accent3" />
+    <Skeleton className="col-span-4 h-3" />
+    <Skeleton className="col-span-2 ml-auto h-3 w-10" />
+    <Skeleton className="col-span-2 ml-auto h-3 w-10" />
+    <Skeleton className="col-span-2 ml-auto h-3 w-10" />
+    <Skeleton className="col-span-2 ml-auto h-3 w-10" />
   </div>
 );
 
 const DataRow: React.FC = () => (
   <div className="border-accent4/40 grid grid-cols-12 items-center gap-2 border-b py-2.5">
-    <Skeleton className="col-span-4 h-3.5 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3.5 w-12 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3.5 w-12 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3.5 w-12 bg-accent3" />
-    <Skeleton className="col-span-2 ml-auto h-3.5 w-12 bg-accent3" />
+    <Skeleton className="col-span-4 h-3.5" />
+    <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />
+    <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />
+    <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />
+    <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />
   </div>
 );
 

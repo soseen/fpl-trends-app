@@ -1,5 +1,14 @@
 module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx,html}", "./public/index.html"],
+  // The `@/` path holds the shadcn UI primitives (Accordion, Tooltip,
+  // Dialog, etc.). Without it in the content scan, classes only used
+  // there — e.g. `animate-accordion-down`, `animate-in`, `fade-in-0`,
+  // `zoom-in-95` — are never JIT-generated, so those components appear
+  // and disappear instantly even though the keyframes are defined.
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx,html}",
+    "./@/**/*.{js,jsx,ts,tsx}",
+    "./public/index.html",
+  ],
   theme: {
     extend: {
       // Custom palette is wired through the RGB-channel CSS vars defined
@@ -64,15 +73,30 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        // Skeleton shimmer: sweeps a brighter highlight band across a 200%-wide
+        // gradient background. Combine with a `linear-gradient(...)`
+        // background and `background-size: 200% 100%` on the element itself
+        // (see `@/components/ui/skeleton.tsx`).
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 0.35s cubic-bezier(0.87, 0, 0.13, 1)",
+        "accordion-up": "accordion-up 0.25s cubic-bezier(0.87, 0, 0.13, 1)",
+        shimmer: "shimmer 1.8s ease-in-out infinite",
       },
       fontFamily: { roboto: ["Roboto", "sans-serif"] },
       screens: { xs: "510px" },
     },
   },
   variants: {},
-  plugins: [import("tailwindcss-radix")],
+  // Use `require` (CJS) instead of `import()`, which would resolve to a
+  // Promise and silently fail to register the plugin. `tailwindcss-animate`
+  // provides the `animate-in` / `fade-in-0` / `zoom-in-95` / `slide-in-from-*`
+  // utility classes that shadcn primitives (Tooltip, Dialog, Drawer, etc.)
+  // rely on for enter/exit transitions — without it those classes are
+  // no-ops and components appear/disappear instantly.
+  plugins: [require("tailwindcss-animate"), require("tailwindcss-radix")],
 };

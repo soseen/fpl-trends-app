@@ -1,37 +1,28 @@
 import type React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { selectGameweekRange } from "src/redux/slices/gameweeksSlice";
-import { getTeamImpact, type TeamImpact } from "src/queries/getTeamImpact";
+import type { TeamImpact } from "src/queries/getTeamImpact";
 import TeamImpactPitch from "./team-impact-pitch";
 import PlayerImpactAccordion from "./player-impact-accordion";
 import TeamImpactSkeleton from "./team-impact.skeleton";
 
+const INITIAL_VISIBLE = 8;
+
 type Props = {
-  entryId: number;
+  query: UseQueryResult<TeamImpact>;
 };
 
-const TeamImpactView: React.FC<Props> = ({ entryId }) => {
-  const { startGameweek, endGameweek } = useSelector(selectGameweekRange);
+const TeamImpactView: React.FC<Props> = ({ query }) => {
+  const [expanded, setExpanded] = useState(false);
 
-  const teamImpactQuery = useQuery<TeamImpact>({
-    queryKey: ["team-impact", entryId, startGameweek, endGameweek],
-    queryFn: () => getTeamImpact(entryId, startGameweek, endGameweek),
-    enabled: startGameweek > 0 && endGameweek > 0,
-    // The first request for a (entry, range) tuple may take 5–10s while we
-    // fetch and persist picks from the FPL API. Subsequent requests hit
-    // our DB and are sub-second, hence a generous staleTime so the user
-    // doesn't pay that cost twice on the same session.
-    staleTime: 5 * 60 * 1000,
-    retry: 1,
-  });
-
-  if (teamImpactQuery.isPending) {
+  if (query.isPending) {
     return <TeamImpactSkeleton />;
   }
 
-  if (teamImpactQuery.isError || !teamImpactQuery.data) {
+  if (query.isError || !query.data) {
     return (
       <Card className="border-rose-400/40 bg-primary p-4 text-sm text-rose-300">
         Couldn&apos;t load team impact for this range. Try again in a moment.
@@ -39,8 +30,10 @@ const TeamImpactView: React.FC<Props> = ({ entryId }) => {
     );
   }
 
-  const data = teamImpactQuery.data;
+  const data = query.data;
   const showRankImpact = data.totals.rank_per_point !== null;
+  const visiblePlayers = expanded ? data.players : data.players.slice(0, INITIAL_VISIBLE);
+  const canExpand = data.players.length > INITIAL_VISIBLE;
 
   return (
     <div className="flex flex-col gap-4">
@@ -70,7 +63,24 @@ const TeamImpactView: React.FC<Props> = ({ entryId }) => {
               : "Sorted by points contributed"}
           </p>
         </div>
-        <PlayerImpactAccordion players={data.players} showRankImpact={showRankImpact} />
+        <PlayerImpactAccordion players={visiblePlayers} showRankImpact={showRankImpact} />
+        {canExpand && (
+          <div className="mt-2 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded((v) => !v)}
+              className="text-text/80 text-xs sm:text-sm"
+            >
+              {expanded ? "Show less" : `Show all ${data.players.length}`}
+              {expanded ? (
+                <FaChevronUp className="ml-1 h-3 w-3" />
+              ) : (
+                <FaChevronDown className="ml-1 h-3 w-3" />
+              )}
+            </Button>
+          </div>
+        )}
         {data.notes.fallback_used && (
           <p className="text-text/60 mt-2 px-2 text-[11px] sm:text-xs">
             We don&apos;t have you ranked yet, so rank impact isn&apos;t shown — points
@@ -84,8 +94,7 @@ const TeamImpactView: React.FC<Props> = ({ entryId }) => {
         )}
         {data.notes.small_sample_gws.length > 0 && (
           <p className="text-text/60 mt-1 px-2 text-[11px] sm:text-xs">
-            Sample data is light for GW {data.notes.small_sample_gws.join(", ")} — captain
-            uplift approximated as global ownership.
+            Sample data is light — captain uplift approximated as global ownership.
           </p>
         )}
       </div>

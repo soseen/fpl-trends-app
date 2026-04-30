@@ -17,7 +17,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import type { PlayerImpact, PlayerImpactGwBreakdown } from "src/queries/getTeamImpact";
+import type {
+  PlayerImpact,
+  PlayerImpactGwBreakdown,
+  PlayerMatch,
+} from "src/queries/getTeamImpact";
 import { formatRankDelta, rankImpactColorClass, POINTS_HAUL_THRESHOLD } from "./format";
 
 type Props = {
@@ -35,6 +39,37 @@ const ELEMENT_TYPE_FWD = 4;
 
 const defconThreshold = (elementType: number): number =>
   elementType === ELEMENT_TYPE_DEF ? 10 : 12;
+
+// "vs ARS 2-1" / "@ LIV 0-2" sub-line under the GW number. Multiple
+// fixtures (DGWs) stack vertically. Score color reflects the result
+// from the player's club's perspective: green = win, amber = draw,
+// rose = loss. Score may be null if the fixture hasn't been finalised
+// in our DB — we just omit the score in that case.
+const matchResultClass = (m: PlayerMatch): string => {
+  if (m.team_score === null || m.opponent_score === null) return "text-text/50";
+  if (m.team_score > m.opponent_score) return "text-emerald-400/80";
+  if (m.team_score < m.opponent_score) return "text-rose-400/80";
+  return "text-amber-400/80";
+};
+
+const MatchSummary: React.FC<{ matches: PlayerMatch[] }> = ({ matches }) => {
+  if (matches.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-0.5 text-[10px] leading-tight">
+      {matches.map((m, i) => (
+        <span key={i} className={matchResultClass(m)}>
+          <span className="text-text/50">{m.was_home ? "vs " : "@ "}</span>
+          <span className="font-medium">{m.opponent_short}</span>
+          {m.team_score !== null && m.opponent_score !== null && (
+            <span className="ml-1 tabular-nums">
+              {m.team_score}-{m.opponent_score}
+            </span>
+          )}
+        </span>
+      ))}
+    </div>
+  );
+};
 
 // Icon + count chip used to render the per-GW match-event breakdown.
 // Mirrors the icon vocabulary used by the home-page pitch card
@@ -89,6 +124,12 @@ const EventChips: React.FC<{
   row: PlayerImpactGwBreakdown;
   elementType: number;
 }> = ({ row, elementType }) => {
+  // had_fixture absent from older API responses → assume the player had
+  // a fixture (the old default), so a stale backend doesn't paint every
+  // row as "No fixture".
+  if (row.had_fixture === false) {
+    return <span className="text-[10px] text-text/40">No fixture</span>;
+  }
   if (row.minutes === 0) {
     return <span className="text-[10px] text-text/40">DNP</span>;
   }
@@ -213,6 +254,12 @@ const effectivePoints = (mult: number, raw: number): number =>
   mult === 0 ? 0 : raw * mult;
 
 const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
+  // For rank-killer rows the user didn't own the player, so multiplier is
+  // always 0 but the meaning is "not in the squad" rather than "benched".
+  // We display the player's raw points and skip the multiplier chip.
+  const isRankKiller = player.played_count === 0;
+  const totalPts = isRankKiller ? player.raw_points : player.points_for_user;
+  const totalExcess = player.per_gw.reduce((s, r) => s + r.excess, 0);
   return (
     <div className="overflow-x-auto">
       <Table className="border-transparent text-xs sm:text-sm">
@@ -241,15 +288,36 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
         </TableHeader>
         <TableBody>
           {player.per_gw.map((row) => {
-            const benched = row.multiplier === 0;
-            const pts = effectivePoints(row.multiplier, row.points);
-            const big = !benched && pts >= POINTS_HAUL_THRESHOLD;
-            const chip = multiplierChip(row.multiplier);
+            // Strict false-check so older API responses (where had_fixture
+            // is undefined) don't get misread as "no fixture".
+            const noFixture = !isRankKiller && row.had_fixture === false;
+            const benched =
+              !isRankKiller && row.multiplier === 0 && !noFixture;
+            // For owned non-starters with a fixture, show the points the
+            // player actually scored (faded) — those are points the user
+            // missed out on. The Total row still uses points_for_user, so
+            // these "shown but un-earned" points don't inflate it.
+            let pts: string | number;
+            if (noFixture) pts = "—";
+            else if (isRankKiller) pts = row.points;
+            else if (benched) pts = row.points;
+            else pts = effectivePoints(row.multiplier, row.points);
+            const big =
+              !benched &&
+              !noFixture &&
+              typeof pts === "number" &&
+              pts >= POINTS_HAUL_THRESHOLD;
+            const chip =
+              isRankKiller || noFixture ? null : multiplierChip(row.multiplier);
 
             const ptsValue = (
               <span
                 className={`inline-flex items-center gap-1.5 font-semibold ${
-                  big ? "text-emerald-400" : benched ? "text-text/40" : "text-text"
+                  big
+                    ? "text-emerald-400"
+                    : benched || noFixture
+                      ? "text-text/40"
+                      : "text-text"
                 }`}
               >
                 {chip && (
@@ -269,7 +337,10 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
                 className="border-b border-accent4 hover:bg-transparent"
               >
                 <TableCell className="px-1.5 py-1.5 text-text/80 sm:px-2">
-                  {row.gw}
+                  <div className="flex flex-col gap-0.5">
+                    <span>{row.gw}</span>
+                    <MatchSummary matches={row.matches ?? []} />
+                  </div>
                 </TableCell>
                 <TableCell className="px-1.5 py-1.5 text-right sm:px-2">
                   {chip ? (
@@ -321,6 +392,42 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
               </TableRow>
             );
           })}
+          <TableRow className="border-t-2 border-accent4 bg-accent4/30 hover:bg-accent4/30">
+            <TableCell className="px-1.5 py-1.5 font-semibold text-text sm:px-2">
+              Total
+            </TableCell>
+            <TableCell className="px-1.5 py-1.5 text-right font-semibold text-text sm:px-2">
+              {totalPts}
+            </TableCell>
+            <TableCell className="px-1.5 py-1.5 sm:px-2" />
+            <TableCell className="px-1.5 py-1.5 text-right text-text/70 sm:px-2">
+              {(player.avg_ownership_pct * 100).toFixed(1)}%
+            </TableCell>
+            <TableCell className="px-1.5 py-1.5 text-right text-text/70 sm:px-2">
+              {(player.avg_eo_in_stratum * 100).toFixed(1)}%
+            </TableCell>
+            <TableCell
+              className={`px-1.5 py-1.5 text-right font-semibold sm:px-2 ${
+                totalExcess > 0
+                  ? "text-emerald-400"
+                  : totalExcess < 0
+                    ? "text-rose-400"
+                    : "text-text/60"
+              }`}
+            >
+              {totalExcess >= 0 ? "+" : ""}
+              {totalExcess.toFixed(1)}
+            </TableCell>
+            {showRankImpact && (
+              <TableCell
+                className={`px-1.5 py-1.5 text-right font-semibold sm:px-2 ${rankImpactColorClass(
+                  player.rank_impact,
+                )}`}
+              >
+                {formatRankDelta(player.rank_impact)}
+              </TableCell>
+            )}
+          </TableRow>
         </TableBody>
       </Table>
     </div>

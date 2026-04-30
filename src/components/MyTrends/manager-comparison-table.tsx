@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type {
   CaptainSummary,
   ChipUsageStat,
@@ -159,30 +160,35 @@ const ChipBarSegment: React.FC<{
   tooltip: string;
   copyLabel?: string;
 }> = ({ pct, tooltip, copyLabel }) => (
-  <div className="flex items-center gap-1.5" title={tooltip}>
-    {copyLabel && (
-      <span className="text-text/60 w-5 shrink-0 text-right text-[9px] font-semibold sm:text-[10px]">
-        {copyLabel}
-      </span>
-    )}
-    <div className="border-accent4/60 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:max-w-[90px]">
-      <div
-        className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
-        style={{ width: `${pct}%` }}
-      />
-      {TICK_POSITIONS.map((t) => (
-        <div
-          key={t}
-          className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
-          style={{ left: `${t}%` }}
-          aria-hidden
-        />
-      ))}
-      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
-        {pct}%
-      </span>
-    </div>
-  </div>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <div className="flex cursor-help items-center gap-1.5">
+        {copyLabel && (
+          <span className="text-text/60 w-5 shrink-0 text-right text-[9px] font-semibold sm:text-[10px]">
+            {copyLabel}
+          </span>
+        )}
+        <div className="border-accent4/60 relative h-4 w-full max-w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:max-w-[90px]">
+          <div
+            className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
+            style={{ width: `${pct}%` }}
+          />
+          {TICK_POSITIONS.map((t) => (
+            <div
+              key={t}
+              className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
+              style={{ left: `${t}%` }}
+              aria-hidden
+            />
+          ))}
+          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-text sm:text-xs">
+            {pct}%
+          </span>
+        </div>
+      </div>
+    </TooltipTrigger>
+    <TooltipContent>{tooltip}</TooltipContent>
+  </Tooltip>
 );
 
 // Renders the chip-usage cell. Two bars stacked vertically when the range

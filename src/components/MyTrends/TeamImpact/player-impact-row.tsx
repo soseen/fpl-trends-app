@@ -5,6 +5,7 @@ import { getTeamsBadge } from "src/utils/images";
 import type { RootState } from "src/redux/store";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import type { PlayerImpact } from "src/queries/getTeamImpact";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatRankDelta, rankImpactPillClass, defconHighlightClass } from "./format";
 import { useOpenPlayerDetails } from "./use-open-player-details";
 
@@ -20,35 +21,52 @@ const POSITION_LABEL: Record<number, string> = {
   4: "FWD",
 };
 
-// Position chip colour — mirrors fixture-difficulty palette feel without
-// reusing the same vars (those are GW-fixture-specific). Magenta tones
-// keep us inside the existing brand palette.
+// Position chip colour. Lifted to /25 background tint and -200 (or
+// brand magenta) foreground so all four positions read at the same
+// legibility level — the previous FWD entry used `text-magenta3` (a
+// dark red), which was nearly invisible on a magenta tint.
 const POSITION_CHIP_CLASS: Record<number, string> = {
-  1: "bg-amber-500/20 text-amber-300", // GK
-  2: "bg-emerald-500/20 text-emerald-300", // DEF
-  3: "bg-cyan-500/20 text-cyan-300", // MID
-  4: "bg-magenta/30 text-magenta3", // FWD
+  1: "bg-amber-500/25 text-amber-200",
+  2: "bg-emerald-500/25 text-emerald-200",
+  3: "bg-cyan-500/25 text-cyan-200",
+  4: "bg-magenta/25 text-magenta",
 };
 
-// Compact stat chip: label + value. Used for goals / assists / xGI etc.
-// `tone` controls the foreground colour for "earn-y" stats (defcon bonus
-// >0 gets emerald, others stay neutral).
+// Compact stat chip: label + value. Solid `bg-accent4` with a subtle
+// border lifts the chip clearly above the card's `bg-primary`. `tone`
+// controls foreground for "earn-y" stats (defcon bonus > 0 gets
+// emerald, others stay neutral). `tooltip` is the description shown on
+// hover via the themed Tooltip primitive.
 const StatChip: React.FC<{
   label: string;
   value: string | number;
   tone?: string | null;
-  title?: string;
-}> = ({ label, value, tone, title }) => (
-  <span
-    className={`bg-accent3/60 inline-flex items-center gap-1 rounded-sm px-1.5 py-[1px] text-[10px] sm:text-[11px] ${
-      tone ?? "text-text/80"
-    }`}
-    title={title}
-  >
-    <span className="text-text/50 text-[9px] uppercase">{label}</span>
-    <span className="font-semibold">{value}</span>
-  </span>
-);
+  tooltip?: string;
+}> = ({ label, value, tone, tooltip }) => {
+  const chip = (
+    <span
+      className={`border-accent/40 inline-flex items-center gap-1 rounded-md border bg-accent4 px-2 py-[2px] text-xs sm:text-sm ${
+        tone ?? "text-text"
+      }`}
+    >
+      {/* Label inherits the parent text size so it matches the value's
+          height — previously a one-step-smaller override (text-[10px]
+          sm:text-xs md:text-sm) made the label noticeably shorter than
+          the value, which read as a vertical-alignment glitch. */}
+      <span className="text-text/70 uppercase">{label}</span>
+      <span className="font-semibold">{value}</span>
+    </span>
+  );
+
+  if (!tooltip) return chip;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{chip}</TooltipTrigger>
+      <TooltipContent>{tooltip}</TooltipContent>
+    </Tooltip>
+  );
+};
 
 const formatDecimal = (raw: string | number | null | undefined): string => {
   const n = typeof raw === "string" ? parseFloat(raw) : (raw ?? 0);
@@ -66,141 +84,161 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
   const openDetails = useOpenPlayerDetails();
 
   const positionLabel = POSITION_LABEL[player.element_type] ?? "—";
-  const captaincyCount = player.captaincies + player.triple_captaincies;
   const isKeeperOrDef = player.element_type === 1 || player.element_type === 2;
+  // played_count === 0 marks a "rank killer" row (a player the user didn't
+  // own who scored, hurting their relative rank). The data has all owned
+  // metrics zeroed out; we render `raw_points` (the points the user
+  // missed) under the same "pts" label so the row stays visually
+  // consistent with the owned breakdown.
+  const isRankKiller = player.played_count === 0;
+  const pointsValue = isRankKiller ? player.raw_points : player.points_for_user;
 
   // rank-gain per start: how many places gained on average each time the
-  // user fielded this player. Expressed in the same units as the total
-  // (negative = lost rank). Use played_count rather than starts so
+  // user fielded this player. Use played_count rather than starts so
   // autosubs (multiplier becomes 1) count, matching the points figure.
   const ranksPerStart =
     player.played_count > 0 ? player.rank_impact / player.played_count : 0;
 
+  const rankPill = showRankImpact ? (
+    <span
+      className={`min-w-[3.75rem] rounded-md px-2 py-1 text-center text-sm font-semibold sm:min-w-[5rem] sm:text-base md:min-w-[5.5rem] md:text-lg ${rankImpactPillClass(
+        player.rank_impact,
+      )}`}
+    >
+      {formatRankDelta(player.rank_impact)}
+    </span>
+  ) : null;
+
   return (
-    <div className="flex w-full flex-col gap-1 px-2 py-2 sm:gap-1.5 sm:px-3">
-      {/* Top line: avatar + name + position chip on the left, points + rank pill on the right */}
-      <div className="flex w-full items-center gap-2 sm:gap-3">
-        <button
-          type="button"
-          onClick={(e) => {
-            // The accordion trigger wraps this row, so a click would also
-            // toggle the disclosure. Stop propagation so the avatar acts
-            // as a dedicated "open details" affordance and doesn't also
-            // expand the row.
-            e.stopPropagation();
-            openDetails(player.player_id);
-          }}
-          className="hover:ring-magenta/60 relative h-9 w-9 shrink-0 rounded-full transition hover:ring-2 sm:h-11 sm:w-11"
-          aria-label={`Open ${player.web_name} details`}
-        >
-          <FootballerImage
-            code={player.code}
-            className="bg-accent4/20 h-full w-full rounded-full object-contain"
-          />
+    // Single horizontal flex with everything inside. Stats chips live in
+    // the middle column rather than on a separate row below, so the
+    // avatar and right-side block sit at the row's actual vertical
+    // center (with `items-center`) — the prior two-row layout pushed
+    // them into the upper half of the row, which read as misaligned.
+    <div className="flex w-full items-center gap-3 px-2 py-5 sm:gap-4 sm:px-3">
+      <button
+        type="button"
+        onClick={(e) => {
+          // The accordion trigger wraps this row, so a click would also
+          // toggle the disclosure. Stop propagation so the avatar acts
+          // as a dedicated "open details" affordance.
+          e.stopPropagation();
+          openDetails(player.player_id);
+        }}
+        className="hover:ring-magenta/60 relative h-12 w-10 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 sm:h-14 sm:w-12 md:h-16 md:w-14"
+        aria-label={`Open ${player.web_name} details`}
+      >
+        <FootballerImage code={player.code} className="h-full w-full object-contain" />
+      </button>
+
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Club badge moved out of the avatar's corner (where it was
+              clipped by the rounded-md overflow) to inline before the
+              name — easier to read and visually couples the player to
+              their club. */}
           <img
             src={getTeamsBadge(player.team_code)}
             alt=""
-            className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-primary p-[1px]"
+            className="h-4 w-4 shrink-0 sm:h-5 sm:w-5"
           />
-        </button>
-
-        <div className="flex min-w-0 flex-1 flex-col items-start text-left">
-          <div className="flex items-center gap-1.5">
-            <span className="truncate text-xs font-semibold text-text sm:text-sm">
-              {player.web_name}
+          <span className="truncate text-sm font-medium text-text sm:text-base md:text-lg">
+            {player.web_name}
+          </span>
+          <span
+            className={`rounded-sm px-1.5 py-[1px] text-[10px] font-medium sm:text-xs md:text-sm ${
+              POSITION_CHIP_CLASS[player.element_type] ?? "bg-accent3 text-text"
+            }`}
+          >
+            {positionLabel}
+          </span>
+          {isRankKiller ? (
+            <span className="bg-rose-500/20 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-rose-300 sm:text-xs md:text-sm">
+              EO {(player.avg_eo_in_stratum * 100).toFixed(0)}%
             </span>
-            <span
-              className={`rounded-sm px-1.5 py-[1px] text-[9px] font-semibold sm:text-[10px] ${
-                POSITION_CHIP_CLASS[player.element_type] ?? "bg-accent3 text-text"
-              }`}
-            >
-              {positionLabel}
-            </span>
-          </div>
-          {/* Starts + captaincy chips */}
-          <div className="mt-0.5 flex flex-wrap items-center gap-1">
-            <span className="bg-magenta2/50 rounded-sm px-1.5 py-[1px] text-[9px] font-semibold text-text sm:text-[10px]">
+          ) : (
+            <span className="bg-magenta2/50 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-text sm:text-xs md:text-sm">
               {player.starts} start{player.starts === 1 ? "" : "s"}
             </span>
-            {captaincyCount > 0 && (
-              <span className="bg-magenta/30 rounded-sm px-1.5 py-[1px] text-[9px] font-semibold text-magenta3 sm:text-[10px]">
-                {captaincyCount}× C
-                {player.triple_captaincies > 0
-                  ? ` (incl. ${player.triple_captaincies}× TC)`
-                  : ""}
-              </span>
+          )}
+          {player.captaincies > 0 && (
+            <span className="bg-magenta/30 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-magenta sm:text-xs md:text-sm">
+              {player.captaincies}× C
+            </span>
+          )}
+          {player.triple_captaincies > 0 && (
+            <span className="bg-magenta rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-white sm:text-xs md:text-sm">
+              {player.triple_captaincies}× TC
+            </span>
+          )}
+        </div>
+        {stats && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <StatChip
+              label="G"
+              value={stats.totalGoals ?? 0}
+              tooltip="Goals scored in range"
+            />
+            <StatChip
+              label="A"
+              value={stats.totalAssists ?? 0}
+              tooltip="Assists in range"
+            />
+            {isKeeperOrDef && (
+              <StatChip
+                label="CS"
+                value={stats.totalCleanSheets ?? 0}
+                tooltip="Clean sheets in range"
+              />
+            )}
+            <StatChip
+              label="D"
+              value={stats.totalDefconBonuses ?? 0}
+              tone={defconHighlightClass(stats.totalDefconBonuses ?? 0)}
+              tooltip="Defensive-contribution +2 bonuses in range (threshold met)"
+            />
+            <StatChip
+              label="xGI"
+              value={formatDecimal(stats.totalXGI)}
+              tooltip="Expected goal involvements (xG + xA)"
+            />
+            {isKeeperOrDef && (
+              <StatChip
+                label="xGC"
+                value={formatDecimal(stats.totalXGC)}
+                tooltip="Expected goals conceded"
+              />
+            )}
+            {stats.totalSaves > 0 && (
+              <StatChip label="Sv" value={stats.totalSaves} tooltip="Saves (keepers)" />
             )}
           </div>
-        </div>
-
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <div className="flex flex-col items-end leading-tight">
-            <span className="text-text/60 text-[10px] sm:text-xs">pts</span>
-            <span className="text-sm font-semibold text-text sm:text-base">
-              {player.points_for_user}
-            </span>
-          </div>
-          {showRankImpact && (
-            <div className="flex flex-col items-end gap-0.5">
-              <span
-                className={`min-w-[3.5rem] rounded-md px-2 py-1 text-center text-xs font-semibold sm:min-w-[4.5rem] sm:text-sm ${rankImpactPillClass(
-                  player.rank_impact,
-                )}`}
-              >
-                {formatRankDelta(player.rank_impact)}
-              </span>
-              {player.played_count > 0 && (
-                <span
-                  className="text-text/50 text-[9px] sm:text-[10px]"
-                  title="Average rank places gained per appearance"
-                >
-                  {formatRankDelta(ranksPerStart)} / start
-                </span>
-              )}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Stats line: only render when we have enriched stats from Redux for this player */}
-      {stats && (
-        <div className="flex flex-wrap items-center gap-1 pl-11 sm:pl-14">
-          <StatChip
-            label="G"
-            value={stats.totalGoals ?? 0}
-            title="Goals scored in range"
-          />
-          <StatChip label="A" value={stats.totalAssists ?? 0} title="Assists in range" />
-          {isKeeperOrDef && (
-            <StatChip
-              label="CS"
-              value={stats.totalCleanSheets ?? 0}
-              title="Clean sheets in range"
-            />
-          )}
-          <StatChip
-            label="D"
-            value={stats.totalDefconBonuses ?? 0}
-            tone={defconHighlightClass(stats.totalDefconBonuses ?? 0)}
-            title="Defensive-contribution +2 bonuses in range (threshold met)"
-          />
-          <StatChip
-            label="xGI"
-            value={formatDecimal(stats.totalXGI)}
-            title="Expected goal involvements (xG + xA)"
-          />
-          {isKeeperOrDef && (
-            <StatChip
-              label="xGC"
-              value={formatDecimal(stats.totalXGC)}
-              title="Expected goals conceded"
-            />
-          )}
-          {stats.totalSaves > 0 && (
-            <StatChip label="Sv" value={stats.totalSaves} title="Saves (keepers)" />
-          )}
+      <div className="ml-auto flex items-center gap-3 sm:gap-4">
+        <div className="flex flex-col items-end leading-tight">
+          <span className="text-text/60 text-xs sm:text-sm">pts</span>
+          <span className="text-base font-semibold text-text sm:text-lg md:text-2xl">
+            {pointsValue}
+          </span>
         </div>
-      )}
+        {rankPill && (
+          <div className="flex flex-col items-end leading-tight">
+            {rankPill}
+            {player.played_count > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="mt-0.5 text-[10px] text-text/60 sm:text-xs">
+                    {formatRankDelta(ranksPerStart)}/start
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>Average rank impact per appearance</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

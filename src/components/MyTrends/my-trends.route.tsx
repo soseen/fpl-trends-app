@@ -20,6 +20,7 @@ import {
   getManagerComparison,
   type ManagerComparison,
 } from "src/queries/getManagerComparison";
+import { getTeamImpact, type TeamImpact } from "src/queries/getTeamImpact";
 import FplIdInput from "./fpl-id-input";
 import RangeRankCard from "./range-rank-card";
 import RangeRankCardSkeleton from "./range-rank-card.skeleton";
@@ -30,6 +31,7 @@ import ManagerComparisonTableSkeleton from "./manager-comparison-table.skeleton"
 import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
 import TeamImpactView from "./TeamImpact/team-impact";
+import RankKillersView from "./TeamImpact/rank-killers";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -67,6 +69,14 @@ const MyTrends: React.FC = () => {
     queryFn: () => getManagerComparison(entryId as number, startGameweek, endGameweek),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
+    retry: 1,
+  });
+
+  const teamImpactQuery = useQuery<TeamImpact>({
+    queryKey: ["team-impact", entryId, startGameweek, endGameweek],
+    queryFn: () => getTeamImpact(entryId as number, startGameweek, endGameweek),
+    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 
@@ -174,7 +184,13 @@ const MyTrends: React.FC = () => {
 
       {typeof entryId === "number" && (
         <MyTrendsSection title="Team impact">
-          <TeamImpactView entryId={entryId} />
+          <TeamImpactView query={teamImpactQuery} />
+        </MyTrendsSection>
+      )}
+
+      {teamImpactQuery.data && teamImpactQuery.data.rank_killers.length > 0 && (
+        <MyTrendsSection title="Rank killers">
+          <RankKillersView data={teamImpactQuery.data} />
         </MyTrendsSection>
       )}
 

@@ -15,6 +15,16 @@ export type TeamImpactTile = {
   rank_impact: number; // signed; positive = rank improved
 };
 
+// One played fixture for a (player, GW) pair. `team_score` /
+// `opponent_score` are flipped for away matches so the first number is
+// always the player's club.
+export type PlayerMatch = {
+  opponent_short: string;
+  was_home: boolean;
+  team_score: number | null;
+  opponent_score: number | null;
+};
+
 export type PlayerImpactGwBreakdown = {
   gw: number;
   multiplier: number;
@@ -23,6 +33,13 @@ export type PlayerImpactGwBreakdown = {
   eo: number;
   excess: number;
   rank_impact_gw: number;
+  // True if the player had a fixture in this GW. False = blank GW
+  // (player's club didn't play). Rendered as "—" in the per-GW table to
+  // distinguish from "had a fixture but scored 0".
+  had_fixture: boolean;
+  // Per-fixture match info — empty for blanks, one entry for normal
+  // GWs, two for DGWs.
+  matches: PlayerMatch[];
   // Match events for this GW — populated by the backend SUM-aggregating
   // history rows across DGW fixtures. Used in the per-player accordion's
   // breakdown table to show WHY a given GW score was what it was.
@@ -65,6 +82,14 @@ export type TeamImpact = {
     fwd: TeamImpactTile[];
   } | null;
   players: PlayerImpact[];
+  // Top 10 players the user did NOT have during the GW range who scored
+  // points and were widely owned in the stratum — i.e. they boosted other
+  // managers' totals and so dragged the user's relative rank down.
+  // Convention: `played_count`, `starts`, `captaincies`,
+  // `triple_captaincies`, and `points_for_user` are all 0; `raw_points` is
+  // the total points the player scored across GWs the user didn't own
+  // them; `rank_impact` is signed and always non-positive.
+  rank_killers: PlayerImpact[];
   totals: {
     user_range_points: number;
     stratum_avg_range_points: number | null;

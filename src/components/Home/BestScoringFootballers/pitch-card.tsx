@@ -94,9 +94,7 @@ const PitchCard = ({ footballer }: Props) => {
                   </span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">
-                {STAT_META[stat.key].label}
-              </TooltipContent>
+              <TooltipContent>{STAT_META[stat.key].label}</TooltipContent>
             </Tooltip>
           ))}
         </div>

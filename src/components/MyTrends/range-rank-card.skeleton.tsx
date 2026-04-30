@@ -13,9 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 // the real card's responsive breakpoints (mobile compact, desktop tall).
 const RankCardColumnSkeleton: React.FC = () => (
   <div className="flex flex-col items-center gap-1.5 md:gap-2">
-    <Skeleton className="bg-magenta/40 h-5 w-20 md:h-6 md:w-32 lg:w-40" />
-    <Skeleton className="h-16 w-full max-w-[180px] bg-accent3 md:h-28 md:max-w-[260px] lg:h-32 lg:max-w-[320px]" />
-    <Skeleton className="bg-magenta/40 h-5 w-24 md:h-6 md:w-36 lg:w-44" />
+    <Skeleton className="h-5 w-20 md:h-6 md:w-32 lg:w-40" />
+    <Skeleton className="h-16 w-full max-w-[180px] md:h-28 md:max-w-[260px] lg:h-32 lg:max-w-[320px]" />
+    <Skeleton className="h-5 w-24 md:h-6 md:w-36 lg:w-44" />
   </div>
 );
 

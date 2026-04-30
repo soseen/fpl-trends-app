@@ -51,7 +51,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
               {topLeftBadge.text}
             </div>
           </TooltipTrigger>
-          <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">
+          <TooltipContent>
             {topLeftBadge.label}
           </TooltipContent>
         </Tooltip>
@@ -77,7 +77,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
                   <p>{footballer.totalGoals}</p> <FaFutbol />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">Goals</TooltipContent>
+              <TooltipContent>Goals</TooltipContent>
             </Tooltip>
           )}
           {!!footballer?.totalAssists && (
@@ -87,7 +87,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
                   <p>{footballer?.totalAssists}</p> <FaHandshake />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">Assists</TooltipContent>
+              <TooltipContent>Assists</TooltipContent>
             </Tooltip>
           )}
           {!!footballer.totalCleanSheets &&
@@ -100,7 +100,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
                     <p>{footballer?.totalCleanSheets}</p> <TbLockFilled />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">Clean sheets</TooltipContent>
+                <TooltipContent>Clean sheets</TooltipContent>
               </Tooltip>
             )}
           {!!footballer?.totalDefconBonuses && (
@@ -110,7 +110,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
                   <p>{footballer.totalDefconBonuses}</p> <FaShieldAlt />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-magenta3 px-2 py-1 text-white shadow-sm">Defcons</TooltipContent>
+              <TooltipContent>Defcons</TooltipContent>
             </Tooltip>
           )}
         </div>
