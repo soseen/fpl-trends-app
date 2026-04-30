@@ -1,6 +1,7 @@
 import type { ManagerRangeRank } from "src/queries/getManagerRangeRank";
 import { useSelector } from "react-redux";
 import type { RootState } from "src/redux/store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type Props = {
   data: ManagerRangeRank;
@@ -8,8 +9,11 @@ type Props = {
   endGw: number;
 };
 
-const formatRank = (rank: number | null): string =>
-  rank === null ? "—" : rank.toLocaleString("en-GB");
+// Treat any non-positive / null / undefined value as "no rank yet" so
+// boot-state and unranked users render as "—". A real rank from FPL is
+// always >= 1.
+const formatRank = (rank: number | null | undefined): string =>
+  typeof rank === "number" && rank > 0 ? rank.toLocaleString("en-GB") : "—";
 
 const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
   const { totalPlayers } = useSelector((state: RootState) => state.totalPlayers);
@@ -49,7 +53,7 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
           <p className="text-xs text-text/60 md:text-sm">Top {percentageOverall}%</p>
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
-          {(data.total_points ?? 0).toLocaleString("en-GB")} pts
+          {(data.total_points ?? 0)?.toLocaleString("en-GB")} pts
         </div>
       </div>
       <div className="col-span-1 h-full w-[1px] self-center justify-self-center bg-accent4" />
@@ -72,16 +76,21 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
               estimator quality without leaving the page. Hidden when
               FPL hasn't published one (partial ranges, unranked user). */}
           {data.range_rank_official !== null && data.range_rank_official !== range && (
-            <p
-              className="mt-1 text-[10px] text-text/50 md:text-xs"
-              title="Cumulative overall rank reported directly by FPL for the end of the range. Treat this as the ground-truth our estimator is trying to match."
-            >
-              FPL: {formatRank(data.range_rank_official)}
-            </p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="mt-1 cursor-help text-[10px] text-text/50 md:text-xs">
+                  FPL: {formatRank(data.range_rank_official)}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent>
+                Cumulative overall rank reported directly by FPL for the end of the range.
+                Treat this as the ground-truth our estimator is trying to match.
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
-          {data.range_total.toLocaleString("en-GB")} pts
+          {data.range_total?.toLocaleString("en-GB")} pts
         </div>
       </div>
     </div>
