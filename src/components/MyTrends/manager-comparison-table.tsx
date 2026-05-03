@@ -110,6 +110,13 @@ const buildRows = (data: ManagerComparison): Row[] => [
     stat: data.transfers,
     direction: "neutral",
   },
+  {
+    kind: "numeric",
+    label: "Avg pts / transfer",
+    stat: data.avg_pts_per_transfer,
+    direction: "high-good",
+    approximate: data.notes.transfers_average_partial,
+  },
   { kind: "chip", label: "Wildcards", stat: data.wildcards },
   { kind: "chip", label: "Free hits", stat: data.free_hits },
   { kind: "chip", label: "Bench boosts", stat: data.bench_boosts },

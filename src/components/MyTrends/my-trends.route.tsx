@@ -21,6 +21,10 @@ import {
   type ManagerComparison,
 } from "src/queries/getManagerComparison";
 import { getTeamImpact, type TeamImpact } from "src/queries/getTeamImpact";
+import {
+  getManagerTransfers,
+  type ManagerTransfers,
+} from "src/queries/getManagerTransfers";
 import FplIdInput from "./fpl-id-input";
 import RangeRankCard from "./range-rank-card";
 import RangeRankCardSkeleton from "./range-rank-card.skeleton";
@@ -32,6 +36,7 @@ import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
 import TeamImpactView from "./TeamImpact/team-impact";
 import RankKillersView from "./TeamImpact/rank-killers";
+import TransferImpactView from "./TransferImpact/transfer-impact";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -77,6 +82,15 @@ const MyTrends: React.FC = () => {
     queryFn: () => getTeamImpact(entryId as number, startGameweek, endGameweek),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  const transfersQuery = useQuery<ManagerTransfers>({
+    queryKey: ["manager-transfers", entryId, startGameweek, endGameweek],
+    queryFn: () =>
+      getManagerTransfers(entryId as number, startGameweek, endGameweek),
+    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    staleTime: 60 * 1000,
     retry: 1,
   });
 
@@ -179,6 +193,12 @@ const MyTrends: React.FC = () => {
           ) : (
             <ManagerComparisonTableSkeleton />
           )}
+        </MyTrendsSection>
+      )}
+
+      {(transfersQuery.data || transfersQuery.isPending) && (
+        <MyTrendsSection title="Transfer impact">
+          <TransferImpactView query={transfersQuery} />
         </MyTrendsSection>
       )}
 

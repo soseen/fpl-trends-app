@@ -49,12 +49,18 @@ export type ManagerComparison = {
   hits: ComparisonStat;
   bench_points: ComparisonStat;
   captain_bonus: ComparisonStat;
+  // Average net points per transfer made in range. User: total transfer
+  // net (sum of in_player_points − out_player_points over each transfer's
+  // remaining-range window) / number of transfers. Sample columns are
+  // averages of per-manager averages across the stratum.
+  avg_pts_per_transfer: ComparisonStat;
   avg_gw_score: ComparisonStat;
   most_captained: CaptainSummary;
   notes: {
     hits_average_partial: boolean;
     bench_average_partial: boolean;
     captain_average_partial: boolean;
+    transfers_average_partial: boolean;
   };
 };
 
