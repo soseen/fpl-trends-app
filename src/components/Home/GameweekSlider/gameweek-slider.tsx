@@ -183,8 +183,7 @@ const GameweekSlider = () => {
           {PRESETS.map((preset) => {
             const max = maxGameweek || TOTAL_GAMEWEEKS_COUNT;
             const range = preset.range(max);
-            const active =
-              range.start === startGameweek && range.end === endGameweek;
+            const active = range.start === startGameweek && range.end === endGameweek;
             return (
               <button
                 key={preset.longLabel}
