@@ -45,11 +45,16 @@ type Props = {
   data: ManagerComparison;
 };
 
-const formatNumber = (n: number, decimals = 0): string =>
-  n.toLocaleString("en-GB", {
+// Defensive against `undefined` — the API can omit fields where the
+// declared type only allows `number | null`, so loose-coerce nullish
+// inputs to a dash rather than crashing inside `toLocaleString`.
+const formatNumber = (n: number | null | undefined, decimals = 0): string => {
+  if (n == null || !Number.isFinite(n)) return "—";
+  return n.toLocaleString("en-GB", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+};
 
 // Each chip type has two copies per season — one usable in the first half
 // (GW1–19), one in the second half (GW20–38). The backend reports each
@@ -125,22 +130,23 @@ const buildRows = (data: ManagerComparison): Row[] => [
 ];
 
 const diffColor = (
-  user: number,
-  comparator: number | null,
+  user: number | null | undefined,
+  comparator: number | null | undefined,
   direction: Direction,
 ): string => {
-  if (comparator === null || direction === "neutral") return "text-text";
+  if (user == null || comparator == null || direction === "neutral")
+    return "text-text";
   if (user === comparator) return "text-text";
   const userIsBetter = direction === "high-good" ? user > comparator : user < comparator;
   return userIsBetter ? "text-emerald-400" : "text-rose-400";
 };
 
 const formatComparator = (
-  value: number | null,
+  value: number | null | undefined,
   decimals: number,
   approximate: boolean,
 ): string => {
-  if (value === null) return "—";
+  if (value == null) return "—";
   const prefix = approximate ? "≈ " : "";
   return `${prefix}${formatNumber(value, decimals)}`;
 };
