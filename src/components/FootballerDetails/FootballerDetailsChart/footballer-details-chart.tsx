@@ -1,8 +1,9 @@
 import {
   Bar,
-  BarChart,
   CartesianGrid,
+  ComposedChart,
   LabelList,
+  Line,
   Rectangle,
   ReferenceLine,
   Tooltip,
@@ -10,11 +11,13 @@ import {
   YAxis,
 } from "recharts";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition, type History } from "src/queries/types";
+import type { RootState } from "src/redux/store";
 import { getDefconThreshold } from "src/utils/defcon";
 
 import CustomTooltip from "./custom-tooltip";
@@ -34,6 +37,7 @@ enum SelectedChartStat {
   minutes = "minutes",
   points = "points",
   defcons = "defcons",
+  ownership = "ownership",
 }
 
 type Props = {
@@ -47,6 +51,9 @@ export type ChartData = {
   minutes: number;
   points: number;
   defcons: number;
+  // % of FPL managers owning this player at GW. null on fake (pre-debut /
+  // future) rounds so the line chart leaves a gap instead of dipping to 0.
+  ownership: number | null;
   matchInfo: History[];
   team_code: number;
   element_type: FootballerPosition;
@@ -55,6 +62,7 @@ export type ChartData = {
 
 const FootballerDetailsChart = ({ footballer }: Props) => {
   const { isMD } = useDimensions();
+  const totalPlayers = useSelector((state: RootState) => state.totalPlayers.totalPlayers);
   const [displayedChartStat, setDisplayedChartStat] = useState<SelectedChartStat>(() =>
     [FootballerPosition.DEF, FootballerPosition.GK].includes(
       footballer?.element_type ?? 1,
@@ -106,6 +114,12 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       gradientTo: "rgba(251, 191, 36, 0.15)",
       activeFill: "#fcd34d",
     },
+    [SelectedChartStat.ownership]: {
+      stroke: "#a78bfa",
+      gradientFrom: "#a78bfa",
+      gradientTo: "rgba(167, 139, 250, 0.15)",
+      activeFill: "#c4b5fd",
+    },
   };
   const palette = STAT_COLORS[displayedChartStat];
   const gradientId = `chart-grad-${displayedChartStat}`;
@@ -122,6 +136,12 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       const round = h.round;
       const existing = gameweekMap.get(round);
 
+      // Approximation: FPL only exposes the *current* total managers, not
+      // the per-GW total. Using the current denominator slightly understates
+      // historical % (the league grows over the season), but it matches what
+      // FPL itself surfaces as `selected_by_percent`.
+      const ownership = totalPlayers > 0 ? (h.selected / totalPlayers) * 100 : 0;
+
       if (existing) {
         gameweekMap.set(round, {
           ...existing,
@@ -130,6 +150,9 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           minutes: existing.minutes + h.minutes,
           points: existing.points + h.total_points,
           defcons: existing.defcons + (h.defensive_contribution ?? 0),
+          // Ownership is a snapshot, not a per-fixture event — for DGWs take
+          // the higher of the two reported values rather than summing.
+          ownership: Math.max(existing.ownership ?? 0, ownership),
           matchInfo: [...existing.matchInfo, h],
         });
       } else {
@@ -140,6 +163,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           minutes: h.minutes,
           points: h.total_points,
           defcons: h.defensive_contribution ?? 0,
+          ownership,
           matchInfo: [h],
           team_code: footballer?.team_code,
           element_type: footballer.element_type,
@@ -158,6 +182,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           minutes: 0,
           points: 0,
           defcons: 0,
+          ownership: null,
           matchInfo: [],
           team_code: footballer?.team_code ?? 0,
           element_type: footballer?.element_type ?? FootballerPosition.MID,
@@ -167,7 +192,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
     });
 
     return allGameweeks;
-  }, [footballer]);
+  }, [footballer, totalPlayers]);
 
   // On mobile, default the scroll position so the latest *played* gameweek
   // sits near the right edge of the viewport — matches the previous "last 10
@@ -260,7 +285,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               // parent and height stays at 350px.
               className="mt-2 aspect-auto h-[350px] max-h-[450px] min-h-[200px] w-full rounded-md bg-accent2 px-2 py-4 pb-2"
             >
-              <BarChart
+              <ComposedChart
                 data={chartData}
                 className="bar-chart"
                 margin={{ top: 20, left: 4, right: 12, bottom: 4 }}
@@ -303,13 +328,17 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                   axisLine={false}
                   width={32}
                   tickCount={5}
-                  // xGI / xGC are floats; everything else is integer counts.
+                  // xGI / xGC are floats; ownership is a percentage; the rest
+                  // are integer counts. Drop trailing `.0` on whole-number
+                  // ownership ticks (e.g. show "5%" not "5.0%").
                   tickFormatter={(v: number) =>
                     [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
                       displayedChartStat,
                     )
                       ? v.toFixed(1)
-                      : `${v}`
+                      : displayedChartStat === SelectedChartStat.ownership
+                        ? `${v % 1 === 0 ? v : v.toFixed(1)}%`
+                        : `${v}`
                   }
                 />
                 <Tooltip
@@ -317,49 +346,94 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                   cursor={{ fill: palette.stroke, fillOpacity: 0.08 }}
                   {...(isMD && { offset: 10 })}
                 />
-                <Bar
-                  dataKey={displayedChartStat}
-                  fill={`url(#${gradientId})`}
-                  stroke={palette.stroke}
-                  strokeOpacity={0.5}
-                  strokeWidth={1}
-                  radius={[3, 3, 0, 0]}
-                  activeBar={
-                    <Rectangle
-                      fill={palette.activeFill}
-                      stroke={palette.stroke}
-                      strokeWidth={1.5}
+                {displayedChartStat === SelectedChartStat.ownership ? (
+                  <Line
+                    dataKey="ownership"
+                    type="monotone"
+                    stroke={palette.stroke}
+                    strokeWidth={2}
+                    dot={{
+                      fill: palette.stroke,
+                      stroke: palette.stroke,
+                      r: 2.5,
+                    }}
+                    activeDot={{
+                      r: 5,
+                      fill: palette.activeFill,
+                      stroke: palette.stroke,
+                      strokeWidth: 1.5,
+                    }}
+                    // Pre-debut and future GWs are stored as null — leave a
+                    // gap rather than dragging the line down to 0.
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  >
+                    <LabelList
+                      dataKey="ownership"
+                      position="top"
+                      fill="var(--text)"
+                      content={({ x, y, value, index }) =>
+                        chartData[index as number]?.isFake || value == null ? null : (
+                          <text
+                            x={x}
+                            y={y}
+                            dy={-8}
+                            textAnchor="middle"
+                            fontSize="11"
+                            fontWeight="600"
+                            fill="var(--text)"
+                          >
+                            {`${(value as number).toFixed(1)}%`}
+                          </text>
+                        )
+                      }
                     />
-                  }
-                >
-                  <LabelList
+                  </Line>
+                ) : (
+                  <Bar
                     dataKey={displayedChartStat}
-                    position="top"
-                    fill="var(--text)"
-                    content={({ x, y, value, index, width }) =>
-                      chartData[index as number]?.isFake ? null : (
-                        <text
-                          x={x}
-                          y={y}
-                          dx={(width as number) / 2}
-                          dy={-6}
-                          textAnchor="middle"
-                          fontSize="11"
-                          fontWeight="600"
-                          fill="var(--text)"
-                        >
-                          {value === 0
-                            ? ""
-                            : [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
-                                  displayedChartStat,
-                                )
-                              ? (value as number).toFixed(2)
-                              : value}
-                        </text>
-                      )
+                    fill={`url(#${gradientId})`}
+                    stroke={palette.stroke}
+                    strokeOpacity={0.5}
+                    strokeWidth={1}
+                    radius={[3, 3, 0, 0]}
+                    activeBar={
+                      <Rectangle
+                        fill={palette.activeFill}
+                        stroke={palette.stroke}
+                        strokeWidth={1.5}
+                      />
                     }
-                  />
-                </Bar>
+                  >
+                    <LabelList
+                      dataKey={displayedChartStat}
+                      position="top"
+                      fill="var(--text)"
+                      content={({ x, y, value, index, width }) =>
+                        chartData[index as number]?.isFake ? null : (
+                          <text
+                            x={x}
+                            y={y}
+                            dx={(width as number) / 2}
+                            dy={-6}
+                            textAnchor="middle"
+                            fontSize="11"
+                            fontWeight="600"
+                            fill="var(--text)"
+                          >
+                            {value === 0
+                              ? ""
+                              : [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
+                                    displayedChartStat,
+                                  )
+                                ? (value as number).toFixed(2)
+                                : value}
+                          </text>
+                        )
+                      }
+                    />
+                  </Bar>
+                )}
                 {displayedChartStat === SelectedChartStat.defcons &&
                   defconThreshold !== null && (
                     <ReferenceLine
@@ -376,7 +450,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                       }}
                     />
                   )}
-              </BarChart>
+              </ComposedChart>
             </ChartContainer>
           </div>
         </div>
