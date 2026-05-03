@@ -38,19 +38,38 @@ const parseGwParam = (param: string | null, max: number) => {
   return { start, end };
 };
 
-// Quick-pick chips covering the 80% of cases where users just want a
-// recent window without precisely dragging two thumbs on a phone. "All"
-// maps to the season-to-date span (1..max), not 1..38, so a click in
-// GW 5 doesn't dilute the data with 33 unplayed rounds.
+// Quick-pick chips. Inline next to the slider so the navbar stays one
+// row tall. Mobile uses tight labels ("3", "5", "10", "All") to keep the
+// row from overflowing on narrow screens; desktop gets the more
+// descriptive "Last N" form. "All" maps to the season-to-date span
+// (1..max), not 1..38, so a click in GW 5 doesn't dilute the data with
+// 33 unplayed rounds.
 type Preset = {
-  label: string;
+  shortLabel: string;
+  longLabel: string;
   range: (max: number) => { start: number; end: number };
 };
 const PRESETS: Preset[] = [
-  { label: "Last 3", range: (max) => ({ start: Math.max(1, max - 2), end: max }) },
-  { label: "Last 5", range: (max) => ({ start: Math.max(1, max - 4), end: max }) },
-  { label: "Last 10", range: (max) => ({ start: Math.max(1, max - 9), end: max }) },
-  { label: "All", range: (max) => ({ start: 1, end: max }) },
+  {
+    shortLabel: "3",
+    longLabel: "Last 3",
+    range: (max) => ({ start: Math.max(1, max - 2), end: max }),
+  },
+  {
+    shortLabel: "5",
+    longLabel: "Last 5",
+    range: (max) => ({ start: Math.max(1, max - 4), end: max }),
+  },
+  {
+    shortLabel: "10",
+    longLabel: "Last 10",
+    range: (max) => ({ start: Math.max(1, max - 9), end: max }),
+  },
+  {
+    shortLabel: "All",
+    longLabel: "All",
+    range: (max) => ({ start: 1, end: max }),
+  },
 ];
 
 const GameweekSlider = () => {
@@ -129,71 +148,68 @@ const GameweekSlider = () => {
 
   return (
     <div className="my-2 px-2 md:my-4 md:px-4 lg:my-6">
-      <div className="flex w-full items-center">
-        <h1 className="mb-1 mr-2 whitespace-nowrap text-center text-sm text-text md:mb-2 md:mr-6 md:text-xl">
-          Gameweek Range
+      <div className="flex w-full items-center gap-2 md:gap-4">
+        {/* Header doubles as a live range readout — mobile drops the long
+            "Gameweek Range" prefix to recover horizontal space; the
+            currentRange numbers update on every drag tick, replacing the
+            per-thumb labels we used to render below the slider (which
+            forced a separate vertical row to clear the chip strip). */}
+        <h1 className="whitespace-nowrap text-sm text-text md:text-xl">
+          <span className="md:hidden">GW</span>
+          <span className="hidden md:inline">Gameweek Range</span>
+          <span className="ml-1.5 font-semibold text-magenta md:ml-2">
+            {currentRange[0]}–{currentRange[1]}
+          </span>
         </h1>
-        <div className="flex w-full items-center justify-between gap-4 md:gap-8">
-          <SliderPrimitive.Root
-            value={currentRange}
-            min={1}
-            max={maxGameweek || TOTAL_GAMEWEEKS_COUNT}
-            step={1}
-            minStepsBetweenThumbs={1}
-            onValueChange={onValueChange}
-            aria-label="Gameweek range"
-            className="relative flex h-5 w-full touch-none items-center"
-          >
-            <SliderPrimitive.Track className="relative h-1 w-full grow rounded-full bg-white dark:bg-magenta">
-              <SliderPrimitive.Range className="absolute h-full rounded-full bg-magenta dark:bg-white" />
-            </SliderPrimitive.Track>
-            {/* 20px thumbs on every breakpoint (was 12px on mobile) — a
-                comfortable touch target on a phone, still discreet on
-                desktop. */}
-            <SliderPrimitive.Thumb className="relative block h-5 w-5 rounded-full bg-magenta focus:outline-none focus-visible:ring-2 focus-visible:ring-magenta focus-visible:ring-offset-2 dark:bg-white">
-              <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-text md:-bottom-8 md:text-base">
-                {currentRange[0]}
-              </p>
-            </SliderPrimitive.Thumb>
-            <SliderPrimitive.Thumb className="relative block h-5 w-5 rounded-full bg-magenta focus:outline-none focus-visible:ring-2 focus-visible:ring-magenta focus-visible:ring-offset-2 dark:bg-white">
-              <p className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-text md:-bottom-8 md:text-base">
-                {currentRange[1]}
-              </p>
-            </SliderPrimitive.Thumb>
-          </SliderPrimitive.Root>
-          <Button
-            onClick={confirmNewRange}
-            disabled={isDisabled}
-            className="bg-magenta px-2 py-1 text-center text-sm text-text disabled:opacity-40 md:px-4 md:text-base"
-          >
-            {isSM ? "Apply" : "Apply Range"}
-          </Button>
+        <SliderPrimitive.Root
+          value={currentRange}
+          min={1}
+          max={maxGameweek || TOTAL_GAMEWEEKS_COUNT}
+          step={1}
+          minStepsBetweenThumbs={1}
+          onValueChange={onValueChange}
+          aria-label="Gameweek range"
+          className="relative flex h-5 min-w-0 flex-1 touch-none items-center"
+        >
+          <SliderPrimitive.Track className="relative h-1 w-full grow rounded-full bg-white dark:bg-magenta">
+            <SliderPrimitive.Range className="absolute h-full rounded-full bg-magenta dark:bg-white" />
+          </SliderPrimitive.Track>
+          <SliderPrimitive.Thumb className="relative block h-4 w-4 rounded-full bg-magenta focus:outline-none focus-visible:ring-2 focus-visible:ring-magenta focus-visible:ring-offset-2 dark:bg-white" />
+          <SliderPrimitive.Thumb className="relative block h-4 w-4 rounded-full bg-magenta focus:outline-none focus-visible:ring-2 focus-visible:ring-magenta focus-visible:ring-offset-2 dark:bg-white" />
+        </SliderPrimitive.Root>
+        {/* Inline preset chips. Auto-apply on click — the user has
+            stated their intent unambiguously, no Apply confirm needed. */}
+        <div className="flex shrink-0 items-center gap-1 md:gap-2">
+          {PRESETS.map((preset) => {
+            const max = maxGameweek || TOTAL_GAMEWEEKS_COUNT;
+            const range = preset.range(max);
+            const active =
+              range.start === startGameweek && range.end === endGameweek;
+            return (
+              <button
+                key={preset.longLabel}
+                type="button"
+                onClick={() => applyRange(range.start, range.end)}
+                className={clsx(
+                  "rounded-md px-1.5 py-0.5 text-xs font-medium transition-colors md:px-2.5 md:text-sm",
+                  active
+                    ? "bg-magenta text-text"
+                    : "bg-magenta2/60 text-text/80 hover:bg-magenta2",
+                )}
+              >
+                <span className="md:hidden">{preset.shortLabel}</span>
+                <span className="hidden md:inline">{preset.longLabel}</span>
+              </button>
+            );
+          })}
         </div>
-      </div>
-      {/* Quick-pick presets. Auto-apply on click — no Apply press needed
-          since chips are explicit one-tap actions, not exploratory drags. */}
-      <div className="mt-3 flex flex-wrap items-center justify-end gap-1.5 md:mt-4 md:gap-2">
-        {PRESETS.map((preset) => {
-          const max = maxGameweek || TOTAL_GAMEWEEKS_COUNT;
-          const range = preset.range(max);
-          const active =
-            range.start === startGameweek && range.end === endGameweek;
-          return (
-            <button
-              key={preset.label}
-              type="button"
-              onClick={() => applyRange(range.start, range.end)}
-              className={clsx(
-                "rounded-md px-2 py-0.5 text-xs font-medium transition-colors md:px-2.5 md:text-sm",
-                active
-                  ? "bg-magenta text-text"
-                  : "bg-magenta2/60 text-text/80 hover:bg-magenta2",
-              )}
-            >
-              {preset.label}
-            </button>
-          );
-        })}
+        <Button
+          onClick={confirmNewRange}
+          disabled={isDisabled}
+          className="shrink-0 bg-magenta px-2 py-1 text-center text-xs text-text disabled:opacity-40 md:px-4 md:text-base"
+        >
+          {isSM ? "Apply" : "Apply Range"}
+        </Button>
       </div>
     </div>
   );
