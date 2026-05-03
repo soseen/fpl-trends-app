@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import React, { useMemo } from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useMemo } from "react";
+import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { AiFillCloseCircle as CloseIcon } from "react-icons/ai";
 import FootballerImage from "../FootballerImage/footballer-image";
 import { FaArrowDown, FaArrowUp, FaStar } from "react-icons/fa";
@@ -50,7 +50,7 @@ const FootballerDetailsDrawer = ({ footballer, onClose }: Props) => {
   return (
     <Drawer open={!!footballer} direction="top" onClose={onClose}>
       <DrawerContent
-        className="inset-0 z-[300] h-full w-full overflow-x-hidden px-2 pt-3 text-text"
+        className="inset-0 z-[300] mt-0 h-full w-full overflow-x-hidden rounded-none border-0 px-2 pt-3 text-text"
         aria-describedby={undefined}
       >
         <DialogTitle className="hidden">{footballer?.web_name}</DialogTitle>
@@ -60,7 +60,7 @@ const FootballerDetailsDrawer = ({ footballer, onClose }: Props) => {
         >
           <CloseIcon className="h-5 w-5 text-magenta" />
         </Button>
-        <div className="w-full flex-col items-center overflow-y-auto overflow-x-hidden rounded-md px-2 py-6">
+        <div className="min-h-0 w-full flex-1 flex-col items-center overflow-y-auto overflow-x-hidden rounded-md px-2 py-6">
           <div className="relative flex w-full items-center justify-center gap-4 bg-secondary px-2 pt-4">
             <FootballerImage
               code={footballer?.code}
