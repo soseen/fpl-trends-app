@@ -46,6 +46,11 @@ export const usePlayersTableColumns = () => {
       header: "Points",
       cell: (info) => <p>{info.getValue()}</p>,
     }),
+    columnHelper.accessor("now_cost", {
+      header: "Price",
+      cell: (info) => <p>£{(info.getValue() / 10).toFixed(1)}m</p>,
+      enableMultiSort: true,
+    }),
     columnHelper.accessor("element_type", {
       header: "Position",
       cell: (info) => (

@@ -85,51 +85,84 @@ const PlayersTableFilters = ({
 
   return (
     <div className="mt-4 w-full flex-col">
-      <div className="mb-2 flex w-full flex-col gap-2 text-text md:mb-4 md:flex-row md:gap-4 lg:items-end">
-        <div className="flex items-center justify-between gap-2 md:justify-start">
-          <Input
-            className="h-6 w-fit min-w-[185px] border-transparent bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
-            onChange={(e) => setFilterProperty(0, removeAccents(e.target.value))}
-            placeholder="Search player..."
-            value={columnFilters[0]?.value as string}
-          />
-          <div className="flex flex-col gap-1">
-            <Select
-              onValueChange={(value) =>
-                setFilterProperty(2, value === "none" ? "" : value)
-              }
-              value={columnFilters[2].value as string}
-            >
-              <SelectTrigger className="h-6 w-[106px] border-transparent bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
-                <SelectValue placeholder="Team" />
-              </SelectTrigger>
-              <SelectContent
-                sideOffset={5}
-                className="w-[106px] cursor-pointer border-transparent bg-magenta sm:w-[120px]"
+      <div className="mb-2 flex w-full flex-col gap-3 text-text md:mb-4 md:flex-row md:items-start md:gap-4">
+        <div className="flex flex-1 flex-col items-center gap-3 md:items-stretch md:gap-3">
+          <div className="flex items-center justify-center gap-2 md:justify-start">
+            <Input
+              className="h-6 w-fit min-w-[185px] border-transparent bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
+              onChange={(e) => setFilterProperty(0, removeAccents(e.target.value))}
+              placeholder="Search player..."
+              value={columnFilters[0]?.value as string}
+            />
+            <div className="flex flex-col gap-1">
+              <Select
+                onValueChange={(value) =>
+                  setFilterProperty(2, value === "none" ? "" : value)
+                }
+                value={columnFilters[2].value as string}
               >
-                <SelectItem
-                  className="outline-non cursor-pointer flex-nowrap items-center px-2 py-[2px] text-sm text-text hover:bg-magenta3 md:py-1"
-                  value="none"
+                <SelectTrigger className="h-6 w-[106px] border-transparent bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
+                  <SelectValue placeholder="Team" />
+                </SelectTrigger>
+                <SelectContent
+                  sideOffset={5}
+                  className="w-[106px] cursor-pointer border-transparent bg-magenta sm:w-[120px]"
                 >
-                  -----
-                </SelectItem>
-                {list.map((team) => (
                   <SelectItem
-                    key={team.id}
-                    className="outline-non cursor-pointer flex-nowrap items-center overflow-hidden overflow-ellipsis whitespace-nowrap px-2 py-[2px] text-sm leading-5 text-text hover:bg-magenta3 md:py-1"
-                    value={team.name}
+                    className="outline-non cursor-pointer flex-nowrap items-center px-2 py-[2px] text-sm text-text hover:bg-magenta3 md:py-1"
+                    value="none"
                   >
-                    {team.name}
+                    -----
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  {list.map((team) => (
+                    <SelectItem
+                      key={team.id}
+                      className="outline-non cursor-pointer flex-nowrap items-center overflow-hidden overflow-ellipsis whitespace-nowrap px-2 py-[2px] text-sm leading-5 text-text hover:bg-magenta3 md:py-1"
+                      value={team.name}
+                    >
+                      {team.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-between gap-2 md:ml-auto md:justify-start lg:gap-4">
           <ToggleGroup
             type="multiple"
-            className="flex justify-start gap-2"
+            className="grid w-fit grid-cols-[auto_auto_auto_auto] gap-0.5 rounded-md border-[2px] border-secondary bg-accent3 p-1"
+            value={hiddenColumnKeysArray}
+            onValueChange={modifyColumnVisibility}
+          >
+            {playersTableColumns
+              .filter(
+                (col) =>
+                  !IGNORED_COLUMN_VISIBILITY_KEYS.includes(col.accessorKey as string),
+              )
+              .map((col, index) => {
+                return (
+                  <ToggleGroupItem
+                    key={index}
+                    value={col.accessorKey as string}
+                    className="flex h-6 items-center justify-start gap-1 justify-self-stretch rounded-md bg-transparent px-1.5 py-0.5 text-left text-[10px] text-text sm:h-auto sm:gap-1.5 sm:px-2 sm:py-1 sm:text-xs"
+                  >
+                    <span
+                      className={clsx(
+                        "h-1.5 w-1.5 shrink-0 rounded-full md:h-2 md:w-2",
+                        hiddenColumnKeysArray.includes(col?.accessorKey as string)
+                          ? "bg-text"
+                          : "bg-magenta",
+                      )}
+                    />
+                    {col?.header}
+                  </ToggleGroupItem>
+                );
+              })}
+          </ToggleGroup>
+        </div>
+        <div className="flex flex-col items-center gap-3 md:items-end md:gap-3">
+          <ToggleGroup
+            type="multiple"
+            className="flex justify-start gap-1 md:self-end"
             defaultValue={["1", "2", "3", "4"]}
             value={(columnFilters[3].value as number[]).map((v) => v.toString())}
             onValueChange={(value) =>
@@ -148,11 +181,11 @@ const PlayersTableFilters = ({
                     key as keyof typeof FootballerPosition
                   ].toString()}
                   className={clsx(
-                    "flex w-8 items-center justify-center rounded-md p-1 text-[8px] sm:w-10 md:text-xs lg:p-2",
+                    "flex h-7 min-w-[28px] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] sm:h-9 sm:min-w-[44px] sm:px-3 sm:py-1 sm:text-xs md:text-sm lg:px-4",
                     (columnFilters[3].value as number[]).includes(
                       FootballerPosition[key as keyof typeof FootballerPosition],
                     )
-                      ? "bg-magenta"
+                      ? "bg-magenta data-[state=on]:bg-magenta"
                       : "bg-secondary",
                   )}
                 >
@@ -160,22 +193,38 @@ const PlayersTableFilters = ({
                 </ToggleGroupItem>
               ))}
           </ToggleGroup>
-          <div className="flex w-fit flex-col gap-1">
-            <Label className="text-xs sm:text-sm">
-              Max ownership: {(columnFilters[1].value as number[])[1]} %
-            </Label>
-            <Slider
-              key={`${isClearState}`}
-              defaultValue={[(columnFilters[1].value as number[])[1]]}
-              max={100}
-              min={1}
-              step={1}
-              onValueCommit={(value) => setFilterProperty(1, [0, value[0]])}
-            />
+          <div className="flex flex-wrap justify-center gap-3 md:justify-end">
+            <div className="flex w-[180px] flex-col gap-1">
+              <Label className="text-xs sm:text-sm">
+                Max ownership: {(columnFilters[1].value as number[])[1]} %
+              </Label>
+              <Slider
+                key={`ownership-${isClearState}`}
+                defaultValue={[(columnFilters[1].value as number[])[1]]}
+                max={100}
+                min={1}
+                step={1}
+                onValueCommit={(value) => setFilterProperty(1, [0, value[0]])}
+              />
+            </div>
+            <div className="flex w-[180px] flex-col gap-1">
+              <Label className="text-xs sm:text-sm">
+                Max price: £
+                {(((columnFilters[4]?.value as number[])?.[1] ?? 150) / 10).toFixed(1)}m
+              </Label>
+              <Slider
+                key={`price-${isClearState}`}
+                defaultValue={[(columnFilters[4]?.value as number[])?.[1] ?? 150]}
+                max={150}
+                min={35}
+                step={1}
+                onValueCommit={(value) => setFilterProperty(4, [0, value[0]])}
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+      <div className="mb-2 flex w-full justify-center md:justify-start">
         <Button
           className="flex items-center rounded-md bg-accent3 px-1 py-1 text-xs text-text disabled:opacity-20 sm:text-sm md:px-2"
           disabled={isClearState}
@@ -184,37 +233,6 @@ const PlayersTableFilters = ({
           <TiDelete className="flex h-4 w-4 items-center justify-center text-magenta sm:h-6 sm:w-6" />
           Reset filters & sorting
         </Button>
-        <ToggleGroup
-          type="multiple"
-          className="grid grid-cols-4 grid-rows-2 gap-1 rounded-md border-[2px] border-secondary bg-accent3 p-1 md:gap-2"
-          value={hiddenColumnKeysArray}
-          onValueChange={modifyColumnVisibility}
-        >
-          {playersTableColumns
-            .filter(
-              (col) =>
-                !IGNORED_COLUMN_VISIBILITY_KEYS.includes(col.accessorKey as string),
-            )
-            .map((col, index) => {
-              return (
-                <ToggleGroupItem
-                  key={index}
-                  value={col.accessorKey as string}
-                  className="flex items-center gap-1 justify-self-start bg-transparent px-0 text-left text-xs text-text md:gap-2"
-                >
-                  <span
-                    className={clsx(
-                      "h-1 w-1 rounded-full md:h-2 md:w-2",
-                      hiddenColumnKeysArray.includes(col?.accessorKey as string)
-                        ? "bg-text"
-                        : "bg-magenta",
-                    )}
-                  />
-                  {col?.header}
-                </ToggleGroupItem>
-              );
-            })}
-        </ToggleGroup>
       </div>
       <div className="flex items-center justify-between gap-2">
         {!isMD && (

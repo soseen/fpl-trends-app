@@ -1,7 +1,6 @@
 import type { ManagerRangeRank } from "src/queries/getManagerRangeRank";
 import { useSelector } from "react-redux";
 import type { RootState } from "src/redux/store";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type Props = {
   data: ManagerRangeRank;
@@ -19,6 +18,8 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
   const { totalPlayers } = useSelector((state: RootState) => state.totalPlayers);
   const overall = data.overall_rank;
   const range = data.range_rank;
+  const displayedRange = data.range_rank_official ?? range;
+  const usingOfficial = data.range_rank_official !== null;
 
   // Color reflects trajectory: did this GW range improve or worsen the user's
   // cumulative overall rank? Compare overall rank entering the range vs
@@ -35,9 +36,11 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
   const percentageOverall =
     totalPlayers > 0 ? Math.ceil(((overall ?? 0) / totalPlayers) * 10000) / 100 : 0;
   const percentageRange =
-    totalPlayers > 0 ? Math.ceil(((range ?? 0) / totalPlayers) * 10000) / 100 : 0;
+    totalPlayers > 0
+      ? Math.ceil(((displayedRange ?? 0) / totalPlayers) * 10000) / 100
+      : 0;
 
-  const prefix = data.confidence === "exact" ? "" : "≈ ";
+  const prefix = usingOfficial || data.confidence === "exact" ? "" : "≈ ";
   const rangeLabel = startGw === endGw ? `GW ${startGw}` : `GWs ${startGw}–${endGw}`;
 
   return (
@@ -66,28 +69,9 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
             className={`flex-nowrap text-base font-semibold md:mb-2 md:text-5xl ${colorClass}`}
           >
             {prefix}
-            {formatRank(range)}
+            {formatRank(displayedRange)}
           </p>
           <p className="text-xs text-text/60 md:text-sm">Top {percentageRange}%</p>
-          {/* Side-by-side ground-truth: FPL publishes the cumulative
-              overall rank at end_gw for any startGw=1 query, so the
-              estimator's `range_rank` should converge on it as the
-              sample matures. Showing both lets the operator eyeball
-              estimator quality without leaving the page. Hidden when
-              FPL hasn't published one (partial ranges, unranked user). */}
-          {data.range_rank_official !== null && data.range_rank_official !== range && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <p className="mt-1 cursor-help text-[10px] text-text/50 md:text-xs">
-                  FPL: {formatRank(data.range_rank_official)}
-                </p>
-              </TooltipTrigger>
-              <TooltipContent>
-                Cumulative overall rank reported directly by FPL for the end of the range.
-                Treat this as the ground-truth our estimator is trying to match.
-              </TooltipContent>
-            </Tooltip>
-          )}
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
           {data.range_total?.toLocaleString("en-GB")} pts

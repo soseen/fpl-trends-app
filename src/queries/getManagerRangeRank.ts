@@ -25,9 +25,11 @@ export const getManagerRangeRank = async (
   entryId: number,
   startGw: number,
   endGw: number,
+  signal?: AbortSignal,
 ): Promise<ManagerRangeRank> => {
   const { data } = await api.get<ManagerRangeRank>(`manager/${entryId}/range-rank`, {
     params: { start: startGw, end: endGw },
+    signal,
   });
   return data;
 };

@@ -73,8 +73,13 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   const matchInfo = data?.matchInfo as History[];
 
   return (
-    <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
-      <p className="text-center text-xs font-bold">Gameweek {label}</p>
+    // Recharts positions its wrapper at the cursor (we set offset=0 in the
+    // chart). Translate the card so its bottom-right sits ~12px above-left
+    // of the cursor — gives a stable top-left placement that won't extend
+    // below the modal and trigger overflow-y scroll.
+    <div style={{ transform: "translate(calc(-100% - 12px), calc(-100% - 12px))" }}>
+      <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
+        <p className="text-center text-xs font-bold">Gameweek {label}</p>
       {matchInfo.map((history, index) => {
         const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
         const homeTeamBadge = getTeamsBadge(
@@ -125,7 +130,8 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
           </div>
         );
       })}
-    </Card>
+      </Card>
+    </div>
   );
 };
 

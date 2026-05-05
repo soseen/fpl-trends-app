@@ -68,9 +68,11 @@ export const getManagerComparison = async (
   entryId: number,
   startGw: number,
   endGw: number,
+  signal?: AbortSignal,
 ): Promise<ManagerComparison> => {
   const { data } = await api.get<ManagerComparison>(`manager/${entryId}/comparison`, {
     params: { start: startGw, end: endGw },
+    signal,
   });
   return data;
 };

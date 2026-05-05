@@ -36,7 +36,8 @@ import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
 import TeamImpactView from "./TeamImpact/team-impact";
 import RankKillersView from "./TeamImpact/rank-killers";
-import TransferImpactView from "./TransferImpact/transfer-impact";
+import TransfersCaptaincyView from "./TransfersCaptaincy/transfers-captaincy";
+import { getCaptainImpact, type CaptainImpact } from "src/queries/getCaptainImpact";
 
 export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
 
@@ -55,7 +56,8 @@ const MyTrends: React.FC = () => {
 
   const rangeRankQuery = useQuery<ManagerRangeRank>({
     queryKey: ["manager-range-rank", entryId, startGameweek, endGameweek],
-    queryFn: () => getManagerRangeRank(entryId as number, startGameweek, endGameweek),
+    queryFn: ({ signal }) =>
+      getManagerRangeRank(entryId as number, startGameweek, endGameweek, signal),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
@@ -71,7 +73,8 @@ const MyTrends: React.FC = () => {
 
   const comparisonQuery = useQuery<ManagerComparison>({
     queryKey: ["manager-comparison", entryId, startGameweek, endGameweek],
-    queryFn: () => getManagerComparison(entryId as number, startGameweek, endGameweek),
+    queryFn: ({ signal }) =>
+      getManagerComparison(entryId as number, startGameweek, endGameweek, signal),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
@@ -79,7 +82,8 @@ const MyTrends: React.FC = () => {
 
   const teamImpactQuery = useQuery<TeamImpact>({
     queryKey: ["team-impact", entryId, startGameweek, endGameweek],
-    queryFn: () => getTeamImpact(entryId as number, startGameweek, endGameweek),
+    queryFn: ({ signal }) =>
+      getTeamImpact(entryId as number, startGameweek, endGameweek, signal),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 5 * 60 * 1000,
     retry: 1,
@@ -87,8 +91,17 @@ const MyTrends: React.FC = () => {
 
   const transfersQuery = useQuery<ManagerTransfers>({
     queryKey: ["manager-transfers", entryId, startGameweek, endGameweek],
-    queryFn: () =>
-      getManagerTransfers(entryId as number, startGameweek, endGameweek),
+    queryFn: ({ signal }) =>
+      getManagerTransfers(entryId as number, startGameweek, endGameweek, signal),
+    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    staleTime: 60 * 1000,
+    retry: 1,
+  });
+
+  const captainImpactQuery = useQuery<CaptainImpact>({
+    queryKey: ["captain-impact", entryId, startGameweek, endGameweek],
+    queryFn: ({ signal }) =>
+      getCaptainImpact(entryId as number, startGameweek, endGameweek, signal),
     enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
@@ -196,9 +209,15 @@ const MyTrends: React.FC = () => {
         </MyTrendsSection>
       )}
 
-      {(transfersQuery.data || transfersQuery.isPending) && (
-        <MyTrendsSection title="Transfer impact">
-          <TransferImpactView query={transfersQuery} />
+      {(transfersQuery.data ||
+        transfersQuery.isPending ||
+        captainImpactQuery.data ||
+        captainImpactQuery.isPending) && (
+        <MyTrendsSection title="Transfers & Captaincy">
+          <TransfersCaptaincyView
+            transfersQuery={transfersQuery}
+            captainQuery={captainImpactQuery}
+          />
         </MyTrendsSection>
       )}
 

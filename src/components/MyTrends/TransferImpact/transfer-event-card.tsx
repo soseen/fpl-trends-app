@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import type {
   ActiveChip,
   TransferImpactEvent,
+  TransferImpactPair,
 } from "src/queries/getManagerTransfers";
 import TransferPlayerTile from "./transfer-player-tile";
 
@@ -18,9 +19,9 @@ const formatNet = (n: number): string => {
 };
 
 const netPillClass = (n: number): string => {
-  if (n > 0) return "bg-emerald-500/20 text-emerald-300";
-  if (n < 0) return "bg-rose-500/20 text-rose-300";
-  return "bg-accent4/40 text-text/70";
+  if (n > 0) return "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40";
+  if (n < 0) return "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40";
+  return "bg-accent4/40 text-text/70 ring-1 ring-text/15";
 };
 
 const CHIP_LABEL: Record<NonNullable<ActiveChip>, string> = {
@@ -52,11 +53,58 @@ const ChipBadge: React.FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
   </span>
 );
 
-const TransferEventCard: React.FC<Props> = ({ event }) => {
-  const { gw, pairs, chip, bench_boost_points, gross_net_points, hits_cost, combined_net_points } =
-    event;
+// More than 5 pairs in a single GW (typically wildcard / free hit) is
+// the threshold where a flat OUT|→|IN row becomes hard to scan. We
+// switch to one row per position with its own gain pill.
+const POSITION_GROUP_THRESHOLD = 5;
+const POSITION_LABEL: Record<number, string> = {
+  1: "GK",
+  2: "DEF",
+  3: "MID",
+  4: "FWD",
+};
+const POSITION_ORDER = [1, 2, 3, 4];
 
+type PositionGroup = {
+  position: number;
+  pairs: TransferImpactPair[];
+  groupNet: number;
+};
+
+const groupPairsByPosition = (pairs: TransferImpactPair[]): PositionGroup[] => {
+  const byPos = new Map<number, TransferImpactPair[]>();
+  for (const p of pairs) {
+    const pos = p.player_in.element_type;
+    const list = byPos.get(pos) ?? [];
+    list.push(p);
+    byPos.set(pos, list);
+  }
+  return POSITION_ORDER.filter((pos) => byPos.has(pos)).map((pos) => {
+    const list = byPos.get(pos) ?? [];
+    return {
+      position: pos,
+      pairs: list,
+      groupNet: list.reduce((acc, p) => acc + p.net_points, 0),
+    };
+  });
+};
+
+const TransferEventCard: React.FC<Props> = ({ event }) => {
+  const {
+    gw,
+    pairs,
+    chip,
+    gross_net_points,
+    hits_cost,
+    combined_net_points,
+    bench_boost_points,
+  } = event;
+
+  const useGrouped = pairs.length > POSITION_GROUP_THRESHOLD;
   const isBenchBoost = chip === "bboost";
+  const isBenchBoostOnly = pairs.length === 0 && isBenchBoost;
+  const showBenchFooter =
+    isBenchBoost && !isBenchBoostOnly && bench_boost_points != null;
 
   return (
     <Card className="flex flex-col overflow-hidden border-accent4 bg-primary/40 shadow-md">
@@ -66,51 +114,98 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
             GW {gw}
           </span>
           {chip && <ChipBadge chip={chip} />}
-          {!isBenchBoost && pairs.length > 1 && (
-            <span className="text-text/60 text-[10px] font-normal sm:text-xs">
+          {pairs.length > 1 && (
+            <span className="text-[10px] font-normal text-text/60 sm:text-xs">
               {pairs.length} transfers
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
-          {/* Hits formula: only show when there's a real hit AND we're
-              displaying a transfer comparison (not on BB GWs, where
-              hits are intentionally suppressed per the user's spec). */}
-          {!isBenchBoost && hits_cost > 0 && (
-            <span className="text-text/60 text-[10px] sm:text-xs">
-              <span className={gross_net_points >= 0 ? "text-emerald-300" : "text-rose-300"}>
+          {!isBenchBoostOnly && hits_cost > 0 && (
+            <span className="text-[10px] text-text/60 sm:text-xs">
+              <span
+                className={gross_net_points >= 0 ? "text-emerald-300" : "text-rose-300"}
+              >
                 {formatNet(gross_net_points)}
               </span>{" "}
               − {hits_cost} ={" "}
             </span>
           )}
-          <span
-            className={clsx(
-              "rounded-md px-2 py-0.5 text-xs font-semibold sm:text-sm md:text-base",
-              netPillClass(combined_net_points),
-            )}
-          >
-            {formatNet(combined_net_points)}
-          </span>
+          {!isBenchBoostOnly && (
+            <span
+              className={clsx(
+                "rounded-full px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
+                netPillClass(combined_net_points),
+              )}
+            >
+              {formatNet(combined_net_points)}
+            </span>
+          )}
+          {isBenchBoostOnly && (
+            <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/40 sm:text-sm md:text-base">
+              +{bench_boost_points ?? 0} bench pts
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Bench-boost: skip the OUT/IN comparison entirely (per the user's
-          spec — comparing against the previous team's bench is unfair).
-          Show a centred bench-points headline + a brief explainer. */}
-      {isBenchBoost ? (
-        <div className="flex flex-col items-center gap-1 px-3 py-4 text-center">
-          <span className="text-text/70 text-[10px] uppercase tracking-wide sm:text-xs">
-            Bench points
-          </span>
-          <span className="text-2xl font-semibold text-emerald-300 sm:text-3xl md:text-4xl">
-            +{bench_boost_points ?? 0} pts
-          </span>
-          <span className="text-text/50 px-2 text-[10px] sm:text-xs">
-            All four bench players counted this GW.
+      {isBenchBoostOnly && (
+        <div className="flex items-center justify-center gap-2 px-3 py-3 text-center text-[11px] text-text/60 sm:text-xs">
+          <span>
+            Bench scored {bench_boost_points ?? 0} pts. Not counted toward transfer total.
           </span>
         </div>
-      ) : (
+      )}
+
+      {!isBenchBoostOnly && useGrouped ? (
+        <div className="flex flex-col gap-2 px-3 py-3 sm:gap-3 sm:py-4">
+          {groupPairsByPosition(pairs).map(
+            ({ position, pairs: groupPairs, groupNet }) => (
+              <div
+                key={position}
+                className="flex flex-col gap-2 border-t border-accent4/40 pt-2 first:border-t-0 first:pt-0 xs:flex-row xs:items-center"
+              >
+                <span className="w-10 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text/70 sm:text-xs">
+                  {POSITION_LABEL[position]}
+                </span>
+                <div className="flex flex-1 flex-col items-center gap-2 xs:flex-row xs:justify-center sm:gap-3">
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                    {groupPairs.map((pair) => (
+                      <TransferPlayerTile
+                        key={`out-${pair.player_out.player_id}-${gw}-${position}`}
+                        player={pair.player_out}
+                        side="out"
+                      />
+                    ))}
+                  </div>
+                  <ArrowRight
+                    className="h-5 w-5 shrink-0 rotate-90 text-text/70 xs:rotate-0 sm:h-6 sm:w-6"
+                    aria-hidden
+                  />
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                    {groupPairs.map((pair) => (
+                      <TransferPlayerTile
+                        key={`in-${pair.player_in.player_id}-${gw}-${position}`}
+                        player={pair.player_in}
+                        side="in"
+                        soldGw={pair.in_sold_gw}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <span
+                  className={clsx(
+                    "shrink-0 self-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold sm:text-xs",
+                    netPillClass(groupNet),
+                  )}
+                >
+                  {formatNet(groupNet)}
+                </span>
+              </div>
+            ),
+          )}
+        </div>
+      ) : !isBenchBoostOnly ? (
         <div className="flex flex-col items-center gap-2 px-3 py-3 xs:flex-row xs:justify-center sm:gap-3 sm:py-4">
           <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
             {pairs.map((pair) => (
@@ -133,9 +228,16 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
                 key={`in-${pair.player_in.player_id}-${gw}`}
                 player={pair.player_in}
                 side="in"
+                soldGw={pair.in_sold_gw}
               />
             ))}
           </div>
+        </div>
+      ) : null}
+
+      {showBenchFooter && (
+        <div className="border-t border-accent4/40 px-3 py-2 text-center text-[10px] text-emerald-300/80 sm:text-xs">
+          Bench Boost added +{bench_boost_points} pts (not counted toward transfer total)
         </div>
       )}
     </Card>

@@ -40,6 +40,7 @@ export const FILTERS_DEFAULT_STATE: ColumnFiltersState = [
   { id: "maxOwnership", value: [0, 100] },
   { id: "teamName", value: "" },
   { id: "element_type", value: [1, 2, 3, 4] },
+  { id: "now_cost", value: [0, 150] },
 ];
 
 const PlayersTable = () => {
@@ -64,6 +65,7 @@ const PlayersTable = () => {
     assistsPerGame: false,
     totalXGI: false,
     totalDefcons: false,
+    element_type: false,
   });
 
   const isClearState = useMemo(() => {

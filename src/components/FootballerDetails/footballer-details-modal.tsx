@@ -5,7 +5,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaArrowDown, FaArrowUp, FaStar, FaUserCircle } from "react-icons/fa";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
@@ -23,6 +23,14 @@ type Props = {
 
 const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
   const [isError, setIsError] = useState(false);
+
+  // The modal stays mounted across openings (DialogContent forceMount), so a
+  // failed load on one player would otherwise leave isError sticky for the
+  // next. Reset whenever the player changes.
+  useEffect(() => {
+    setIsError(false);
+  }, [footballer?.code]);
+
   const info = useMemo(() => {
     const price = footballer?.now_cost ? footballer.now_cost / 10 : 0;
     const position = mapElementTypeToPosition(footballer?.element_type);
@@ -60,11 +68,11 @@ const FootballerDetailsModal = ({ footballer, onClose }: Props) => {
         >
           <div className="max-h-[85vh] w-full flex-col items-center overflow-y-auto rounded-md bg-background px-6 py-6 sm:px-12 lg:max-w-[1060px] lg:px-20">
             <div className="relative flex items-end justify-around gap-4 lg:gap-8">
-              {isError ? (
+              {!footballer?.code || isError ? (
                 <FaUserCircle className="mb-8 h-12 w-12 object-contain text-accent shadow-md lg:h-72 lg:w-72" />
               ) : (
                 <img
-                  src={getFootballersImage(footballer?.code)}
+                  src={getFootballersImage(footballer.code)}
                   className="h-auto w-auto object-contain md:h-44 md:w-44 lg:h-72 lg:w-72"
                   onError={() => setIsError(true)}
                 />

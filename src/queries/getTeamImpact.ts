@@ -107,9 +107,11 @@ export const getTeamImpact = async (
   entryId: number,
   startGw: number,
   endGw: number,
+  signal?: AbortSignal,
 ): Promise<TeamImpact> => {
   const { data } = await api.get<TeamImpact>(`manager/${entryId}/team-impact`, {
     params: { start: startGw, end: endGw },
+    signal,
   });
   return data;
 };

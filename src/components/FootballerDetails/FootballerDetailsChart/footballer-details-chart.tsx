@@ -23,6 +23,13 @@ import { getDefconThreshold } from "src/utils/defcon";
 import CustomTooltip from "./custom-tooltip";
 import { ToggleGroup } from "@/components/ui/toggle-group";
 import { ToggleGroupItem } from "@radix-ui/react-toggle-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import clsx from "clsx";
 import { useDimensions } from "src/hooks/use-dimensions";
 
@@ -238,27 +245,52 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between gap-4 border-transparent p-1 md:p-0">
           <p className="text-sm md:text-base">Gameweek trends chart</p>
-          <ToggleGroup
-            type="single"
-            value={displayedChartStat}
-            className="flex flex-nowrap items-center gap-1"
-            onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
-          >
-            {availableStats.map((stat, index) => (
-              <ToggleGroupItem
-                key={index}
-                className={clsx(
-                  "flex-grow rounded-md px-2.5 py-1 text-xs font-semibold transition-all sm:text-sm",
-                  stat === displayedChartStat
-                    ? "bg-magenta text-text shadow-[0_0_0_1px_rgb(var(--magenta-rgb)/0.6)]"
-                    : "bg-magenta2/60 text-text/70 hover:bg-magenta2",
-                )}
-                value={stat}
+          {isMD ? (
+            <Select
+              value={displayedChartStat}
+              onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
+            >
+              <SelectTrigger className="h-8 w-[120px] border-transparent bg-magenta px-2 py-1 text-xs font-semibold text-text">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                sideOffset={5}
+                className="w-[120px] border-transparent bg-magenta"
               >
-                {stat}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+                {availableStats.map((stat) => (
+                  <SelectItem
+                    key={stat}
+                    value={stat}
+                    className="cursor-pointer px-2 py-1 text-xs font-semibold text-text hover:bg-magenta3"
+                  >
+                    {stat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <ToggleGroup
+              type="single"
+              value={displayedChartStat}
+              className="flex flex-nowrap items-center gap-1"
+              onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
+            >
+              {availableStats.map((stat, index) => (
+                <ToggleGroupItem
+                  key={index}
+                  className={clsx(
+                    "flex-grow rounded-md px-2.5 py-1 text-xs font-semibold transition-all sm:text-sm",
+                    stat === displayedChartStat
+                      ? "bg-magenta text-text shadow-[0_0_0_1px_rgb(var(--magenta-rgb)/0.6)]"
+                      : "bg-magenta2/60 text-text/70 hover:bg-magenta2",
+                  )}
+                  value={stat}
+                >
+                  {stat}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -344,7 +376,14 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                 <Tooltip
                   content={<CustomTooltip />}
                   cursor={{ fill: palette.stroke, fillOpacity: 0.08 }}
-                  {...(isMD && { offset: 10 })}
+                  // Pin the wrapper exactly at the cursor and let it leave
+                  // the chart viewBox; CustomTooltip itself translates the
+                  // visible card to top-left of the cursor (see its render).
+                  // Without this, Recharts auto-flips placement near edges
+                  // and can push the tooltip below the viewport, scrolling
+                  // the modal as a side-effect.
+                  offset={0}
+                  allowEscapeViewBox={{ x: true, y: true }}
                 />
                 {displayedChartStat === SelectedChartStat.ownership ? (
                   <Line
