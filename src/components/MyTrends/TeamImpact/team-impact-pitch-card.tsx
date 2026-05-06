@@ -30,17 +30,16 @@ type Props = {
 // e.g. mid-season transfer out of the league), the click is a no-op
 // rather than throwing.
 const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
-  const rankColor = rankImpactColorClass(tile.rank_impact);
   const openDetails = useOpenPlayerDetails();
   return (
     <div className="flex">
       <Button
         onClick={() => openDetails(tile.player_id)}
-        className="relative m-auto flex h-[92px] w-14 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:h-[136px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[188px] lg:w-32"
+        className="relative m-auto flex h-[92px] w-14 flex-col items-center gap-0 overflow-hidden rounded-md bg-secondary p-0 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:h-[136px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[188px] lg:w-32"
       >
         <FootballerImage
           code={tile.code}
-          className="m-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"
+          className="mx-auto mt-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"
         />
         <div className="flex w-full items-center justify-center bg-magenta md:p-[2px]">
           <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-3 text-text sm:text-xs">
@@ -48,19 +47,17 @@ const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
           </p>
         </div>
         {showRankImpact && (
-          <div
+          <p
             className={clsx(
-              "flex w-full items-center justify-center bg-primary px-1 md:p-[2px]",
-              rankColor,
+              "py-0.5 text-[8px] font-semibold leading-3 sm:text-[9px] md:text-[10px]",
+              rankImpactColorClass(tile.rank_impact),
             )}
           >
-            <p className="md:text-md text-[8px] font-semibold leading-3 sm:text-xs">
-              {formatRankDelta(tile.rank_impact)}
-            </p>
-          </div>
+            {formatRankDelta(tile.rank_impact)}
+          </p>
         )}
-        <div className="flex w-full items-center justify-center rounded-b-md bg-magenta2 text-text md:p-[2px]">
-          <p className="md:text-md text-[8px] leading-3 sm:text-xs">
+        <div className="flex w-full items-center justify-center rounded-b-md bg-magenta2 px-1 text-text md:p-[2px]">
+          <p className="text-[8px] font-semibold tabular-nums leading-3 sm:text-[10px] md:text-xs">
             {tile.points_for_user} pts
           </p>
         </div>

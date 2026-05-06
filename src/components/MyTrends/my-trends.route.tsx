@@ -34,8 +34,7 @@ import ManagerComparisonTable from "./manager-comparison-table";
 import ManagerComparisonTableSkeleton from "./manager-comparison-table.skeleton";
 import MyTrendsSection from "./my-trends-section";
 import AccuracyMeter from "./accuracy-meter";
-import TeamImpactView from "./TeamImpact/team-impact";
-import RankKillersView from "./TeamImpact/rank-killers";
+import TeamAndRankKillersView from "./TeamImpact/team-and-rank-killers";
 import TransfersCaptaincyView from "./TransfersCaptaincy/transfers-captaincy";
 import { getCaptainImpact, type CaptainImpact } from "src/queries/getCaptainImpact";
 
@@ -223,13 +222,7 @@ const MyTrends: React.FC = () => {
 
       {typeof entryId === "number" && (
         <MyTrendsSection title="Team impact">
-          <TeamImpactView query={teamImpactQuery} />
-        </MyTrendsSection>
-      )}
-
-      {teamImpactQuery.data && teamImpactQuery.data.rank_killers.length > 0 && (
-        <MyTrendsSection title="Rank killers">
-          <RankKillersView data={teamImpactQuery.data} />
+          <TeamAndRankKillersView query={teamImpactQuery} />
         </MyTrendsSection>
       )}
 

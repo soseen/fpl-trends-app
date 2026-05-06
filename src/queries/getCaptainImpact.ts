@@ -12,9 +12,18 @@ export type CaptainPlayer = {
   raw_points: number;
   multiplier: number;
   effective_points: number;
+  effective_multiplier: number;
   ownership_pct: number;
   captain_rate: number;
   triple_captain_rate: number;
+  minutes: number;
+  goals: number;
+  assists: number;
+  clean_sheets: number;
+  goals_conceded: number;
+  defensive_contribution: number;
+  saves: number;
+  bonus: number;
 };
 
 export type CaptainEvent = {

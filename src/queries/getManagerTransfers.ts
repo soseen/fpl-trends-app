@@ -66,7 +66,10 @@ export type TransferImpactEvent = {
 export type FreeTransferState = {
   gw: number;
   used: number;
-  available: number;
+  // Null when the API cannot infer the exact FT bank reliably from FPL's
+  // public history payload. The UI then falls back to the plain transfer
+  // count instead of showing a fake denominator.
+  available: number | null;
 };
 
 export type ManagerTransfers = {

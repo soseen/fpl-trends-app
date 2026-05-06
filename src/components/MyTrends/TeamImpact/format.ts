@@ -35,6 +35,17 @@ export const rankImpactPillClass = (n: number): string => {
   return n > 0 ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300";
 };
 
+// Rank chips are intentionally outline-first so they don't read like the
+// solid points chips used elsewhere.
+export const rankImpactBadgeClass = (n: number): string => {
+  if (!Number.isFinite(n) || Math.abs(n) < 50) {
+    return "border-text/15 bg-transparent text-text/60";
+  }
+  return n > 0
+    ? "border-emerald-400/40 bg-emerald-950/20 text-emerald-300"
+    : "border-rose-400/40 bg-rose-950/20 text-rose-300";
+};
+
 // FPL haul threshold: a single-GW score worth highlighting. 9+ pts is the
 // canonical "did well" line — captaincy bonus on a 5-pt return, double
 // digits on a clean sheet for a defender, etc. Used by the per-GW

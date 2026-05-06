@@ -61,7 +61,11 @@ const CaptainImpactView: FC<Props> = ({ query }) => {
       {data.events.length > 0 && (
         <div className="flex flex-col gap-3">
           {visibleEvents.map((event) => (
-            <CaptainEventCard key={event.gw} event={event} />
+            <CaptainEventCard
+              key={event.gw}
+              event={event}
+              rankPerPoint={data.notes.rank_per_point}
+            />
           ))}
         </div>
       )}

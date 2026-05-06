@@ -1,5 +1,4 @@
 import { useState, type FC } from "react";
-import clsx from "clsx";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +11,12 @@ import TransferImpactSkeleton from "../TransferImpact/transfer-impact.skeleton";
 import CaptainImpactSummary from "../CaptainImpact/captain-impact-summary";
 import CaptainEventCard from "../CaptainImpact/captain-event-card";
 import CaptainImpactSkeleton from "../CaptainImpact/captain-impact.skeleton";
+import TabSwitch from "../tab-switch";
+
+const TABS = [
+  { id: "transfers", label: "Transfers" },
+  { id: "captaincy", label: "Captaincy" },
+] as const;
 
 type Props = {
   transfersQuery: UseQueryResult<ManagerTransfers>;
@@ -60,36 +65,7 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
 
   return (
     <div className="flex w-full flex-col gap-5">
-      {/* Compact pill toggle, centered. Sits inline at the top of the
-          section — much lighter visually than a full-width strip. */}
-      <div className="flex justify-center">
-        <div className="inline-flex overflow-hidden rounded-md border border-accent4 bg-primary/40">
-          <button
-            type="button"
-            onClick={() => setTab("transfers")}
-            className={clsx(
-              "px-4 py-1 text-xs font-semibold transition-colors sm:px-5 sm:py-1.5 sm:text-sm",
-              tab === "transfers"
-                ? "bg-magenta text-white"
-                : "text-text/70 hover:bg-accent4/30",
-            )}
-          >
-            Transfers
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("captaincy")}
-            className={clsx(
-              "px-4 py-1 text-xs font-semibold transition-colors sm:px-5 sm:py-1.5 sm:text-sm",
-              tab === "captaincy"
-                ? "bg-magenta text-white"
-                : "text-text/70 hover:bg-accent4/30",
-            )}
-          >
-            Captaincy
-          </button>
-        </div>
-      </div>
+      <TabSwitch tabs={TABS} value={tab} onChange={(id) => setTab(id as Tab)} />
 
       {/* Active tab content. Each section gets the full container
           width — no inner column split — so cards have plenty of room. */}
@@ -153,14 +129,21 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
               />
               {captain.notes?.partial_rank_impact && (
                 <p className="text-center text-[10px] text-text/60 sm:text-xs">
-                  Some captain sample data is missing — rank impact is based on available GWs.
+                  Some captain sample data is missing — rank impact is based on available
+                  GWs.
                 </p>
               )}
               <div className="flex flex-col gap-3">
                 {visibleGws.map((gw) => {
                   const ev = captainByGw.get(gw);
                   if (!ev) return null;
-                  return <CaptainEventCard key={`cev-${gw}`} event={ev} />;
+                  return (
+                    <CaptainEventCard
+                      key={`cev-${gw}`}
+                      event={ev}
+                      rankPerPoint={captain.notes.rank_per_point}
+                    />
+                  );
                 })}
               </div>
             </>

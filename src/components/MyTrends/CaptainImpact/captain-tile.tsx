@@ -21,6 +21,9 @@ type Props = {
 const CaptainTile: React.FC<Props> = ({ player, variant }) => {
   const openDetails = useOpenPlayerDetails();
   const isReference = variant === "reference";
+  const pointsLabel = Number.isInteger(player.effective_points)
+    ? `${player.effective_points}`
+    : player.effective_points.toFixed(1);
 
   return (
     <Button
@@ -40,8 +43,8 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
         </p>
       </div>
       <div className="flex w-full items-center justify-center rounded-b-md bg-magenta2 text-text md:p-[2px]">
-        <p className="text-[8px] leading-3 sm:text-[10px] md:text-xs">
-          {player.effective_points} pts
+        <p className="text-[8px] font-semibold leading-3 sm:text-[10px] md:text-xs">
+          {pointsLabel} pts
         </p>
       </div>
       <img

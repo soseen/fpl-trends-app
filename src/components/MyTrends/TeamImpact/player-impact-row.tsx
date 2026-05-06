@@ -6,7 +6,7 @@ import type { RootState } from "src/redux/store";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import type { PlayerImpact } from "src/queries/getTeamImpact";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { formatRankDelta, rankImpactPillClass, defconHighlightClass } from "./format";
+import { formatRankDelta, rankImpactBadgeClass, defconHighlightClass } from "./format";
 import { useOpenPlayerDetails } from "./use-open-player-details";
 
 type Props = {
@@ -45,7 +45,7 @@ const StatChip: React.FC<{
 }> = ({ label, value, tone, tooltip }) => {
   const chip = (
     <span
-      className={`border-accent/40 inline-flex items-center gap-0.5 rounded-md border bg-accent4 px-1.5 py-[1px] text-[10px] sm:gap-1 sm:px-2 sm:py-[2px] sm:text-xs md:text-sm ${
+      className={`inline-flex items-center gap-0.5 rounded-md border border-accent/40 bg-accent4 px-1.5 py-[1px] text-[10px] sm:gap-1 sm:px-2 sm:py-[2px] sm:text-xs md:text-sm ${
         tone ?? "text-text"
       }`}
     >
@@ -53,7 +53,7 @@ const StatChip: React.FC<{
           height — previously a one-step-smaller override (text-[10px]
           sm:text-xs md:text-sm) made the label noticeably shorter than
           the value, which read as a vertical-alignment glitch. */}
-      <span className="text-text/70 uppercase">{label}</span>
+      <span className="uppercase text-text/70">{label}</span>
       <span className="font-semibold">{value}</span>
     </span>
   );
@@ -101,16 +101,15 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
   const appearances = isRankKiller
     ? player.per_gw.filter((r) => r.minutes > 0).length
     : player.played_count;
-  const ranksPerAppearance =
-    appearances > 0 ? player.rank_impact / appearances : 0;
+  const ranksPerAppearance = appearances > 0 ? player.rank_impact / appearances : 0;
 
   const rankPill = showRankImpact ? (
     <span
-      className={`min-w-[3.5rem] rounded-md px-2 py-0.5 text-center text-xs font-semibold sm:min-w-[5rem] sm:py-1 sm:text-base md:min-w-[5.5rem] md:text-lg ${rankImpactPillClass(
+      className={`min-w-[3.5rem] rounded-md border px-2 py-0.5 text-center text-xs font-semibold sm:min-w-[5rem] sm:py-1 sm:text-base md:min-w-[5.5rem] md:text-lg ${rankImpactBadgeClass(
         player.rank_impact,
       )}`}
     >
-      {formatRankDelta(player.rank_impact)}
+      rank {formatRankDelta(player.rank_impact)}
     </span>
   ) : null;
 
@@ -130,7 +129,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
           e.stopPropagation();
           openDetails(player.player_id);
         }}
-        className="hover:ring-magenta/60 relative h-14 w-12 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 sm:h-14 sm:w-12 md:h-16 md:w-14"
+        className="relative h-14 w-12 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 hover:ring-magenta/60 sm:h-14 sm:w-12 md:h-16 md:w-14"
         aria-label={`Open ${player.web_name} details`}
       >
         <FootballerImage code={player.code} className="h-full w-full object-contain" />
@@ -158,21 +157,21 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
             {positionLabel}
           </span>
           {isRankKiller ? (
-            <span className="bg-rose-500/20 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-rose-300 sm:text-xs md:text-sm">
+            <span className="rounded-sm bg-rose-500/20 px-1.5 py-[1px] text-[10px] font-semibold text-rose-300 sm:text-xs md:text-sm">
               EO {(player.avg_eo_in_stratum * 100).toFixed(0)}%
             </span>
           ) : (
-            <span className="bg-magenta2/50 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-text sm:text-xs md:text-sm">
+            <span className="rounded-sm bg-magenta2/50 px-1.5 py-[1px] text-[10px] font-semibold text-text sm:text-xs md:text-sm">
               {player.starts} start{player.starts === 1 ? "" : "s"}
             </span>
           )}
           {player.captaincies > 0 && (
-            <span className="bg-magenta/30 rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-magenta sm:text-xs md:text-sm">
+            <span className="rounded-sm bg-magenta/30 px-1.5 py-[1px] text-[10px] font-semibold text-magenta sm:text-xs md:text-sm">
               {player.captaincies}× C
             </span>
           )}
           {player.triple_captaincies > 0 && (
-            <span className="bg-magenta rounded-sm px-1.5 py-[1px] text-[10px] font-semibold text-white sm:text-xs md:text-sm">
+            <span className="rounded-sm bg-magenta px-1.5 py-[1px] text-[10px] font-semibold text-white sm:text-xs md:text-sm">
               {player.triple_captaincies}× TC
             </span>
           )}
@@ -227,7 +226,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
           side-by-side layout from `sm:` upward where there's room. */}
       <div className="ml-auto flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex flex-col items-end leading-tight">
-          <span className="text-text/60 text-[10px] sm:text-sm">pts</span>
+          <span className="text-[10px] text-text/60 sm:text-sm">pts</span>
           <span className="text-base font-semibold text-text sm:text-lg md:text-2xl">
             {pointsValue}
           </span>

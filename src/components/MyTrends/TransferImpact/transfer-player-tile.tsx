@@ -29,7 +29,8 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
   const openDetails = useOpenPlayerDetails();
   const isOut = side === "out";
   const showSoldBadge = !isOut && typeof soldGw === "number";
-  const showRank = player.rank_impact != null;
+  const rankImpact = player.rank_impact;
+  const showRank = rankImpact != null;
 
   return (
     // The wrapper is `relative` so the sold-gw badge can be a sibling of
@@ -60,15 +61,13 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
           title={
             showRank
               ? `${player.points_in_window} pts · ${formatRankDelta(
-                  player.rank_impact,
+                  rankImpact,
                 )} estimated rank`
               : undefined
           }
         >
-          <p className="text-[8px] leading-3 sm:text-[10px] md:text-xs">
-            {showRank
-              ? formatRankDelta(player.rank_impact)
-              : `${player.points_in_window} pts`}
+          <p className="text-[8px] font-semibold leading-3 sm:text-[10px] md:text-xs">
+            {player.points_in_window} pts
           </p>
         </div>
         <img

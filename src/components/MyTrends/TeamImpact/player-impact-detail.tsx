@@ -6,6 +6,7 @@ import {
   FaStar,
   FaRegHandPaper,
 } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { TbLockFilled } from "react-icons/tb";
 import { GiSoccerKick } from "react-icons/gi";
 import {
@@ -17,11 +18,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import type { RootState } from "src/redux/store";
 import type {
   PlayerImpact,
   PlayerImpactGwBreakdown,
   PlayerMatch,
 } from "src/queries/getTeamImpact";
+import { getTeamsBadge } from "src/utils/images";
 import { formatRankDelta, rankImpactColorClass, POINTS_HAUL_THRESHOLD } from "./format";
 
 type Props = {
@@ -53,20 +56,42 @@ const matchResultClass = (m: PlayerMatch): string => {
 };
 
 const MatchSummary: React.FC<{ matches: PlayerMatch[] }> = ({ matches }) => {
+  const teams = useSelector((state: RootState) => state.teams.list);
+
   if (matches.length === 0) return null;
   return (
-    <div className="flex flex-col gap-0.5 text-[10px] leading-tight">
-      {matches.map((m, i) => (
-        <span key={i} className={matchResultClass(m)}>
-          <span className="text-text/50">{m.was_home ? "vs " : "@ "}</span>
-          <span className="font-medium">{m.opponent_short}</span>
-          {m.team_score !== null && m.opponent_score !== null && (
-            <span className="ml-1 tabular-nums">
-              {m.team_score}-{m.opponent_score}
-            </span>
-          )}
-        </span>
-      ))}
+    <div className="flex flex-col gap-1">
+      {matches.map((m, i) => {
+        const badgeCode =
+          m.opponent_code > 0
+            ? m.opponent_code
+            : teams.find((team) => team.short_name === m.opponent_short)?.code;
+
+        return (
+          <span
+            key={i}
+            className={`inline-flex items-center gap-1.5 rounded-md bg-accent3/50 px-1.5 py-1 ring-1 ring-inset ring-accent4/60 ${matchResultClass(
+              m,
+            )}`}
+            title={`${m.was_home ? "Home vs" : "Away at"} ${m.opponent_short}`}
+          >
+            <img
+              src={getTeamsBadge(badgeCode)}
+              alt={m.opponent_short}
+              className="h-5 w-5 shrink-0 object-contain"
+            />
+            {m.team_score !== null && m.opponent_score !== null ? (
+              <span className="text-[10px] font-semibold tabular-nums leading-none">
+                {m.team_score}-{m.opponent_score}
+              </span>
+            ) : (
+              <span className="text-[10px] font-semibold leading-none">
+                {m.opponent_short}
+              </span>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 };
@@ -248,6 +273,34 @@ const multiplierChip = (mult: number): MultiplierChip => {
   return null;
 };
 
+const PointsValue: React.FC<{
+  value: string | number;
+  chip: MultiplierChip;
+  big: boolean;
+  muted: boolean;
+}> = ({ value, chip, big, muted }) => (
+  <span className="inline-flex min-w-[4.75rem] items-center justify-end gap-1.5">
+    {chip && (
+      <span
+        className={`flex h-5 min-w-5 items-center justify-center rounded-sm px-1.5 text-[10px] font-semibold leading-none ${chip.className}`}
+      >
+        {chip.label}
+      </span>
+    )}
+    <span
+      className={`inline-flex min-w-8 justify-center rounded-md px-2 py-1 text-sm font-bold tabular-nums leading-none ring-1 ring-inset sm:text-base ${
+        big
+          ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30"
+          : muted
+            ? "bg-accent4/20 text-text/40 ring-text/10"
+            : "bg-accent4/45 text-text ring-text/10"
+      }`}
+    >
+      {value}
+    </span>
+  </span>
+);
+
 // What the user actually got from this player on this GW: 0 if benched
 // (multiplier === 0), otherwise raw_points × multiplier.
 const effectivePoints = (mult: number, raw: number): number =>
@@ -266,10 +319,10 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
         <TableHeader>
           <TableRow className="border-b border-accent4 hover:bg-transparent">
             <TableHead className="h-7 px-1.5 text-text/70 sm:px-2">GW</TableHead>
+            <TableHead className="h-7 px-1.5 text-text/70 sm:px-2">Events</TableHead>
             <TableHead className="h-7 px-1.5 text-right text-text/70 sm:px-2">
               Pts
             </TableHead>
-            <TableHead className="h-7 px-1.5 text-text/70 sm:px-2">Events</TableHead>
             <TableHead className="h-7 px-1.5 text-right text-text/70 sm:px-2">
               Own%
             </TableHead>
@@ -291,8 +344,7 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
             // Strict false-check so older API responses (where had_fixture
             // is undefined) don't get misread as "no fixture".
             const noFixture = !isRankKiller && row.had_fixture === false;
-            const benched =
-              !isRankKiller && row.multiplier === 0 && !noFixture;
+            const benched = !isRankKiller && row.multiplier === 0 && !noFixture;
             // For owned non-starters with a fixture, show the points the
             // player actually scored (faded) — those are points the user
             // missed out on. The Total row still uses points_for_user, so
@@ -311,24 +363,12 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
               isRankKiller || noFixture ? null : multiplierChip(row.multiplier);
 
             const ptsValue = (
-              <span
-                className={`inline-flex items-center gap-1.5 font-semibold ${
-                  big
-                    ? "text-emerald-400"
-                    : benched || noFixture
-                      ? "text-text/40"
-                      : "text-text"
-                }`}
-              >
-                {chip && (
-                  <span
-                    className={`rounded-sm px-1.5 py-[1px] text-[10px] font-semibold ${chip.className}`}
-                  >
-                    {chip.label}
-                  </span>
-                )}
-                {pts}
-              </span>
+              <PointsValue
+                value={pts}
+                chip={chip}
+                big={big}
+                muted={benched || noFixture}
+              />
             );
 
             return (
@@ -337,10 +377,15 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
                 className="border-b border-accent4 hover:bg-transparent"
               >
                 <TableCell className="px-1.5 py-1.5 text-text/80 sm:px-2">
-                  <div className="flex flex-col gap-0.5">
-                    <span>{row.gw}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 shrink-0 font-semibold tabular-nums">
+                      {row.gw}
+                    </span>
                     <MatchSummary matches={row.matches ?? []} />
                   </div>
+                </TableCell>
+                <TableCell className="px-1.5 py-1.5 sm:px-2">
+                  <EventChips row={row} elementType={player.element_type} />
                 </TableCell>
                 <TableCell className="px-1.5 py-1.5 text-right sm:px-2">
                   {chip ? (
@@ -358,9 +403,6 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
                   ) : (
                     ptsValue
                   )}
-                </TableCell>
-                <TableCell className="px-1.5 py-1.5 sm:px-2">
-                  <EventChips row={row} elementType={player.element_type} />
                 </TableCell>
                 <TableCell className="px-1.5 py-1.5 text-right text-text/80 sm:px-2">
                   {(row.ownership_pct * 100).toFixed(1)}%
@@ -396,10 +438,15 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
             <TableCell className="px-1.5 py-1.5 font-semibold text-text sm:px-2">
               Total
             </TableCell>
-            <TableCell className="px-1.5 py-1.5 text-right font-semibold text-text sm:px-2">
-              {totalPts}
-            </TableCell>
             <TableCell className="px-1.5 py-1.5 sm:px-2" />
+            <TableCell className="px-1.5 py-1.5 text-right font-semibold text-text sm:px-2">
+              <PointsValue
+                value={totalPts}
+                chip={null}
+                big={typeof totalPts === "number" && totalPts >= POINTS_HAUL_THRESHOLD}
+                muted={false}
+              />
+            </TableCell>
             <TableCell className="px-1.5 py-1.5 text-right text-text/70 sm:px-2">
               {(player.avg_ownership_pct * 100).toFixed(1)}%
             </TableCell>

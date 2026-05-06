@@ -7,6 +7,7 @@ import type {
   TransferImpactEvent,
   TransferImpactPair,
 } from "src/queries/getManagerTransfers";
+import { formatRankDelta, rankImpactBadgeClass } from "../TeamImpact/format";
 import TransferPlayerTile from "./transfer-player-tile";
 
 type Props = {
@@ -50,6 +51,15 @@ const ChipBadge: React.FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
     )}
   >
     {CHIP_LABEL[chip]}
+  </span>
+);
+
+const formatTransferCount = (count: number): string =>
+  `${count} transfer${count === 1 ? "" : "s"}`;
+
+const TransferCountBadge: React.FC<{ count: number }> = ({ count }) => (
+  <span className="text-[10px] font-normal text-text/60 sm:text-xs">
+    {formatTransferCount(count)}
   </span>
 );
 
@@ -97,14 +107,15 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
     gross_net_points,
     hits_cost,
     combined_net_points,
+    combined_rank_impact,
     bench_boost_points,
   } = event;
 
   const useGrouped = pairs.length > POSITION_GROUP_THRESHOLD;
   const isBenchBoost = chip === "bboost";
   const isBenchBoostOnly = pairs.length === 0 && isBenchBoost;
-  const showBenchFooter =
-    isBenchBoost && !isBenchBoostOnly && bench_boost_points != null;
+  const showBenchFooter = isBenchBoost && !isBenchBoostOnly && bench_boost_points != null;
+  const showRank = combined_rank_impact != null;
 
   return (
     <Card className="flex flex-col overflow-hidden border-accent4 bg-primary/40 shadow-md">
@@ -114,11 +125,7 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
             GW {gw}
           </span>
           {chip && <ChipBadge chip={chip} />}
-          {pairs.length > 1 && (
-            <span className="text-[10px] font-normal text-text/60 sm:text-xs">
-              {pairs.length} transfers
-            </span>
-          )}
+          {pairs.length > 0 && <TransferCountBadge count={pairs.length} />}
         </div>
         <div className="flex items-center gap-2">
           {!isBenchBoostOnly && hits_cost > 0 && (
@@ -132,14 +139,27 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
             </span>
           )}
           {!isBenchBoostOnly && (
-            <span
-              className={clsx(
-                "rounded-full px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
-                netPillClass(combined_net_points),
+            <>
+              <span
+                className={clsx(
+                  "rounded-full px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
+                  netPillClass(combined_net_points),
+                )}
+              >
+                {formatNet(combined_net_points)}
+              </span>
+              {showRank && combined_rank_impact != null && (
+                <span
+                  className={clsx(
+                    "rounded-full border px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
+                    rankImpactBadgeClass(combined_rank_impact),
+                  )}
+                  title="Estimated rank impact from these transfers"
+                >
+                  rank {formatRankDelta(combined_rank_impact)}
+                </span>
               )}
-            >
-              {formatNet(combined_net_points)}
-            </span>
+            </>
           )}
           {isBenchBoostOnly && (
             <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/40 sm:text-sm md:text-base">

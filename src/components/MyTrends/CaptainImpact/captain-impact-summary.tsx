@@ -15,9 +15,12 @@ type Props = {
 };
 
 const formatSigned = (n: number): string => {
+  const value = Number.isInteger(n) ? `${n}` : n.toFixed(1);
   if (n === 0) return "0 pts";
-  return `${n > 0 ? "+" : ""}${n} pts`;
+  return `${n > 0 ? "+" : ""}${value} pts`;
 };
+
+const formatPoints = (n: number): string => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
 
 const totalToneClass = (n: number): string => {
   if (n > 0) return "text-emerald-400";
@@ -107,7 +110,7 @@ const Column: React.FC<ColumnProps> = ({ label, value, diff, matched, totalGws }
       {label}
     </span>
     <span className="text-base font-semibold text-text sm:text-lg md:text-xl">
-      {value} pts
+      {formatPoints(value)} pts
     </span>
     {typeof diff === "number" && (
       <span className={clsx("text-[10px] sm:text-xs", totalToneClass(diff))}>

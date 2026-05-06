@@ -20,6 +20,7 @@ export type TeamImpactTile = {
 // always the player's club.
 export type PlayerMatch = {
   opponent_short: string;
+  opponent_code: number;
   was_home: boolean;
   team_score: number | null;
   opponent_score: number | null;

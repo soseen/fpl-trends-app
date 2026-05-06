@@ -40,7 +40,7 @@ const TransferImpactSummary: React.FC<Props> = ({ totalNet, totalTransfers }) =>
         {formatSigned(totalNet)}
       </span>
       <span className="text-xs text-text/70 md:text-sm lg:text-base">
-        from {totalTransfers} transfer{totalTransfers === 1 ? "" : "s"}
+        {totalTransfers} transfer{totalTransfers === 1 ? "" : "s"} made total
       </span>
     </div>
   );
