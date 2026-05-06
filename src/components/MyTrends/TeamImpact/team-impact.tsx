@@ -1,5 +1,4 @@
-import type React from "react";
-import { useState } from "react";
+import { useState, type React } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -108,8 +107,8 @@ const TeamImpactView: React.FC<Props> = ({ query }) => {
         )}
         {data.notes.small_sample_gws.length > 0 && (
           <p className="mt-1 px-2 text-[11px] text-text/60 sm:text-xs">
-            EO sample is light for some GWs, so those rows fall back to global
-            ownership and captain data.
+            EO sample is light for some GWs, so those rows use captain data to infer
+            minimum cohort ownership.
           </p>
         )}
       </div>
