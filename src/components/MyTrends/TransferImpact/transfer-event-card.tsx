@@ -7,7 +7,7 @@ import type {
   TransferImpactEvent,
   TransferImpactPair,
 } from "src/queries/getManagerTransfers";
-import { formatRankDelta, rankImpactBadgeClass } from "../TeamImpact/format";
+import { formatRankDelta, rankImpactColorClass } from "../TeamImpact/format";
 import TransferPlayerTile from "./transfer-player-tile";
 
 type Props = {
@@ -24,6 +24,52 @@ const netPillClass = (n: number): string => {
   if (n < 0) return "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40";
   return "bg-accent4/40 text-text/70 ring-1 ring-text/15";
 };
+
+const ImpactSummary: React.FC<{
+  points: number;
+  grossPoints: number;
+  hitsCost: number;
+  rankImpact: number | null;
+}> = ({ points, grossPoints, hitsCost, rankImpact }) => (
+  <div
+    className="inline-flex overflow-hidden rounded-md border border-accent4 bg-accent4/30 shadow-sm"
+    title="Estimated transfer impact in points and rank"
+  >
+    <div
+      className={clsx(
+        "flex min-w-[4.25rem] flex-col items-center justify-center px-2.5 py-1",
+        netPillClass(points),
+      )}
+    >
+      <span className="text-[9px] font-medium uppercase leading-none opacity-75">
+        points
+      </span>
+      <span className="text-xs font-bold tabular-nums leading-tight sm:text-sm">
+        {formatNet(points)}
+      </span>
+      {hitsCost > 0 && (
+        <span className="text-[9px] font-medium leading-none opacity-70">
+          {formatNet(grossPoints)} - {hitsCost}
+        </span>
+      )}
+    </div>
+    {rankImpact !== null && (
+      <div className="flex min-w-[4.75rem] flex-col items-center justify-center border-l border-accent4 px-2.5 py-1">
+        <span className="text-[9px] font-medium uppercase leading-none text-text/50">
+          rank
+        </span>
+        <span
+          className={clsx(
+            "text-xs font-bold tabular-nums leading-tight sm:text-sm",
+            rankImpactColorClass(rankImpact),
+          )}
+        >
+          {formatRankDelta(rankImpact)}
+        </span>
+      </div>
+    )}
+  </div>
+);
 
 const CHIP_LABEL: Record<NonNullable<ActiveChip>, string> = {
   wildcard: "Wildcard",
@@ -64,7 +110,7 @@ const TransferCountBadge: React.FC<{ count: number }> = ({ count }) => (
 );
 
 // More than 5 pairs in a single GW (typically wildcard / free hit) is
-// the threshold where a flat OUT|→|IN row becomes hard to scan. We
+// the threshold where a flat OUT -> IN row becomes hard to scan. We
 // switch to one row per position with its own gain pill.
 const POSITION_GROUP_THRESHOLD = 5;
 const POSITION_LABEL: Record<number, string> = {
@@ -114,8 +160,9 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
   const useGrouped = pairs.length > POSITION_GROUP_THRESHOLD;
   const isBenchBoost = chip === "bboost";
   const isBenchBoostOnly = pairs.length === 0 && isBenchBoost;
-  const showBenchFooter = isBenchBoost && !isBenchBoostOnly && bench_boost_points != null;
-  const showRank = combined_rank_impact != null;
+  const showBenchFooter =
+    isBenchBoost && !isBenchBoostOnly && bench_boost_points !== null;
+  const showRank = combined_rank_impact !== null;
 
   return (
     <Card className="flex flex-col overflow-hidden border-accent4 bg-primary/40 shadow-md">
@@ -128,38 +175,13 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
           {pairs.length > 0 && <TransferCountBadge count={pairs.length} />}
         </div>
         <div className="flex items-center gap-2">
-          {!isBenchBoostOnly && hits_cost > 0 && (
-            <span className="text-[10px] text-text/60 sm:text-xs">
-              <span
-                className={gross_net_points >= 0 ? "text-emerald-300" : "text-rose-300"}
-              >
-                {formatNet(gross_net_points)}
-              </span>{" "}
-              − {hits_cost} ={" "}
-            </span>
-          )}
           {!isBenchBoostOnly && (
-            <>
-              <span
-                className={clsx(
-                  "rounded-full px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
-                  netPillClass(combined_net_points),
-                )}
-              >
-                {formatNet(combined_net_points)}
-              </span>
-              {showRank && combined_rank_impact != null && (
-                <span
-                  className={clsx(
-                    "rounded-full border px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
-                    rankImpactBadgeClass(combined_rank_impact),
-                  )}
-                  title="Estimated rank impact from these transfers"
-                >
-                  rank {formatRankDelta(combined_rank_impact)}
-                </span>
-              )}
-            </>
+            <ImpactSummary
+              points={combined_net_points}
+              grossPoints={gross_net_points}
+              hitsCost={hits_cost}
+              rankImpact={showRank ? combined_rank_impact : null}
+            />
           )}
           {isBenchBoostOnly && (
             <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/40 sm:text-sm md:text-base">
