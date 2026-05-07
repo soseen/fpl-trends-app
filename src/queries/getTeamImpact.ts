@@ -85,9 +85,9 @@ export type TeamImpact = {
   players: PlayerImpact[];
   // Top players the user did NOT have during the GW range who scored points
   // and were widely owned in the stratum — i.e. they boosted other managers'
-  // totals and so dragged the user's relative rank down. Usually the flat top
-  // 10, with the most damaging goalkeeper appended when no keeper made that
-  // top 10 so the pitch can still render an XI.
+  // totals and so dragged the user's relative rank down. Usually the most
+  // damaging valid FPL XI, falling back to a flat top list only if the range
+  // cannot produce a full formation.
   // Convention: `played_count`, `starts`, `captaincies`, `triple_captaincies`,
   // and `points_for_user` are all 0; `raw_points` is the total points the
   // player scored across GWs the user didn't own them; `rank_impact` is signed

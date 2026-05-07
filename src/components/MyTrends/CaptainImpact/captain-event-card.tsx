@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 import { GiSoccerKick } from "react-icons/gi";
 import { TbLockFilled } from "react-icons/tb";
-import { Check, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { CaptainEvent, CaptainPlayer } from "src/queries/getCaptainImpact";
 import ImpactPill from "../shared/impact-pill";
@@ -169,14 +169,6 @@ const SlotFrame: React.FC<{
   </div>
 );
 
-const MatchedPlaceholder: React.FC = () => (
-  <div
-    className={`${SLOT_BODY_CLASS} border border-dashed border-accent4/60 bg-accent3/30 text-text/40`}
-  >
-    <Check className="h-4 w-4 sm:h-5 sm:w-5" />
-  </div>
-);
-
 const MissingDataPlaceholder: React.FC = () => (
   <div
     className={`${SLOT_BODY_CLASS} border border-dashed border-accent4/40 bg-accent3/20 text-text/30`}
@@ -185,11 +177,7 @@ const MissingDataPlaceholder: React.FC = () => (
   </div>
 );
 
-const renderReferenceSlot = (
-  player: CaptainPlayer | null,
-  matched: boolean,
-): React.ReactNode => {
-  if (matched) return <MatchedPlaceholder />;
+const renderReferenceSlot = (player: CaptainPlayer | null): React.ReactNode => {
   if (!player) return <MissingDataPlaceholder />;
   return <CaptainTile player={player} variant="reference" />;
 };
@@ -277,10 +265,10 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
           <CaptainTile player={userPlayer} variant="user" />
         </SlotFrame>
         <SlotFrame label="Average" matched={event.matched_template}>
-          {renderReferenceSlot(event.template_captain, event.matched_template)}
+          {renderReferenceSlot(event.template_captain)}
         </SlotFrame>
         <SlotFrame label="Top 10k" matched={event.matched_top10k}>
-          {renderReferenceSlot(event.top10k_captain, event.matched_top10k)}
+          {renderReferenceSlot(event.top10k_captain)}
         </SlotFrame>
       </div>
 

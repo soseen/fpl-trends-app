@@ -45,10 +45,8 @@ const TeamAndRankKillersView: FC<Props> = ({ query }) => {
   }
 
   const killers = data!.rank_killers;
-  // The API normally returns a flat top 10, plus the highest-impact
-  // goalkeeper when the top 10 is all outfielders. Group directly by FPL
-  // position so that appended keeper slots into the pitch without changing
-  // the outfield order.
+  // The API normally returns a formation-valid rank-killer XI. Group directly
+  // by FPL position so each line lands in the right pitch row.
   const killerXi = {
     gk: killers.filter((p) => p.element_type === 1).map(toTile),
     def: killers.filter((p) => p.element_type === 2).map(toTile),
