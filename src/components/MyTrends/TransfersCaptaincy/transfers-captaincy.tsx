@@ -82,6 +82,7 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
               <TransferImpactSummary
                 totalNet={transfers.total_net_points}
                 totalTransfers={transfers.total_transfers}
+                totalRankImpact={transfers.total_rank_impact}
               />
               {transfers.incomplete && (
                 <p className="text-center text-[10px] text-text/60 sm:text-xs">

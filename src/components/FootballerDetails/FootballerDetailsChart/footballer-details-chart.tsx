@@ -250,12 +250,12 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               value={displayedChartStat}
               onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
             >
-              <SelectTrigger className="h-8 w-[120px] border-transparent bg-magenta px-2 py-1 text-xs font-semibold text-text">
+              <SelectTrigger className="h-8 w-[120px] border-transparent bg-magenta px-2 py-1 text-xs font-semibold text-text focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent
                 sideOffset={5}
-                className="w-[120px] border-transparent bg-magenta"
+                className="z-[400] w-[120px] border-transparent bg-magenta"
               >
                 {availableStats.map((stat) => (
                   <SelectItem

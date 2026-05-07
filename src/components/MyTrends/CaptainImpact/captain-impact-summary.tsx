@@ -53,6 +53,20 @@ const CaptainImpactSummary: React.FC<Props> = ({
   }
 
   const hasRankImpact = totalRankImpact != null;
+  const showVsPopular = matchedTemplateCount < totalGws;
+  const showVsTop10k = matchedTop10kCount < totalGws;
+  const diffSegments: string[] = [];
+  if (showVsPopular) {
+    diffSegments.push(`${formatSigned(totalDiffVsTemplate)} vs popular`);
+  }
+  if (showVsTop10k) {
+    diffSegments.push(`${formatSigned(totalDiffVsTop10k)} vs Top 10k`);
+  }
+  const subtitle = hasRankImpact
+    ? ["captaincy rank impact", ...diffSegments].join(" · ")
+    : diffSegments.length > 0
+      ? `points: ${diffSegments.join(" · ")}`
+      : "matched the popular and top 10k captains every GW";
 
   return (
     <div className="flex flex-col items-center gap-3 py-2">
@@ -68,11 +82,7 @@ const CaptainImpactSummary: React.FC<Props> = ({
           ? formatRankDelta(totalRankImpact)
           : formatSigned(totalDiffVsTop10k)}
       </span>
-      <span className="text-xs text-text/70 md:text-sm">
-        {hasRankImpact
-          ? `captaincy rank impact · ${formatSigned(totalDiffVsTop10k)} vs Top 10k`
-          : "points vs Top 10k"}
-      </span>
+      <span className="text-xs text-text/70 md:text-sm">{subtitle}</span>
       <div className="grid w-full max-w-md grid-cols-3 gap-2 sm:gap-4">
         <Column label="You" value={totalUser} />
         <Column

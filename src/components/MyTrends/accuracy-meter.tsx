@@ -12,15 +12,15 @@ type Props = {
 // meter reflects "how close is the cron to a complete pass" rather than a
 // loose ratio that saturates after a few runs.
 //   - Stratum 1: full census of the top 10k
-//   - Stratum 2: ~45k unique probes per stride-2 pass, plus accumulated
-//     re-tagged movers from stratum 1
-//   - Stratum 3: 150k random probes — at this size each probe weighs
-//     ~80 ranks instead of the original ~1,240, so a single sample skew
-//     barely moves the estimate.
+//   - Stratum 2: ~45k unique probes per pass, plus accumulated re-tagged
+//     movers from stratum 1
+//   - Stratum 3: matches the backend cron's STRATUM_C_TARGET_MANAGERS env
+//     (default 50k). Each probe weighs ~240 ranks at this sample size,
+//     so some sampling noise is expected even at 99%.
 const TARGET_SAMPLE: Record<1 | 2 | 3, number> = {
   1: 10_000,
   2: 50_000,
-  3: 150_000,
+  3: 50_000,
 };
 
 // Cap at 99 deliberately. Hitting the design sample target doesn't mean the
@@ -65,7 +65,7 @@ const AccuracyMeter: React.FC<Props> = ({ stratum, sampleSize, isLoading }) => {
   const tooltip =
     stratum === null
       ? "No rank data yet for this manager."
-      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} probes in your stratum. Target: ${target.toLocaleString("en-GB")} for full accuracy. Sample grows automatically as the data refresh runs.`;
+      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} probes in your stratum. Target: ${target.toLocaleString("en-GB")} for full accuracy. Sample resets at the start of each gameweek and grows as the cron runs.`;
 
   return (
     <Tooltip>

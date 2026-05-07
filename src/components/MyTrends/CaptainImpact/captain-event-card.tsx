@@ -1,5 +1,4 @@
 import type React from "react";
-import clsx from "clsx";
 import {
   FaFutbol,
   FaHandshake,
@@ -12,7 +11,7 @@ import { TbLockFilled } from "react-icons/tb";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { CaptainEvent, CaptainPlayer } from "src/queries/getCaptainImpact";
-import { formatRankDelta, rankImpactBadgeClass } from "../TeamImpact/format";
+import ImpactPill from "../shared/impact-pill";
 import CaptainTile from "./captain-tile";
 
 type Props = {
@@ -24,15 +23,6 @@ const formatNet = (n: number): string => {
   const value = Number.isInteger(n) ? `${n}` : n.toFixed(1);
   if (n === 0) return "0 pts";
   return `${n > 0 ? "+" : ""}${value} pts`;
-};
-
-const differentialBadgeClass = (n: number): string => {
-  if (!Number.isFinite(n) || Math.abs(n) < 0.05) {
-    return "bg-accent4/40 text-text/70 ring-text/15";
-  }
-  return n > 0
-    ? "bg-emerald-500/20 text-emerald-300 ring-emerald-400/30"
-    : "bg-rose-500/20 text-rose-300 ring-rose-400/30";
 };
 
 type LabeledTile = {
@@ -173,18 +163,22 @@ const CaptainBreakdown: React.FC<{ player: CaptainPlayer }> = ({ player }) => {
 };
 
 const slotsFor = (event: CaptainEvent): Slot[] => {
+  const userLabelParts = ["Your pick"];
+  if (event.matched_template) userLabelParts.push("Average");
+  if (event.matched_top10k) userLabelParts.push("Top 10k");
+
   const slots: Slot[] = [
     {
       tile: {
         key: "user",
-        label: "Your pick",
+        label: userLabelParts.join(" · "),
         player: event.user_captain,
         variant: "user",
       },
     },
   ];
 
-  if (event.top10k_captain) {
+  if (!event.matched_top10k && event.top10k_captain) {
     slots.push({
       tile: {
         key: "top10k",
@@ -195,7 +189,7 @@ const slotsFor = (event: CaptainEvent): Slot[] => {
     });
   }
 
-  if (event.template_captain) {
+  if (!event.matched_template && event.template_captain) {
     slots.push({
       tile: {
         key: "template",
@@ -215,7 +209,7 @@ const captainBonusExposure = (player: CaptainPlayer): number =>
 const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
   const { gw, differential_vs_top10k, differential_vs_template } = event;
   const slots = slotsFor(event);
-  const headlineDiff = event.template_captain
+  const primaryDiff = event.template_captain
     ? {
         label: "vs popular",
         value: differential_vs_template,
@@ -226,12 +220,18 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
           value: differential_vs_top10k,
         }
       : null;
+  const secondaryDiff =
+    event.template_captain && event.top10k_captain
+      ? {
+          label: "vs top 10k",
+          value: differential_vs_top10k,
+        }
+      : null;
   const rankImpact =
     event.rank_impact ??
     (event.captaincy_excess != null && rankPerPoint != null
       ? event.captaincy_excess * rankPerPoint
       : null);
-  const showRank = rankImpact != null;
   const isTripleCaptain = event.user_captain.multiplier === 3;
   const templateCaptain = event.template_captain;
   const userCaptainExposure = Math.max((event.user_captain.multiplier ?? 0) - 1, 0);
@@ -262,32 +262,25 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
           )}
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          {headlineDiff && (
-            <span
-              className={clsx(
-                "rounded-full px-2.5 py-1 text-xs font-semibold ring-1 sm:text-sm md:text-base",
-                differentialBadgeClass(headlineDiff.value),
-              )}
-              title={`${formatNet(differential_vs_template)} vs popular captain${
-                event.top10k_captain
-                  ? `; ${formatNet(differential_vs_top10k)} vs top 10k captain`
-                  : ""
-              }`}
-            >
-              {formatNet(headlineDiff.value)} {headlineDiff.label}
-            </span>
+          {primaryDiff && (
+            <ImpactPill
+              points={primaryDiff.value}
+              pointsLabel={primaryDiff.label}
+              pointsSubtitle={
+                secondaryDiff
+                  ? `${formatNet(secondaryDiff.value)} ${secondaryDiff.label}`
+                  : undefined
+              }
+              pointsTitle={
+                `${formatNet(differential_vs_template)} vs popular captain` +
+                (event.top10k_captain
+                  ? ` · ${formatNet(differential_vs_top10k)} vs top 10k captain`
+                  : "")
+              }
+              rankImpact={rankImpact}
+              rankTitle={rankTitle}
+            />
           )}
-          {showRank ? (
-            <span
-              className={clsx(
-                "rounded-full border px-2.5 py-1 text-xs font-semibold sm:text-sm md:text-base",
-                rankImpactBadgeClass(rankImpact),
-              )}
-              title={rankTitle}
-            >
-              rank {formatRankDelta(rankImpact)}
-            </span>
-          ) : null}
         </div>
       </div>
 

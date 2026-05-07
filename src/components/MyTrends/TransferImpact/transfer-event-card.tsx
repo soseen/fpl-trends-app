@@ -7,7 +7,7 @@ import type {
   TransferImpactEvent,
   TransferImpactPair,
 } from "src/queries/getManagerTransfers";
-import { formatRankDelta, rankImpactColorClass } from "../TeamImpact/format";
+import ImpactPill from "../shared/impact-pill";
 import TransferPlayerTile from "./transfer-player-tile";
 
 type Props = {
@@ -24,52 +24,6 @@ const netPillClass = (n: number): string => {
   if (n < 0) return "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40";
   return "bg-accent4/40 text-text/70 ring-1 ring-text/15";
 };
-
-const ImpactSummary: React.FC<{
-  points: number;
-  grossPoints: number;
-  hitsCost: number;
-  rankImpact: number | null;
-}> = ({ points, grossPoints, hitsCost, rankImpact }) => (
-  <div
-    className="inline-flex overflow-hidden rounded-md border border-accent4 bg-accent4/30 shadow-sm"
-    title="Estimated transfer impact in points and rank"
-  >
-    <div
-      className={clsx(
-        "flex min-w-[4.25rem] flex-col items-center justify-center px-2.5 py-1",
-        netPillClass(points),
-      )}
-    >
-      <span className="text-[9px] font-medium uppercase leading-none opacity-75">
-        points
-      </span>
-      <span className="text-xs font-bold tabular-nums leading-tight sm:text-sm">
-        {formatNet(points)}
-      </span>
-      {hitsCost > 0 && (
-        <span className="text-[9px] font-medium leading-none opacity-70">
-          {formatNet(grossPoints)} - {hitsCost}
-        </span>
-      )}
-    </div>
-    {rankImpact !== null && (
-      <div className="flex min-w-[4.75rem] flex-col items-center justify-center border-l border-accent4 px-2.5 py-1">
-        <span className="text-[9px] font-medium uppercase leading-none text-text/50">
-          rank
-        </span>
-        <span
-          className={clsx(
-            "text-xs font-bold tabular-nums leading-tight sm:text-sm",
-            rankImpactColorClass(rankImpact),
-          )}
-        >
-          {formatRankDelta(rankImpact)}
-        </span>
-      </div>
-    )}
-  </div>
-);
 
 const CHIP_LABEL: Record<NonNullable<ActiveChip>, string> = {
   wildcard: "Wildcard",
@@ -176,11 +130,15 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
         </div>
         <div className="flex items-center gap-2">
           {!isBenchBoostOnly && (
-            <ImpactSummary
+            <ImpactPill
               points={combined_net_points}
-              grossPoints={gross_net_points}
-              hitsCost={hits_cost}
+              pointsSubtitle={
+                hits_cost > 0
+                  ? `${formatNet(gross_net_points)} - ${hits_cost}`
+                  : undefined
+              }
               rankImpact={showRank ? combined_rank_impact : null}
+              title="Estimated transfer impact in points and rank"
             />
           )}
           {isBenchBoostOnly && (

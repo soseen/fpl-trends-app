@@ -1,9 +1,11 @@
 import type React from "react";
 import clsx from "clsx";
+import { formatRankDelta, rankImpactColorClass } from "../TeamImpact/format";
 
 type Props = {
   totalNet: number;
   totalTransfers: number;
+  totalRankImpact: number | null;
 };
 
 const formatSigned = (n: number): string => {
@@ -17,7 +19,11 @@ const totalToneClass = (n: number): string => {
   return "text-text/60";
 };
 
-const TransferImpactSummary: React.FC<Props> = ({ totalNet, totalTransfers }) => {
+const TransferImpactSummary: React.FC<Props> = ({
+  totalNet,
+  totalTransfers,
+  totalRankImpact,
+}) => {
   if (totalTransfers === 0 && totalNet === 0) {
     return (
       <div className="flex flex-col items-center gap-1 py-2 text-center text-sm text-text/70 md:text-base">
@@ -39,6 +45,14 @@ const TransferImpactSummary: React.FC<Props> = ({ totalNet, totalTransfers }) =>
       >
         {formatSigned(totalNet)}
       </span>
+      {totalRankImpact != null && (
+        <span className="rounded-full bg-accent4/30 px-2.5 py-0.5 text-xs sm:text-sm">
+          rank{" "}
+          <span className={rankImpactColorClass(totalRankImpact)}>
+            {formatRankDelta(totalRankImpact)}
+          </span>
+        </span>
+      )}
       <span className="text-xs text-text/70 md:text-sm lg:text-base">
         {totalTransfers} transfer{totalTransfers === 1 ? "" : "s"} made total
       </span>
