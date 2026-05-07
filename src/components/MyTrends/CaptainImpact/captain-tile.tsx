@@ -33,6 +33,8 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
     ? `${player.effective_points}`
     : player.effective_points.toFixed(1);
   const eo = computeEO(player);
+  const eoPct = eo * 100;
+  const eoLabel = eoPct >= 10 ? eoPct.toFixed(0) : eoPct.toFixed(1);
 
   return (
     <div className={clsx("flex", isReference && "opacity-60 grayscale-[40%]")}>
@@ -49,6 +51,16 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
             />
           </span>
         }
+        topRight={
+          eo > 0 ? (
+            <span
+              title={`Effective ownership: ${eoPct.toFixed(1)}%`}
+              className="inline-flex items-center rounded-md bg-accent3/85 px-1 py-0.5 text-[8px] font-semibold leading-none text-text shadow-sm ring-1 ring-inset ring-accent4/40 sm:text-[9px] md:px-1.5 md:py-1 md:text-[10px]"
+            >
+              {eoLabel}%
+            </span>
+          ) : undefined
+        }
         image={
           <FootballerImage
             code={player.code}
@@ -56,13 +68,6 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
           />
         }
         name={player.web_name}
-        middleRow={
-          eo > 0 ? (
-            <span className="text-[9px] text-text/60 sm:text-[10px]">
-              EO {(eo * 100).toFixed(1)}%
-            </span>
-          ) : undefined
-        }
         points={`${pointsLabel} pts`}
       />
     </div>
