@@ -7,15 +7,23 @@ type Props = {
   footballer: Footballer;
   size?: number;
   styles?: React.CSSProperties;
+  className?: string;
+  imageClassName?: string;
 };
 
-const FootballerAvatar = ({ footballer, size, styles }: Props) => (
+const FootballerAvatar = ({
+  footballer,
+  size,
+  styles,
+  className,
+  imageClassName,
+}: Props) => (
   <Avatar
-    className="flex justify-center"
+    className={`flex justify-center ${className ?? ""}`}
     style={{ height: size ?? 12, width: size ?? 12, ...styles }}
   >
     <AvatarImage
-      className="rounded-lg object-cover object-top"
+      className={`rounded-lg object-cover object-top ${imageClassName ?? ""}`}
       src={getFootballersImage(footballer.code)}
     />
     <AvatarFallback>{footballer.code}</AvatarFallback>

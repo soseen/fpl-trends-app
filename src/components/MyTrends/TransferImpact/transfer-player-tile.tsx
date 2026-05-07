@@ -1,12 +1,11 @@
 import type React from "react";
 import clsx from "clsx";
 import { Redo } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { getTeamsBadge } from "src/utils/images";
 import type { TransferImpactPlayer } from "src/queries/getManagerTransfers";
-import { formatRankDelta } from "../TeamImpact/format";
 import { useOpenPlayerDetails } from "../TeamImpact/use-open-player-details";
+import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
 
 type Props = {
   player: TransferImpactPlayer;
@@ -20,62 +19,45 @@ type Props = {
   soldGw?: number | null;
 };
 
-// Compact pitch-style tile for a single transferred player. Layout mirrors
-// TeamImpactPitchCard so the visual language is consistent across My
-// Trends sections, but it's narrower (we render two of these side-by-side
-// on mobile with an arrow between them, so each tile must fit in <half
-// the viewport). Clicking opens the global FootballerDetails modal.
+// Compact pitch-style tile for a single transferred player. Shares the
+// PlayerCardShell visual language used elsewhere in the app (Best XI,
+// Outliers, Team Impact). The relative wrapper exists so the sold-gw
+// badge can sit OUTSIDE the card's overflow-hidden boundary while
+// still anchoring to the tile's top-right.
 const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
   const openDetails = useOpenPlayerDetails();
   const isOut = side === "out";
   const showSoldBadge = !isOut && typeof soldGw === "number";
-  const rankImpact = player.rank_impact;
-  const showRank = rankImpact != null;
 
   return (
-    // The wrapper is `relative` so the sold-gw badge can be a sibling of
-    // the Button rather than a child. The Button needs `overflow-hidden`
-    // to clip the diagonal magenta `before:` banner that intrudes from
-    // outside its bounds, but that same overflow would also clip the
-    // sold-gw badge if it lived inside. Lifting the badge one level up
-    // breaks it out of the clip without giving up the banner effect.
-    <div className="relative flex">
-      <Button
+    <div
+      className={clsx(
+        "relative flex",
+        isOut && "opacity-60 grayscale-[40%]",
+      )}
+    >
+      <PlayerCardShell
         onClick={() => openDetails(player.player_id)}
-        className={clsx(
-          "relative m-auto flex h-[80px] w-12 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-3 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:h-[100px] sm:w-16 md:h-[120px] md:w-20",
-          isOut && "opacity-60 grayscale-[40%]",
-        )}
-      >
-        <FootballerImage
-          code={player.code}
-          className="m-auto h-auto w-10 rounded-none object-contain px-1 sm:w-14 md:w-16"
-        />
-        <div className="flex w-full items-center justify-center bg-magenta md:p-[2px]">
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-[8px] leading-3 text-text sm:text-[10px] md:text-xs">
-            {player.web_name}
-          </p>
-        </div>
-        <div
-          className="flex w-full items-center justify-center rounded-b-md bg-magenta2 text-text md:p-[2px]"
-          title={
-            showRank
-              ? `${player.points_in_window} pts · ${formatRankDelta(
-                  rankImpact,
-                )} estimated rank`
-              : undefined
-          }
-        >
-          <p className="text-[8px] font-semibold leading-3 sm:text-[10px] md:text-xs">
-            {player.points_in_window} pts
-          </p>
-        </div>
-        <img
-          src={getTeamsBadge(player.team_code)}
-          alt=""
-          className="absolute left-0.5 top-0.5 z-20 w-3 object-cover md:w-4"
-        />
-      </Button>
+        ariaLabel={`Open ${player.web_name} details`}
+        className="h-[88px] w-12 sm:h-[108px] sm:w-16 md:h-[128px] md:w-20"
+        topLeft={
+          <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
+            <img
+              src={getTeamsBadge(player.team_code)}
+              alt=""
+              className="block h-3 w-3 object-contain md:h-4 md:w-4"
+            />
+          </span>
+        }
+        image={
+          <FootballerImage
+            code={player.code}
+            className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+          />
+        }
+        name={player.web_name}
+        points={`${player.points_in_window} pts`}
+      />
       {showSoldBadge && (
         // pointer-events-none lets clicks on the badge area pass through
         // to the Button beneath, preserving the open-details click target.

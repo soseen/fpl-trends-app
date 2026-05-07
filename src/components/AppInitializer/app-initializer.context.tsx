@@ -28,6 +28,11 @@ const AppInitializerContext = createContext<AppInitializerState>({
   status: AppInitStatus.loading,
 });
 
+const parseStat = (value: string | number | null | undefined): number => {
+  const parsed = typeof value === "number" ? value : parseFloat(value ?? "0");
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 export const AppInitializerProvider = ({ children }: AppInitializerProviderProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { status, list } = useSelector((state: RootState) => state.footballers);
@@ -87,6 +92,14 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             const ownershipPercent =
               (val.selected / (gameweekEvent?.ranked_count ?? totalPlayers)) * 100;
             const per90Count = (acc.totalMinutes + val.minutes) / 90;
+            const expectedAssists =
+              val.expected_assists === undefined || val.expected_assists === null
+                ? Math.max(
+                    0,
+                    parseStat(val.expected_goal_involvements) -
+                      parseStat(val.expected_goals),
+                  )
+                : parseStat(val.expected_assists);
 
             return {
               totalPoints: acc.totalPoints + val.total_points,
@@ -100,37 +113,42 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
               totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
               totalSaves: acc.totalSaves + val.saves,
               savesPerGame: (acc.totalSaves + val.saves) / gameweeksCount,
-              totalXGI: acc.totalXGI + parseFloat(val.expected_goal_involvements),
+              totalXGI: acc.totalXGI + parseStat(val.expected_goal_involvements),
               xGIPerGame: (
-                (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
+                (acc.totalXGI + parseStat(val.expected_goal_involvements)) /
                 gameweeksCount
               ).toFixed(2),
               xGIPer90: (
-                (acc.totalXGI + parseFloat(val.expected_goal_involvements)) /
+                (acc.totalXGI + parseStat(val.expected_goal_involvements)) /
                 per90Count
               ).toFixed(2),
-              totalXGS: acc.totalXGS + parseFloat(val.expected_goals),
+              totalXA: acc.totalXA + expectedAssists,
+              xAPerGame: ((acc.totalXA + expectedAssists) / gameweeksCount).toFixed(2),
+              xAPer90: ((acc.totalXA + expectedAssists) / per90Count).toFixed(2),
+              totalXGS: acc.totalXGS + parseStat(val.expected_goals),
               xGSPerGame: (
-                (acc.totalXGS + parseFloat(val.expected_goals)) /
+                (acc.totalXGS + parseStat(val.expected_goals)) /
                 gameweeksCount
               ).toFixed(2),
               xGSPer90: (
-                (acc.totalXGS + parseFloat(val.expected_goals)) /
+                (acc.totalXGS + parseStat(val.expected_goals)) /
                 per90Count
               ).toFixed(2),
-              totalXGC: acc.totalXGC + parseFloat(val.expected_goals_conceded),
+              totalXGC: acc.totalXGC + parseStat(val.expected_goals_conceded),
               xGCPerGame: (
-                (acc.totalXGC + parseFloat(val.expected_goals_conceded)) /
+                (acc.totalXGC + parseStat(val.expected_goals_conceded)) /
                 gameweeksCount
               ).toFixed(2),
               xGCPer90: (
-                (acc.totalXGC + parseFloat(val.expected_goals_conceded)) /
+                (acc.totalXGC + parseStat(val.expected_goals_conceded)) /
                 per90Count
               ).toFixed(2),
               teamName: footballer.teams.name,
               maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
               totalMinutes: acc.totalMinutes + val.minutes,
               minPerGame: (acc.totalMinutes + val.minutes) / historyInRange.length,
+              totalBonus: acc.totalBonus + val.bonus,
+              totalHauls: acc.totalHauls + (val.total_points >= 9 ? 1 : 0),
             };
           },
           {
@@ -148,6 +166,9 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             totalXGI: 0,
             xGIPerGame: "0.00",
             xGIPer90: "0.00",
+            totalXA: 0,
+            xAPerGame: "0.00",
+            xAPer90: "0.00",
             totalXGS: 0,
             xGSPerGame: "0.00",
             xGSPer90: "0.00",
@@ -158,6 +179,8 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             maxOwnership: 0,
             minPerGame: 0,
             totalMinutes: 0,
+            totalBonus: 0,
+            totalHauls: 0,
           },
         );
 

@@ -1,10 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import type { RootState } from "../store";
 
 interface GameweekState {
   startGameweek: number;
   endGameweek: number;
-  maxGameweek: number; 
+  maxGameweek: number;
 }
 
 const initialState: GameweekState = {
@@ -24,7 +25,7 @@ const gameweeksSlice = createSlice({
     initializeGameweekRange: (state, action: PayloadAction<number>) => {
       state.maxGameweek = action.payload;
       state.endGameweek = action.payload;
-      state.startGameweek = Math.max(1, action.payload - 3);
+      state.startGameweek = Math.max(1, action.payload - 4);
     },
   },
 });

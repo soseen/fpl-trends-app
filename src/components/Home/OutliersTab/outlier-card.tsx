@@ -1,12 +1,15 @@
 import React from "react";
+import clsx from "clsx";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
+import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
+import StatBadge from "src/components/PlayerCard/stat-badge";
+import { getTeamsBadge } from "src/utils/images";
 
 type Props = {
   footballer: FootballerWithGameweekStats;
@@ -45,71 +48,85 @@ const buildReturnStats = (f: FootballerWithGameweekStats): ReturnStat[] => {
   return stats;
 };
 
-const getTopLeftBadge = (
+type MetricChip = { value: string; suffix: string; label: string };
+
+const getMetricChip = (
   footballer: FootballerWithGameweekStats,
   include: Props["include"],
-): { text: string; label: string } | null => {
+): MetricChip | null => {
   if (include.xGI)
-    return { text: `${footballer?.xGIPerGame} xGI`, label: "xGI / g" };
+    return {
+      value: `${footballer?.xGIPerGame}`,
+      suffix: "xGI",
+      label: "xGI per game",
+    };
   if (include.defcons)
     return {
-      text: `${footballer?.defconsPerGame}`,
-      label: "Defcons / g",
+      value: `${footballer?.defconsPerGame}`,
+      suffix: "DEF",
+      label: "Defcons per game",
     };
   if (include.selectedBy)
-    return { text: `${footballer?.selected_by_percent} %`, label: "Selected by" };
+    return {
+      value: `${footballer?.selected_by_percent}%`,
+      suffix: "own",
+      label: "Selected by (current)",
+    };
   return null;
 };
 
 const OutlierCard = ({ footballer, include }: Props) => {
   const { setFootballer } = useFootballerDetailsContext();
-  const topLeftBadge = getTopLeftBadge(footballer, include);
+  const metric = getMetricChip(footballer, include);
+  const returnStats = include?.returns ? buildReturnStats(footballer) : [];
+
   return (
-    <Button
+    <PlayerCardShell
       onClick={() => setFootballer(footballer)}
-      key={footballer.id}
-      className="relative mb-4 flex h-auto w-full flex-col items-center justify-center gap-0 justify-self-center rounded-md border-accent2 bg-secondary p-0 pt-2 text-center shadow-lg md:pt-6"
-    >
-      {topLeftBadge && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="absolute -left-[2px] -top-[2px] min-w-6 rotate-[-28deg] whitespace-nowrap rounded-md bg-magenta px-1 py-[2px] text-[10px] leading-4 text-white shadow-md md:-left-3 md:top-0 md:min-w-16 md:px-2 md:py-[2px] md:text-sm xl:text-base">
-              {topLeftBadge.text}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            {topLeftBadge.label}
-          </TooltipContent>
-        </Tooltip>
-      )}
-      <div className="flex max-h-[110px] w-auto flex-grow items-center justify-center px-2 md:max-h-[180px] md:px-4 lg:px-6">
-        <FootballerImage
-          code={footballer.code}
-          className="aspect-[calc(220/280)] w-auto min-w-16 rounded-none object-contain"
-        />
-      </div>
-      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-1 text-center text-xs text-text md:py-[2px] md:text-base">
-        {footballer?.web_name}
-      </p>
-      <p className="flex w-full items-center justify-center overflow-hidden text-ellipsis whitespace-nowrap rounded-b-md bg-magenta2 px-1 text-center text-xs text-text md:py-[2px] md:text-base">
-        {footballer?.totalPoints} pts
-      </p>
-      {include?.returns && (
-        <div className="absolute right-0 top-1 flex flex-col items-end gap-[2px] md:gap-1">
-          {buildReturnStats(footballer).map((stat) => (
-            <Tooltip key={stat.label}>
+      ariaLabel={`Open ${footballer.web_name} details`}
+      className="h-auto w-full"
+      imageAreaClassName="aspect-[8/9] pt-3 md:pt-4"
+      topLeft={
+        <span className="inline-flex items-center gap-1 rounded-md bg-accent3/90 px-1 py-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:gap-1.5 md:px-1.5">
+          <img
+            src={getTeamsBadge(footballer.team_code)}
+            alt={footballer.teams?.short_name}
+            className="block h-3.5 w-3.5 shrink-0 object-contain md:h-4 md:w-4"
+          />
+          {metric && (
+            <Tooltip>
               <TooltipTrigger asChild>
-                <span className="inline-flex items-center gap-0.5 rounded-l-md bg-accent2 px-1 py-[1px] text-[8px] font-semibold leading-[10px] text-text shadow-md [&_svg]:!size-2 sm:gap-1 sm:px-1.5 sm:py-[2px] sm:text-[10px] sm:[&_svg]:!size-2.5 lg:text-xs lg:[&_svg]:!size-3">
-                  <span>{stat.value}</span>
-                  <span className="text-text/80 flex items-center">{stat.icon}</span>
+                <span
+                  className={clsx(
+                    "inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold leading-none text-text md:text-[12px]",
+                  )}
+                >
+                  <span className="tabular-nums text-magenta">{metric.value}</span>
+                  <span className="text-text/60">{metric.suffix}</span>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>{stat.label}</TooltipContent>
+              <TooltipContent>{metric.label}</TooltipContent>
             </Tooltip>
-          ))}
-        </div>
-      )}
-    </Button>
+          )}
+        </span>
+      }
+      topRight={returnStats.map((stat) => (
+        <StatBadge
+          key={stat.label}
+          value={stat.value}
+          icon={stat.icon}
+          label={stat.label}
+        />
+      ))}
+      image={
+        <FootballerImage
+          code={footballer.code}
+          className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+        />
+      }
+      name={footballer?.web_name}
+      points={`${footballer?.totalPoints} pts`}
+    />
   );
 };
 

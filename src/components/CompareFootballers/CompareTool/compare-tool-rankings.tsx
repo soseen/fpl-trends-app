@@ -31,10 +31,13 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
             isMostHauls,
             isBestAttacker,
             isBestDefender,
+            isBestDefcon,
             isDifferential,
             totalTeamGoals,
             avgGoalsPerGame,
             isBestAttackingTeam,
+            totalDefcons,
+            totalDefconBonuses,
             returns,
           } = bestAttributes[footballer.id] || {};
 
@@ -136,7 +139,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                   </span>
                 )}
 
-                {isMostHauls?.value && (
+                {isMostHauls?.value && isMostHauls.count > 0 && (
                   <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
                     <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1 pr-4">
                       💥 Most Hauls{" "}
@@ -170,6 +173,20 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                       Plays for a defense that accumulated{" "}
                       <b className="text-magenta">{footballer?.xGCPer90?.value}</b>{" "}
                       expected goals conceded per 90
+                    </p>
+                  </span>
+                )}
+
+                {isBestDefcon && !!totalDefcons && (
+                  <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
+                    <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1 pr-4">
+                      Best Defensive Contributor{" "}
+                    </p>
+                    <p className="">
+                      Recorded <b className="text-magenta">{totalDefcons}</b> defensive
+                      contributions and{" "}
+                      <b className="text-magenta">{totalDefconBonuses}</b> threshold bonus
+                      {totalDefconBonuses !== 1 ? "es" : ""} in the selected range
                     </p>
                   </span>
                 )}

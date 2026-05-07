@@ -42,14 +42,15 @@ const CompareToolSearchCommand = ({
     const normalizedSearch = removeAccents(search.toLowerCase());
     return sortedFootballers
       .filter((f) => {
-        const normalizedName = removeAccents(f.web_name.toLowerCase());
-        if (f?.web_name.includes("ouri")) {
-          console.log(normalizedSearch);
-          console.log(removeAccents(f.web_name.toLowerCase()).includes(normalizedSearch));
-        }
+        const normalizedSearchSource = removeAccents(
+          [f.web_name, f.first_name, f.second_name, f.teamName, f.teams?.short_name]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase(),
+        );
 
         return (
-          normalizedName.includes(normalizedSearch) &&
+          normalizedSearchSource.includes(normalizedSearch) &&
           !selectedFootballers.find((existing) => f.id === existing?.id)
         );
       })
@@ -72,8 +73,7 @@ const CompareToolSearchCommand = ({
             suggestedFootballers.map((f) => (
               <CommandItem
                 key={f.id}
-                value={f.web_name} // Keep name for filtering!
-                data-value={f.id} // Store ID for selection
+                value={`${f.id}-${f.web_name}`}
                 onSelect={() => {
                   addFootballer(f, index);
                   onAdd();

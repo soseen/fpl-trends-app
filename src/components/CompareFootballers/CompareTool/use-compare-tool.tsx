@@ -8,12 +8,14 @@ import { BestAttributes, RankedFootballer, SelectedStatKey } from "./types";
 import { rankStats } from "./rankings/rankStats";
 import { rankFinishing } from "./rankings/rankFinishing";
 import { rankFixtures } from "./rankings/rankFixtures";
+import { getDefconThreshold } from "src/utils/defcon";
 
 export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string }> = [
   { key: "goalsPer90", label: "Goals/90" },
   { key: "assistsPer90", label: "Assists/90" },
   { key: "xGIPer90", label: "xGI/90" },
   { key: "xGCPer90", label: "xGC/90" },
+  { key: "defconsPerGame", label: "Def/g" },
   { key: "minPerGame", label: "Min/g" },
 ];
 
@@ -21,7 +23,7 @@ export const useCompareTool = () => {
   const { startGameweek, endGameweek, maxGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
-  const { isMD } = useDimensions();
+  const { isMD, isSM } = useDimensions();
   const { setFootballer } = useFootballerDetailsContext();
   const { footballers } = useSelector(
     (state: RootState) => state.footballersGameweekStats,
@@ -37,20 +39,36 @@ export const useCompareTool = () => {
     );
   }, [footballers]);
 
+  useEffect(() => {
+    if (!isSM) return;
+    setSelectedFootballers((current) =>
+      current.length > 2 ? current.slice(0, 2) : current,
+    );
+  }, [isSM]);
+
+  const displayedSelectedFootballers = useMemo(
+    () => (isSM ? selectedFootballers.slice(0, 2) : selectedFootballers),
+    [isSM, selectedFootballers],
+  );
+
   const canAddNewCard = useMemo(
-    () => selectedFootballers.length < (isMD ? 3 : 4),
-    [selectedFootballers, isMD],
+    () => displayedSelectedFootballers.length < (isSM ? 2 : isMD ? 3 : 4),
+    [displayedSelectedFootballers, isMD, isSM],
   );
 
   const validFootballers = useMemo(
-    () => selectedFootballers.filter(Boolean),
-    [selectedFootballers],
+    () => displayedSelectedFootballers.filter(Boolean),
+    [displayedSelectedFootballers],
   ) as FootballerWithGameweekStats[];
 
   const addFootballer = useCallback(
     (footballerToAdd: FootballerWithGameweekStats, index: number) => {
       setSelectedFootballers((current) =>
-        current.map((footballer, i) => (index === i ? footballerToAdd : footballer)),
+        current.some(
+          (footballer, i) => i !== index && footballer?.id === footballerToAdd.id,
+        )
+          ? current
+          : current.map((footballer, i) => (index === i ? footballerToAdd : footballer)),
       );
     },
     [setSelectedFootballers],
@@ -72,7 +90,7 @@ export const useCompareTool = () => {
       const footballerObject = footballers.find((f) => f.id === footballerToDisplay.id);
       setFootballer(footballerObject ?? null);
     },
-    [footballers],
+    [footballers, setFootballer],
   );
 
   const footballersComparisonArray: (RankedFootballer | null)[] = useMemo(() => {
@@ -99,11 +117,11 @@ export const useCompareTool = () => {
       };
     });
 
-    return selectedFootballers.map((f) => {
+    return displayedSelectedFootballers.map((f) => {
       const ranked = rankedFootballers.find((rankedF) => f?.id === rankedF?.id);
       return ranked ?? null;
     });
-  }, [selectedFootballers]);
+  }, [displayedSelectedFootballers, maxGameweek, validFootballers]);
 
   const bestAttributes = useMemo(() => {
     const validFootballers = footballersComparisonArray.filter(
@@ -133,6 +151,11 @@ export const useCompareTool = () => {
     const mostDifferentialValue = Math.min(
       ...validFootballers.map((f) => parseFloat(f?.selected_by_percent ?? "0")),
     );
+    const bestDefconValue = Math.max(
+      ...validFootballers
+        .filter((f) => getDefconThreshold(f.element_type) !== null)
+        .map((f) => parseFloat(f.defconsPerGame.value as string) || 0),
+    );
 
     // Find all players that match the best values
     const mostMinutesPlayers = validFootballers.filter(
@@ -154,6 +177,11 @@ export const useCompareTool = () => {
     });
     const mostDifferentialPlayers = validFootballers.filter(
       (f) => parseFloat(f?.selected_by_percent ?? "0") === mostDifferentialValue,
+    );
+    const bestDefconPlayers = validFootballers.filter(
+      (f) =>
+        getDefconThreshold(f.element_type) !== null &&
+        (parseFloat(f.defconsPerGame.value as string) || 0) === bestDefconValue,
     );
 
     // Find max haul count
@@ -253,21 +281,25 @@ export const useCompareTool = () => {
         isDifferential: mostDifferentialPlayers.includes(footballer),
         isBestHighScoringGames: highScoringGamesPlayers.includes(footballer),
         isBestLowScoringGames: lowScoringGamesPlayers.includes(footballer),
+        isBestDefcon: bestDefconPlayers.includes(footballer),
         isMostHauls: {
           value:
+            maxHaulCount > 0 &&
             haulsCount.find((entry) => entry.footballer === footballer)?.haulCount ===
-            maxHaulCount,
+              maxHaulCount,
           count: haulCount ?? 0,
         },
         isBestAttackingTeam: bestAttackingTeamPlayers.includes(footballer),
         avgGoalsPerGame: avgGoals,
         totalTeamGoals: totalTeamGoals,
+        totalDefcons: footballer.totalDefcons,
+        totalDefconBonuses: footballer.totalDefconBonuses,
         returns,
       };
     });
 
     return best;
-  }, [footballersComparisonArray, footballers]);
+  }, [endGameweek, footballersComparisonArray, startGameweek]);
 
   return {
     footballersComparisonArray,

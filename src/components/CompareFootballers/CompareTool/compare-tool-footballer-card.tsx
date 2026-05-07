@@ -13,16 +13,19 @@ import {
   FaChevronRight,
   FaFutbol,
   FaHandshake,
+  FaShieldAlt,
 } from "react-icons/fa";
-import FootballerUpcomingFixtures from "src/components/FootballerDetails/footballer-upcoming-fixtures";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
 import { RankedFootballer } from "./types";
+import { mapElementTypeToPosition } from "src/utils/strings";
+import { useSelector } from "react-redux";
+import type { RootState } from "src/redux/store";
 
 type SelectedStats = Pick<
   RankedFootballer,
-  "totalGoals" | "totalAssists" | "totalCleanSheets"
+  "totalGoals" | "totalAssists" | "totalCleanSheets" | "totalDefconBonuses"
 >;
 
 const getIcon = (key: keyof SelectedStats) => {
@@ -33,9 +36,89 @@ const getIcon = (key: keyof SelectedStats) => {
       return <FaHandshake />;
     case "totalCleanSheets":
       return <TbLockFilled />;
+    case "totalDefconBonuses":
+      return <FaShieldAlt />;
     default:
       return null;
   }
+};
+
+const getFixtureDifficultyClass = (difficulty?: number) => {
+  switch (difficulty) {
+    case 1:
+      return "bg-fixDif1 text-white";
+    case 2:
+      return "bg-fixDif2 text-background";
+    case 3:
+      return "bg-fixDif3 text-background";
+    case 4:
+      return "bg-fixDif4 text-white";
+    case 5:
+      return "bg-fixDif5 text-white";
+    default:
+      return "bg-accent text-text";
+  }
+};
+
+const CompareCardFixtures = ({
+  footballer,
+  max,
+}: {
+  footballer: RankedFootballer;
+  max: number;
+}) => {
+  const { list: teams } = useSelector((state: RootState) => state.teams);
+  const fixtures = useMemo(
+    () =>
+      Array.from({ length: max }, (_, index) => footballer.footballer_fixtures[index]),
+    [footballer.footballer_fixtures, max],
+  );
+
+  return (
+    <div
+      className="grid w-full gap-1.5"
+      style={{ gridTemplateColumns: `repeat(${max}, minmax(0, 1fr))` }}
+    >
+      {fixtures.map((fixture, index) => {
+        const opponentId = fixture
+          ? fixture.is_home
+            ? fixture.team_a
+            : fixture.team_h
+          : undefined;
+        const team = teams.find((t) => t.id === opponentId);
+        const fixtureLabel = team?.short_name ?? "-";
+        const venue = fixture ? (fixture.is_home ? "H" : "A") : "-";
+
+        return (
+          <div
+            key={fixture?.id ?? `missing-${index}`}
+            className="min-w-0 rounded-md bg-accent2/70 px-1 py-1.5 text-center shadow-sm ring-1 ring-inset ring-accent4/50 md:px-1.5 md:py-2"
+          >
+            {team?.code ? (
+              <img
+                src={getTeamsBadge(team.code)}
+                className="mx-auto mb-1 h-5 w-5 object-contain md:mb-1.5 md:h-7 md:w-7"
+              />
+            ) : (
+              <span className="mx-auto mb-1 block h-5 w-5 rounded-full bg-accent md:mb-1.5 md:h-7 md:w-7" />
+            )}
+            <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-[10px] font-semibold leading-3 text-text md:text-xs">
+              {fixtureLabel}
+            </span>
+            <span
+              className={clsx(
+                "mt-1 inline-flex max-w-full items-center justify-center rounded-sm px-1 py-[2px] text-[8px] font-semibold leading-3 md:px-1.5 md:text-[10px]",
+                getFixtureDifficultyClass(fixture?.difficulty),
+              )}
+              title={`${fixtureLabel} (${venue}) GW${fixture?.event ?? "-"}`}
+            >
+              {venue} GW{fixture?.event ?? "-"}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 type Props = {
@@ -61,18 +144,26 @@ const CompareToolFootballerCard = ({
     (key: keyof RankedFootballer) => {
       if (!footballer) return;
       const gamesPer90 = footballer?.minutes / 90;
+      const seasonAppearances = footballer.history.filter(
+        (h) => h.team_a_score !== null && h.team_h_score !== null,
+      ).length;
 
       switch (key) {
         case "goalsPer90":
-          return footballer?.goals_scored / gamesPer90;
+          return gamesPer90 > 0 ? footballer?.goals_scored / gamesPer90 : 0;
         case "assistsPer90":
-          return footballer?.assists / gamesPer90;
+          return gamesPer90 > 0 ? footballer?.assists / gamesPer90 : 0;
         case "xGIPer90":
           return footballer?.expected_goal_involvements_per_90;
         case "xGCPer90":
           return footballer?.expected_goals_conceded_per_90;
+        case "defconsPerGame": {
+          return seasonAppearances > 0
+            ? (footballer.defensive_contribution ?? 0) / seasonAppearances
+            : 0;
+        }
         case "minPerGame":
-          return footballer?.minutes / footballer?.history?.length;
+          return seasonAppearances > 0 ? footballer?.minutes / seasonAppearances : 0;
         default:
           return 0;
       }
@@ -85,8 +176,12 @@ const CompareToolFootballerCard = ({
     const stats = Object.keys(footballer)
       .filter(
         (key) =>
-          ["totalGoals", "totalAssists", "totalCleanSheets"].includes(key) &&
-          (footballer[key as keyof typeof footballer] as number) > 0,
+          [
+            "totalGoals",
+            "totalAssists",
+            "totalCleanSheets",
+            "totalDefconBonuses",
+          ].includes(key) && (footballer[key as keyof typeof footballer] as number) > 0,
       )
       .filter(
         (key) =>
@@ -98,158 +193,170 @@ const CompareToolFootballerCard = ({
           ),
       );
     return stats.map((stat) => ({
-      key: stat,
+      key: stat as keyof SelectedStats,
       value: footballer[stat as keyof typeof footballer] as number,
     }));
   }, [footballer]);
 
   return (
-    <div className="w-min max-w-[110px] self-start shadow-large md:max-w-[165px] lg:max-w-[205px] xl:max-w-[268px]">
-      <div className="relative rounded-t-md border-0 border-text bg-accent2 shadow-lg">
-        {footballer && (
-          <Button
-            className="absolute -right-1 -top-2 z-50 bg-transparent p-0 hover:opacity-85 md:-right-3 md:-top-3"
-            onClick={() => removeFootballer(footballer)}
-          >
-            <CloseIcon className="box-content h-2 w-2 rounded-full bg-accent p-1 text-text md:h-4 md:w-4 lg:h-6 lg:w-6" />
-          </Button>
-        )}
-        <div
-          className={clsx(
-            "relative flex aspect-[220/280] h-[140px] flex-col items-end justify-end overflow-hidden rounded-md before:absolute before:-left-[84px] before:-top-32 before:z-10 before:h-[155px] before:w-[155px] before:-rotate-[45deg] before:bg-magenta2 before:shadow-large md:h-[210px] md:before:-left-28 md:before:-top-20 lg:h-[260px] lg:before:-left-36 lg:before:-top-11 lg:before:h-[150px] lg:before:w-[255px] xl:h-[310px]",
-            !footballer && "before:hidden",
-          )}
-        >
-          {footballer ? (
-            <>
-              <img
-                src={getFootballersImage(footballer.code)}
-                className="h-auto w-full self-end object-contain px-2 pt-10 lg:px-4"
-              />
+    <div className="w-[184px] shrink-0 snap-start self-stretch md:w-[220px] lg:w-[238px] xl:w-[268px]">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-md border border-accent4/70 bg-accent2 shadow-large">
+        {!footballer ? (
+          <div className="flex min-h-[390px] items-center justify-center p-4 md:min-h-[470px]">
+            <CompareToolSearch
+              selectedFootballers={selectedFootballers}
+              addFootballer={addFootballer}
+              index={index}
+            />
+          </div>
+        ) : (
+          <>
+            <Button
+              aria-label={`Remove ${footballer.web_name}`}
+              className="absolute right-2 top-2 z-50 h-7 w-7 rounded-full bg-accent/90 p-0 text-text hover:bg-accent"
+              onClick={() => removeFootballer(footballer)}
+            >
+              <CloseIcon className="h-4 w-4" />
+            </Button>
 
-              <img
-                src={getTeamsBadge(footballer.team_code)}
-                className="absolute left-2 top-2 z-40 h-4 w-4 object-contain md:h-6 md:w-6 lg:h-12 lg:w-12"
-              />
-              <div className="absolute right-0 top-4 z-50 flex flex-col gap-1 md:top-6 md:gap-2">
+            <div className="relative h-[210px] overflow-hidden bg-accent5 md:h-[260px] lg:h-[280px] xl:h-[310px]">
+              <div className="absolute inset-x-0 top-0 h-1 bg-magenta" />
+              <div className="absolute left-3 top-3 z-30 flex items-center gap-2 rounded-md bg-accent3/90 px-2 py-1 shadow-md">
+                <img
+                  src={getTeamsBadge(footballer.team_code)}
+                  className="h-6 w-6 object-contain md:h-8 md:w-8"
+                />
+                <span className="text-[10px] font-semibold text-text/80 md:text-xs">
+                  {footballer.teams?.short_name}
+                </span>
+              </div>
+              <div className="absolute bottom-2 right-2 z-30 flex flex-col items-end gap-1">
                 {!!selectedStats?.length &&
-                  selectedStats.map((stat, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-end gap-1 rounded-l-md bg-accent3 px-1 text-[8px] text-text shadow-md md:gap-1 md:px-2 md:text-xs lg:px-3 lg:text-base"
+                  selectedStats.slice(0, 4).map((stat) => (
+                    <span
+                      key={stat.key}
+                      className="inline-flex items-center gap-1 rounded-md bg-accent3/95 px-1.5 py-[2px] text-[10px] font-semibold text-text shadow-md md:text-xs"
                     >
-                      {stat.value} {getIcon(stat.key as keyof SelectedStats)}
-                    </div>
+                      <span>{stat.value}</span>
+                      <span className="text-text/75">{getIcon(stat.key)}</span>
+                    </span>
                   ))}
               </div>
-            </>
-          ) : (
-            <span className="m-auto">
-              <CompareToolSearch
-                selectedFootballers={selectedFootballers}
-                addFootballer={addFootballer}
-                index={index}
+              <img
+                src={getFootballersImage(footballer.code)}
+                className="absolute inset-x-0 bottom-0 m-auto h-[92%] w-auto object-contain px-2 pt-8"
               />
-            </span>
-          )}
-        </div>
-        <div
-          className={
-            "flex w-full flex-col self-end text-center text-sm text-text md:text-base lg:text-lg"
-          }
-        >
-          {footballer && (
-            <>
-              <p className="w-full overflow-hidden text-ellipsis whitespace-nowrap bg-magenta px-2 text-center text-xs md:text-sm lg:text-base">
-                {footballer?.web_name}
-              </p>
-              <p className="w-full bg-magenta2 text-center text-xs md:text-sm lg:text-base">
-                {footballer?.totalPoints} pts
-              </p>
-              <div className="m-auto mb-2 md:mb-4">
-                <FootballerUpcomingFixtures
-                  max={isMD ? 3 : 4}
-                  footballer={footballer as unknown as FootballerWithGameweekStats}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+            </div>
 
-      {footballer && (
-        <>
-          <div className="flex flex-col flex-nowrap justify-center rounded-b-md bg-accent3 text-text">
-            {COMPARE_TOOL_STAT_KEYS.map((stat, index) => {
-              const { rank, value } = footballer[stat.key];
-              const parsedValue = isNumber(value) ? value : parseFloat(value);
-              const seasonTotal = seasonTotalComparison(stat.key) ?? 0;
-
-              const minValue = Math.min(parsedValue, seasonTotal);
-              const maxValue = Math.max(parsedValue, seasonTotal);
-
-              const isIncrease =
-                stat.key === "xGCPer90"
-                  ? parsedValue < seasonTotal
-                  : parsedValue > seasonTotal;
-
-              const diff =
-                stat.key === "minPerGame"
-                  ? `${(maxValue - minValue).toFixed(0)}'`
-                  : (maxValue - minValue).toFixed(2);
-
-              const isEqual =
-                minValue === maxValue || diff === "0" || maxValue - minValue <= 0.02;
-
-              return (
-                <div key={footballer.id + stat.key}>
-                  <div className="flex items-center gap-1 px-1 py-1 md:px-1 md:py-2 lg:px-2">
-                    <p className="flex flex-1 text-[10px] sm:text-xs lg:text-base">
-                      {stat.label}
+            <div className="flex flex-col gap-3 px-3 py-3">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="overflow-hidden text-ellipsis whitespace-nowrap text-base font-semibold leading-5 text-text md:text-lg">
+                      {footballer.web_name}
                     </p>
-                    {!isEqual && (
-                      <span className="ml-auto flex gap-1 text-xs md:text-sm">
-                        {!isMD && diff}
-                        {isIncrease ? (
-                          <FaArrowUp className="h-2 w-2 rotate-45 text-green-600 md:h-auto md:w-auto" />
-                        ) : (
-                          <FaArrowDown className="h-2 w-2 -rotate-45 text-red-600 md:h-auto md:w-auto" />
-                        )}
-                      </span>
-                    )}
-
-                    <div
-                      className={clsx(
-                        "rounded-md, flex w-fit flex-col justify-center gap-1 rounded-md px-1 text-xs text-text lg:text-base",
-                        rank === 1
-                          ? "bg-magenta"
-                          : rank === 2
-                            ? "bg-magenta2"
-                            : "bg-secondary",
-                      )}
-                    >
-                      {isNumber(value)
-                        ? stat.key === "minPerGame"
-                          ? value.toFixed(0)
-                          : value.toFixed(2)
-                        : value}
-                    </div>
+                    <p className="text-[11px] text-text/55 md:text-xs">
+                      {mapElementTypeToPosition(footballer.element_type)}
+                    </p>
                   </div>
-                  {index !== COMPARE_TOOL_STAT_KEYS.length - 1 && (
-                    <span className="m-auto h-[1px] w-[85%] bg-accent3" />
-                  )}
+                  <span className="shrink-0 rounded-md bg-magenta px-2 py-1 text-xs font-semibold text-white md:text-sm">
+                    {footballer.totalPoints} pts
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-          <Button
-            className="flex w-full items-center justify-between gap-1 rounded-t-none bg-magenta px-2 py-[2px] text-xs text-text hover:opacity-85 md:text-base lg:px-4 lg:py-2"
-            onClick={() => openFootballersProfile(footballer)}
-          >
-            {isMD ? "Profile" : "View Player's Profile"} <FaChevronRight />
-          </Button>
-        </>
-      )}
+                <div className="mt-2 flex items-center gap-2 text-[11px] text-text/70 md:text-xs">
+                  <span className="rounded-sm bg-accent3 px-1.5 py-[2px]">
+                    {"\u00a3"}
+                    {(footballer.now_cost / 10).toFixed(1)}m
+                  </span>
+                  <span className="rounded-sm bg-accent3 px-1.5 py-[2px]">
+                    {footballer.pointsPerGame.toFixed(1)} pts/g
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-md bg-accent4/30 px-1.5 py-2 ring-1 ring-inset ring-accent4/40 md:px-2.5">
+                <CompareCardFixtures footballer={footballer} max={3} />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                {COMPARE_TOOL_STAT_KEYS.map((stat) => {
+                  const { rank, value } = footballer[stat.key];
+                  const parsedValue = isNumber(value) ? value : parseFloat(value);
+                  const seasonTotal = seasonTotalComparison(stat.key) ?? 0;
+
+                  const minValue = Math.min(parsedValue, seasonTotal);
+                  const maxValue = Math.max(parsedValue, seasonTotal);
+
+                  const isIncrease =
+                    stat.key === "xGCPer90"
+                      ? parsedValue < seasonTotal
+                      : parsedValue > seasonTotal;
+
+                  const diff =
+                    stat.key === "minPerGame"
+                      ? `${(maxValue - minValue).toFixed(0)}'`
+                      : (maxValue - minValue).toFixed(2);
+
+                  const isEqual =
+                    minValue === maxValue || diff === "0" || maxValue - minValue <= 0.02;
+
+                  return (
+                    <div
+                      key={footballer.id + stat.key}
+                      className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 rounded-md bg-accent3/55 px-2 py-1.5"
+                    >
+                      <p className="min-w-0 text-[11px] font-medium text-text/85 md:text-xs">
+                        {stat.label}
+                      </p>
+                      {!isEqual ? (
+                        <span
+                          className={clsx(
+                            "inline-flex items-center gap-1 text-[10px] md:text-xs",
+                            isIncrease ? "text-highlight" : "text-red-400",
+                          )}
+                        >
+                          {!isMD && diff}
+                          {isIncrease ? (
+                            <FaArrowUp className="h-2.5 w-2.5 rotate-45" />
+                          ) : (
+                            <FaArrowDown className="h-2.5 w-2.5 -rotate-45" />
+                          )}
+                        </span>
+                      ) : (
+                        <span />
+                      )}
+
+                      <span
+                        className={clsx(
+                          "min-w-9 rounded-sm px-1.5 py-[2px] text-right text-[11px] font-semibold text-text md:text-xs",
+                          rank === 1
+                            ? "bg-magenta"
+                            : rank === 2
+                              ? "bg-magenta2"
+                              : "bg-secondary",
+                        )}
+                      >
+                        {isNumber(value)
+                          ? stat.key === "minPerGame"
+                            ? value.toFixed(0)
+                            : value.toFixed(2)
+                          : value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <Button
+              className="mt-auto flex h-10 w-full items-center justify-between rounded-none bg-magenta px-3 text-sm text-text hover:bg-magenta/90"
+              onClick={() => openFootballersProfile(footballer)}
+            >
+              Profile <FaChevronRight />
+            </Button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

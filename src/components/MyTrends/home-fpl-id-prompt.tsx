@@ -12,9 +12,9 @@ const HomeFplIdPrompt: React.FC = () => {
 
   if (entryId !== null) {
     return (
-      <div className="mb-2 flex w-full items-center justify-end gap-2 rounded-sm px-1 py-1 text-sm text-text md:px-4 md:text-lg">
+      <div className="my-2 flex w-full items-center justify-end gap-2 rounded-sm text-sm text-text md:text-lg">
         <div className="flex items-center gap-2 rounded-md bg-accent3 px-2 py-1 text-xs text-text shadow-md md:px-4 md:py-2 md:text-sm">
-          <span className="rounded-md bg-magenta3 p-2 text-lg">
+          <span className="rounded-md bg-magenta3 p-2 md:text-lg">
             <FaChartLine className="text-text" />
           </span>
           <span>FPL ID: {entryId}</span>

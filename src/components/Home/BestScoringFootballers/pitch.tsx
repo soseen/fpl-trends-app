@@ -13,7 +13,7 @@ import PitchSkeleton from "./pitch.skeleton";
 
 const PitchRow = ({ data }: { data: BestScoringFootballer[] }) => {
   return (
-    <div className="mx-auto mb-2 flex max-w-[900px] items-center justify-center gap-4 px-4 text-text md:mb-4 lg:mb-8 lg:px-8">
+    <div className="mx-auto mb-2 flex max-w-[900px] items-center justify-center gap-1.5 px-2 text-text md:mb-4 md:gap-4 md:px-4 lg:mb-8 lg:px-8">
       {data.map((f) => (
         <div key={f.id} className="flex justify-center md:mx-2 lg:mx-2">
           <PitchCard footballer={f} />

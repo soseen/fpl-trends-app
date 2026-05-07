@@ -1,10 +1,10 @@
 import type React from "react";
 import clsx from "clsx";
-import { Button } from "@/components/ui/button";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { getTeamsBadge } from "src/utils/images";
 import type { CaptainPlayer } from "src/queries/getCaptainImpact";
 import { useOpenPlayerDetails } from "../TeamImpact/use-open-player-details";
+import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
 
 type Props = {
   player: CaptainPlayer;
@@ -14,45 +14,58 @@ type Props = {
   variant: "user" | "reference";
 };
 
-// Compact captain tile mirroring TransferPlayerTile's visual language.
-// Variant-only opacity differentiation: user picks at full strength,
-// reference picks faded — no chip overlay needed since the section's
-// labels above each tile carry the meaning.
+// Compact captain tile that mirrors the PlayerCardShell language used
+// across the app. Variant-only opacity differentiation: user picks at
+// full strength, reference picks faded — no chip overlay needed since
+// the section's labels above each tile carry the meaning.
+// Effective ownership: ownership weighted by armband multipliers. Mirrors the
+// backend formula in fpl-trends-api/src/managers/getTeamImpact.ts (line 865):
+//   eo = ownership_pct + captain_rate + 2 * triple_captain_rate
+const computeEO = (player: CaptainPlayer): number =>
+  (player.ownership_pct ?? 0) +
+  (player.captain_rate ?? 0) +
+  2 * (player.triple_captain_rate ?? 0);
+
 const CaptainTile: React.FC<Props> = ({ player, variant }) => {
   const openDetails = useOpenPlayerDetails();
   const isReference = variant === "reference";
   const pointsLabel = Number.isInteger(player.effective_points)
     ? `${player.effective_points}`
     : player.effective_points.toFixed(1);
+  const eo = computeEO(player);
 
   return (
-    <Button
-      onClick={() => openDetails(player.player_id)}
-      className={clsx(
-        "relative m-auto flex h-[80px] w-12 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-3 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:h-[100px] sm:w-16 md:h-[120px] md:w-20",
-        isReference && "opacity-60 grayscale-[40%]",
-      )}
-    >
-      <FootballerImage
-        code={player.code}
-        className="m-auto h-auto w-10 rounded-none object-contain px-1 sm:w-14 md:w-16"
+    <div className={clsx("flex", isReference && "opacity-60 grayscale-[40%]")}>
+      <PlayerCardShell
+        onClick={() => openDetails(player.player_id)}
+        ariaLabel={`Open ${player.web_name} details`}
+        className="h-[88px] w-12 sm:h-[108px] sm:w-16 md:h-[140px] md:w-[84px] lg:h-[160px] lg:w-24"
+        topLeft={
+          <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
+            <img
+              src={getTeamsBadge(player.team_code)}
+              alt=""
+              className="block h-3 w-3 object-contain md:h-4 md:w-4"
+            />
+          </span>
+        }
+        image={
+          <FootballerImage
+            code={player.code}
+            className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+          />
+        }
+        name={player.web_name}
+        middleRow={
+          eo > 0 ? (
+            <span className="text-[9px] text-text/60 sm:text-[10px]">
+              EO {(eo * 100).toFixed(1)}%
+            </span>
+          ) : undefined
+        }
+        points={`${pointsLabel} pts`}
       />
-      <div className="flex w-full items-center justify-center bg-magenta md:p-[2px]">
-        <p className="overflow-hidden text-ellipsis whitespace-nowrap px-1 text-center text-[8px] leading-3 text-text sm:text-[10px] md:text-xs">
-          {player.web_name}
-        </p>
-      </div>
-      <div className="flex w-full items-center justify-center rounded-b-md bg-magenta2 text-text md:p-[2px]">
-        <p className="text-[8px] font-semibold leading-3 sm:text-[10px] md:text-xs">
-          {pointsLabel} pts
-        </p>
-      </div>
-      <img
-        src={getTeamsBadge(player.team_code)}
-        alt=""
-        className="absolute left-0.5 top-0.5 z-20 w-3 object-cover md:w-4"
-      />
-    </Button>
+    </div>
   );
 };
 

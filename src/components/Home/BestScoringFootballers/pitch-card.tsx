@@ -4,12 +4,11 @@ import { getTeamsBadge } from "src/utils/images";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
-import clsx from "clsx";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
+import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
+import StatBadge from "src/components/PlayerCard/stat-badge";
 
 type Props = {
   footballer: BestScoringFootballer;
@@ -20,11 +19,8 @@ type StatKey = "totalGoals" | "totalAssists" | "totalCleanSheets" | "totalDefcon
 type SelectedStats = Pick<FootballerWithGameweekStats, StatKey>;
 
 const STAT_META: Record<StatKey, { icon: React.ReactNode; label: string }> = {
-  totalGoals: { icon: <FaFutbol className="h-2 w-2 md:h-4 md:w-4" />, label: "Goals" },
-  totalAssists: {
-    icon: <FaHandshake className="h-2 w-2 md:h-4 md:w-4" />,
-    label: "Assists",
-  },
+  totalGoals: { icon: <FaFutbol />, label: "Goals" },
+  totalAssists: { icon: <FaHandshake />, label: "Assists" },
   totalCleanSheets: { icon: <TbLockFilled />, label: "Clean sheets" },
   totalDefconBonuses: { icon: <FaShieldAlt />, label: "Defcons" },
 };
@@ -56,54 +52,39 @@ const PitchCard = ({ footballer }: Props) => {
   }, [footballer]);
 
   return (
-    <div className="flex">
-      <Button
-        onClick={() => setFootballer(footballer)}
-        className="relative m-auto flex h-[81px] w-14 flex-col items-center justify-center gap-0 overflow-hidden rounded-md bg-secondary p-0 pt-4 text-text shadow-large before:absolute before:-left-12 before:-top-10 before:z-10 before:h-[80px] before:w-[85px] before:skew-x-[-48deg] before:bg-magenta2 before:shadow-large sm:w-20 md:h-[118px] md:w-24 md:before:-left-10 md:before:-top-8 lg:h-[170px] lg:w-32"
-      >
+    <PlayerCardShell
+      onClick={() => setFootballer(footballer)}
+      ariaLabel={`Open ${footballer.web_name} details`}
+      className="h-[88px] w-16 sm:w-20 md:h-[124px] md:w-24 lg:h-[170px] lg:w-32"
+      imageAreaClassName="flex-1 pt-1.5 md:pt-2"
+      topLeft={
+        <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
+          <img
+            src={getTeamsBadge(footballer.team_code)}
+            alt={footballer.teams?.short_name}
+            className="block h-3 w-3 object-contain md:h-4 md:w-4"
+          />
+        </span>
+      }
+      topRight={selectedStats.slice(0, 2).map((stat) => (
+        <StatBadge
+          key={stat.key}
+          value={stat.value}
+          icon={STAT_META[stat.key].icon}
+          label={STAT_META[stat.key].label}
+          compact
+        />
+      ))}
+      image={
         <FootballerImage
           code={footballer.code}
-          className="m-auto h-auto w-12 rounded-none object-contain px-2 sm:w-[72px] md:h-auto md:w-[64px] lg:w-[105px]"
+          className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
         />
-        <div className="flex w-full items-center justify-center bg-magenta md:p-[2px]">
-          <p className="md:text-md overflow-hidden text-ellipsis whitespace-nowrap text-center text-[8px] leading-3 text-text sm:text-xs">
-            {footballer.web_name}
-          </p>
-        </div>
-        <div
-          className={clsx(
-            "flex w-full items-center justify-center rounded-b-md md:p-[2px]",
-            footballer?.isBestScoringPlayer
-              ? "bg-highlight text-primary"
-              : "bg-magenta2 text-text",
-          )}
-        >
-          <p className="md:text-md text-[8px] leading-3 sm:text-xs">
-            {footballer.totalPoints} pts
-          </p>
-        </div>
-        <div className="absolute right-0 top-1 z-50 flex flex-col items-end gap-[2px]">
-          {selectedStats.map((stat) => (
-            <Tooltip key={stat.key}>
-              <TooltipTrigger asChild>
-                <span className="inline-flex items-center gap-0.5 rounded-l-md bg-accent2 px-1 py-[1px] text-[7px] font-semibold leading-[9px] text-text shadow-md [&_svg]:!size-2 sm:gap-1 sm:text-[9px] sm:[&_svg]:!size-2.5 md:text-[10px] md:[&_svg]:!size-3">
-                  <span>{stat.value}</span>
-                  <span className="text-text/80 flex items-center">
-                    {STAT_META[stat.key].icon}
-                  </span>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{STAT_META[stat.key].label}</TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
-        <img
-          src={getTeamsBadge(footballer.team_code)}
-          alt={footballer.teams?.short_name}
-          className="absolute left-1 top-1 z-20 w-3 object-cover md:w-5"
-        />
-      </Button>
-    </div>
+      }
+      name={footballer.web_name}
+      points={`${footballer.totalPoints} pts`}
+      pointsHighlight={!!footballer.isBestScoringPlayer}
+    />
   );
 };
 

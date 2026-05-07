@@ -1,10 +1,9 @@
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { SelectedStatKey } from "../types";
 
-
 export const rankStats = (
   footballers: FootballerWithGameweekStats[],
-  statKey: SelectedStatKey
+  statKey: SelectedStatKey,
 ) => {
   const sortedByKey = [...footballers].sort((a, b) => {
     const aValue = parseFloat(a[statKey] as string) || 0;
@@ -21,7 +20,8 @@ export const rankStats = (
     if (!rankMap.has(playerValue)) rankMap.set(playerValue, rank);
 
     if (index < sortedByKey.length - 1) {
-      const nextValue = parseFloat(sortedByKey[index + 1][statKey] as string) || 0;
+      const nextPlayer = sortedByKey[index + 1];
+      const nextValue = nextPlayer ? parseFloat(nextPlayer[statKey] as string) || 0 : 0;
       if (playerValue !== nextValue) rank++;
     }
   });

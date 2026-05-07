@@ -11,6 +11,9 @@ export type AdditionalStats = {
   totalXGI: number;
   xGIPerGame: string;
   xGIPer90: string;
+  totalXA: number;
+  xAPerGame: string;
+  xAPer90: string;
   totalXGS: number;
   xGSPerGame: string;
   xGSPer90: string;
@@ -27,6 +30,8 @@ export type AdditionalStats = {
   maxOwnership: number;
   totalMinutes: number;
   minPerGame: number;
+  totalBonus: number;
+  totalHauls: number;
   totalDefconBonuses: number;
   totalDefcons: number;
   defconsPerGame: string;
@@ -39,14 +44,17 @@ type FootballersStatsState = {
 };
 
 const initialState: FootballersStatsState = {
-    footballers: [],
+  footballers: [],
 };
 
 const footballersGameweekStatsSlice = createSlice({
   name: "footballersGameweekStats",
   initialState,
   reducers: {
-    setEnrichedFootballers: (state, action: PayloadAction<FootballerWithGameweekStats[]>) => {
+    setEnrichedFootballers: (
+      state,
+      action: PayloadAction<FootballerWithGameweekStats[]>,
+    ) => {
       state.footballers = action.payload;
     },
   },
@@ -54,6 +62,7 @@ const footballersGameweekStatsSlice = createSlice({
 
 export const { setEnrichedFootballers } = footballersGameweekStatsSlice.actions;
 
-export const selectEnrichedFootballers = (state: RootState) => state.footballersGameweekStats.footballers;
+export const selectEnrichedFootballers = (state: RootState) =>
+  state.footballersGameweekStats.footballers;
 
 export default footballersGameweekStatsSlice.reducer;
