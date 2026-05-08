@@ -33,7 +33,7 @@ const FootballerUpcomingFixtures = ({
     });
 
     return footballerFixturesObject as Record<number, Fixture | undefined>;
-  }, [footballer]);
+  }, [footballer, max]);
 
   const findTeamById = useCallback(
     (id?: number) => teams?.find((t) => t?.id === id),

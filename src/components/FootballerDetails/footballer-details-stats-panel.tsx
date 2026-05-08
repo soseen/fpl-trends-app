@@ -35,21 +35,26 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
     return [...baseInfo, ...additionalInfo];
   }, [footballer]);
   return (
-    <div className="mt-2 flex-col shadow-sm">
-      <h3 className="ml-2 w-fit rounded-t-md bg-magenta px-2 pb-[0px] pt-1 text-center text-xs text-text md:text-sm lg:ml-6 lg:min-w-[45%] lg:px-4 lg:text-base">
-        Season Stats
-      </h3>
-      <div className="flex w-full items-center gap-1 rounded-md bg-accent5 px-2 pb-1 pt-2 shadow-lg lg:bg-accent3 lg:px-4 lg:pb-2 lg:pt-4">
+    <div className="rounded-md bg-accent4/25 p-2 ring-1 ring-inset ring-accent4/40">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h3 className="text-[10px] font-semibold uppercase text-text/45 md:text-xs">
+          Season stats
+        </h3>
+        <span className="h-[1px] flex-1 bg-accent4/60" />
+      </div>
+      <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
         {seasonStats.map((stat, index) => (
-          <React.Fragment key={index}>
-            <div className="flex w-7 flex-col items-center justify-center gap-1 whitespace-nowrap lg:w-[68px]">
-              <p className="text-[9px] sm:text-xs lg:text-sm">{stat.title}</p>
-              <p className="text-[9px] sm:text-xs lg:text-base">{stat.value}</p>
-            </div>
-            {index < seasonStats.length - 1 && (
-              <span className="mx-1 block h-6 w-[1px] rounded-md bg-text align-middle opacity-10 lg:mx-3" />
-            )}
-          </React.Fragment>
+          <div
+            key={`${stat.title}-${index}`}
+            className="min-w-0 rounded-md bg-accent3/60 px-2 py-1.5 text-center"
+          >
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[10px] text-text/55 md:text-xs">
+              {stat.title}
+            </p>
+            <p className="mt-1 text-xs font-semibold text-text md:text-sm">
+              {stat.value}
+            </p>
+          </div>
         ))}
       </div>
     </div>

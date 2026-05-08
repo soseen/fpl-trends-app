@@ -76,7 +76,7 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
   return (
     <div
       ref={ref}
-      className="flex flex-1 items-end overflow-x-auto rounded-md bg-accent2 px-2 py-3 text-text"
+      className="flex flex-1 items-end overflow-x-auto rounded-md border border-accent4/60 bg-accent2/90 px-2 py-3 text-text shadow-large"
     >
       {footballer?.history?.map((event, index) => (
         <div

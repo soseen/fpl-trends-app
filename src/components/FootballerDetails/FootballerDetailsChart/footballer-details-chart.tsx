@@ -47,6 +47,34 @@ enum SelectedChartStat {
   ownership = "ownership",
 }
 
+const CHART_STAT_COPY: Record<SelectedChartStat, { label: string; description: string }> =
+  {
+    [SelectedChartStat.xGI]: {
+      label: "Expected involvement",
+      description: "xG + xA by gameweek",
+    },
+    [SelectedChartStat.xGC]: {
+      label: "Expected conceded",
+      description: "Defensive exposure by gameweek",
+    },
+    [SelectedChartStat.minutes]: {
+      label: "Minutes",
+      description: "Playing time by gameweek",
+    },
+    [SelectedChartStat.points]: {
+      label: "Points",
+      description: "FPL output by gameweek",
+    },
+    [SelectedChartStat.defcons]: {
+      label: "Defensive contributions",
+      description: "DefCon actions by gameweek",
+    },
+    [SelectedChartStat.ownership]: {
+      label: "Ownership",
+      description: "Manager ownership trend",
+    },
+  };
+
 type Props = {
   footballer: FootballerWithGameweekStats | null;
 };
@@ -130,6 +158,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
   };
   const palette = STAT_COLORS[displayedChartStat];
   const gradientId = `chart-grad-${displayedChartStat}`;
+  const selectedStatCopy = CHART_STAT_COPY[displayedChartStat];
 
   // One row per gameweek (1..38). Real GWs sum across double-GWs; missing
   // rounds (future or unplayed) are zeroed and flagged isFake so labels and
@@ -241,29 +270,35 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
   );
 
   return (
-    <Card className="border-transparent">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between gap-4 border-transparent p-1 md:p-0">
-          <p className="text-sm md:text-base">Gameweek trends chart</p>
+    <Card className="relative overflow-hidden rounded-md border border-accent4/70 bg-accent2 text-text shadow-large">
+      <div className="absolute inset-x-0 top-0 h-1 bg-magenta" />
+      <CardHeader className="p-3 pb-2 md:p-4 md:pb-3">
+        <CardTitle className="flex flex-col gap-3 border-transparent p-0 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold md:text-base">Gameweek trends</p>
+            <p className="mt-1 text-xs font-normal text-text/50">
+              {selectedStatCopy.description}
+            </p>
+          </div>
           {isMD ? (
             <Select
               value={displayedChartStat}
               onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
             >
-              <SelectTrigger className="h-8 w-[120px] border-transparent bg-magenta px-2 py-1 text-xs font-semibold text-text focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
+              <SelectTrigger className="h-9 w-full border border-accent4/60 bg-accent3 px-2 py-1 text-xs font-semibold text-text shadow-sm focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 xs:w-[190px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent
                 sideOffset={5}
-                className="z-[400] w-[120px] border-transparent bg-magenta"
+                className="z-[400] w-[190px] border border-accent4/70 bg-accent2 text-text shadow-large"
               >
                 {availableStats.map((stat) => (
                   <SelectItem
                     key={stat}
                     value={stat}
-                    className="cursor-pointer px-2 py-1 text-xs font-semibold text-text hover:bg-magenta3"
+                    className="cursor-pointer px-2 py-1 text-xs font-semibold text-text hover:bg-accent3"
                   >
-                    {stat}
+                    {CHART_STAT_COPY[stat].label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -272,17 +307,17 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
             <ToggleGroup
               type="single"
               value={displayedChartStat}
-              className="flex flex-nowrap items-center gap-1"
+              className="flex flex-wrap items-center justify-end gap-1.5"
               onValueChange={(value: SelectedChartStat) => setDisplayedChartStat(value)}
             >
               {availableStats.map((stat, index) => (
                 <ToggleGroupItem
                   key={index}
                   className={clsx(
-                    "flex-grow rounded-md px-2.5 py-1 text-xs font-semibold transition-all sm:text-sm",
+                    "rounded-md px-2.5 py-1.5 text-xs font-semibold transition-all",
                     stat === displayedChartStat
-                      ? "bg-magenta text-text shadow-[0_0_0_1px_rgb(var(--magenta-rgb)/0.6)]"
-                      : "bg-magenta2/60 text-text/70 hover:bg-magenta2",
+                      ? "bg-magenta text-text shadow-[0_0_0_1px_rgb(var(--magenta-rgb)/0.55)]"
+                      : "bg-accent3/70 text-text/65 hover:bg-accent3 hover:text-text",
                   )}
                   value={stat}
                 >
@@ -293,10 +328,27 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3 pt-0 md:p-4 md:pt-0">
+        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-text/60">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-sm bg-accent3 px-2 py-1 font-semibold text-text"
+            style={{ color: palette.stroke }}
+          >
+            <span
+              className="h-2 w-2 rounded-sm"
+              style={{ backgroundColor: palette.stroke }}
+            />
+            {selectedStatCopy.label}
+          </span>
+          {isMD && (
+            <span className="rounded-sm bg-accent4/30 px-2 py-1">
+              Swipe horizontally for all GWs
+            </span>
+          )}
+        </div>
         <div
           ref={scrollRef}
-          className="overflow-x-auto"
+          className="overflow-x-auto rounded-md bg-accent5/80 p-2 ring-1 ring-inset ring-accent4/50"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <div
@@ -315,7 +367,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
               // as ~622px and leaves the chart short of the modal's
               // edges. Force `aspect-auto w-full` so width tracks the
               // parent and height stays at 350px.
-              className="mt-2 aspect-auto h-[350px] max-h-[450px] min-h-[200px] w-full rounded-md bg-accent2 px-2 py-4 pb-2"
+              className="aspect-auto h-[300px] max-h-[450px] min-h-[220px] w-full rounded-md bg-accent2/70 px-2 py-4 pb-2 md:h-[360px]"
             >
               <ComposedChart
                 data={chartData}
@@ -341,20 +393,20 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="var(--accent-4)"
-                  opacity={0.5}
+                  opacity={0.42}
                   vertical={false}
                 />
                 <XAxis
                   dataKey="gw"
                   padding={{ left: 4, right: 4 }}
                   interval={isMD ? 0 : "preserveStartEnd"}
-                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.75 }}
+                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.7 }}
                   stroke="var(--accent-4)"
                   tickLine={false}
                   axisLine={{ stroke: "var(--accent-4)" }}
                 />
                 <YAxis
-                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.6 }}
+                  tick={{ fill: "var(--text)", fontSize: 11, opacity: 0.58 }}
                   stroke="var(--accent-4)"
                   tickLine={false}
                   axisLine={false}
