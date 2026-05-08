@@ -18,7 +18,7 @@ const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
     <PlayerCardShell
       onClick={() => openDetails(tile.player_id)}
       ariaLabel={`Open ${tile.web_name} details`}
-      className="h-[112px] w-20 xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
+      className="h-[104px] w-[68px] xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
       imageAreaClassName="flex-1 pt-1.5 md:pt-2"
       topLeft={
         <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">

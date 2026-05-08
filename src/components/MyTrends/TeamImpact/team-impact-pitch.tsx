@@ -21,7 +21,7 @@ const PitchRow: React.FC<{ tiles: TeamImpactTile[]; showRankImpact: boolean }> =
 }) => {
   if (tiles.length === 0) return null;
   return (
-    <div className="mx-auto mb-2 flex max-w-[900px] flex-wrap items-center justify-center gap-x-1.5 gap-y-3 px-2 text-text md:mb-4 md:gap-x-4 md:px-4 lg:mb-8 lg:px-8">
+    <div className="mx-auto mb-2 flex max-w-[900px] flex-wrap items-center justify-center gap-x-1 gap-y-3 px-2 text-text md:mb-4 md:gap-x-4 md:px-4 lg:mb-8 lg:px-8">
       {tiles.map((t) => (
         <div key={t.player_id} className="flex justify-center md:mx-2 lg:mx-2">
           <TeamImpactPitchCard tile={t} showRankImpact={showRankImpact} />
