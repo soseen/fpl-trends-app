@@ -72,12 +72,10 @@ const captainPointsBreakdown = (player: CaptainPlayer): BreakdownLine[] => {
   const dcThreshold = DC_THRESH[et] ?? Number.POSITIVE_INFINITY;
   const dcPts = defcon >= dcThreshold ? 2 : 0;
   const savesPts = et === 1 ? Math.floor(saves / 3) : 0;
-  const concededPts =
-    et === 1 || et === 2 ? -Math.floor(goalsConceded / 2) : 0;
+  const concededPts = et === 1 || et === 2 ? -Math.floor(goalsConceded / 2) : 0;
   const bonusPts = bonus;
 
-  const sum =
-    goalPts + assistPts + csPts + dcPts + savesPts + concededPts + bonusPts;
+  const sum = goalPts + assistPts + csPts + dcPts + savesPts + concededPts + bonusPts;
   const otherPts = (player.raw_points ?? 0) - sum;
 
   const lines: BreakdownLine[] = [
@@ -119,10 +117,7 @@ const captainPointsBreakdown = (player: CaptainPlayer): BreakdownLine[] => {
     {
       key: "gc",
       icon: GiSoccerKick,
-      label:
-        goalsConceded === 1
-          ? "1 goal conceded"
-          : `${goalsConceded} goals conceded`,
+      label: goalsConceded === 1 ? "1 goal conceded" : `${goalsConceded} goals conceded`,
       points: concededPts,
       tone: "text-rose-400",
     },
@@ -151,7 +146,7 @@ const captainPointsBreakdown = (player: CaptainPlayer): BreakdownLine[] => {
 // Shared inner-box dimensions match CaptainTile so all 3 reference slots stay
 // the same size regardless of matched/missing-data state.
 const SLOT_BODY_CLASS =
-  "flex h-[88px] w-12 items-center justify-center rounded-md sm:h-[108px] sm:w-16 md:h-[140px] md:w-[84px] lg:h-[160px] lg:w-24";
+  "flex h-[112px] w-20 items-center justify-center rounded-md xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36";
 
 const SlotFrame: React.FC<{
   label: string;
@@ -200,10 +195,7 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
       : null);
   const isTripleCaptain = event.user_captain.multiplier === 3;
   const templateCaptain = event.template_captain;
-  const userCaptainExposure = Math.max(
-    (event.user_captain.multiplier ?? 0) - 1,
-    0,
-  );
+  const userCaptainExposure = Math.max((event.user_captain.multiplier ?? 0) - 1, 0);
   const userCaptainFieldExposure = captainBonusExposure(event.user_captain);
   const templateCaptainFieldExposure = templateCaptain
     ? captainBonusExposure(templateCaptain)
@@ -296,14 +288,9 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
             breakdown.map((line) => {
               const Icon = line.icon;
               return (
-                <li
-                  key={line.key}
-                  className="flex items-center justify-between gap-2"
-                >
+                <li key={line.key} className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5 text-text/80">
-                    <Icon
-                      className={`${line.tone} h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5`}
-                    />
+                    <Icon className={`${line.tone} h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5`} />
                     {line.label}
                   </span>
                   <span className="font-semibold tabular-nums">

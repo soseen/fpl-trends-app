@@ -33,6 +33,62 @@ const compactRank = (n: number): string =>
       ? `${Math.round(n / 1_000)}k`
       : `${n}`;
 
+const NICE_RANK_FACTORS = [1, 2, 3, 5, 7];
+
+const niceFloorRank = (value: number): number => {
+  if (!Number.isFinite(value) || value <= 1) return 1;
+  const power = 10 ** Math.floor(Math.log10(value));
+  const normalized = value / power;
+  const lowerFactors = NICE_RANK_FACTORS.filter(
+    (candidate) => candidate <= normalized,
+  );
+  const factor = lowerFactors[lowerFactors.length - 1] ?? 1;
+  return Math.max(1, Math.round(factor * power));
+};
+
+const niceCeilRank = (value: number): number => {
+  if (!Number.isFinite(value) || value <= 1) return 1;
+  const power = 10 ** Math.floor(Math.log10(value));
+  const normalized = value / power;
+  const factor = NICE_RANK_FACTORS.find((candidate) => candidate >= normalized);
+  return Math.round((factor ?? 10) * power);
+};
+
+const buildRankTicks = (top: number, bottom: number, maxTicks: number): number[] => {
+  const startPower = Math.floor(Math.log10(Math.max(top, 1))) - 1;
+  const endPower = Math.ceil(Math.log10(Math.max(bottom, 1))) + 1;
+  const candidates = new Set<number>([top, bottom]);
+
+  for (let power = startPower; power <= endPower; power += 1) {
+    const base = 10 ** power;
+    NICE_RANK_FACTORS.forEach((factor) => {
+      const tick = Math.round(factor * base);
+      if (tick >= top && tick <= bottom) candidates.add(tick);
+    });
+  }
+
+  const sorted = Array.from(candidates).sort((a, b) => a - b);
+  if (sorted.length <= maxTicks) return sorted;
+
+  const logTop = Math.log10(top);
+  const logBottom = Math.log10(bottom);
+  const selected = new Set<number>([top, bottom]);
+
+  for (let index = 1; index < maxTicks - 1; index += 1) {
+    const target =
+      logTop + ((logBottom - logTop) * index) / Math.max(maxTicks - 1, 1);
+    const closest = sorted
+      .filter((tick) => !selected.has(tick))
+      .sort(
+        (a, b) =>
+          Math.abs(Math.log10(a) - target) - Math.abs(Math.log10(b) - target),
+      )[0];
+    if (closest) selected.add(closest);
+  }
+
+  return Array.from(selected).sort((a, b) => a - b);
+};
+
 type TooltipPayload = {
   value: number;
   payload: {
@@ -121,14 +177,15 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
 
   if (points.length === 0) return null;
 
-  // Anchor Y axis between the user's best rank (with a small log-space
-  // buffer above so the line doesn't kiss the top edge) and the full FPL
-  // field size below — gives "where am I in the field" context without the
-  // empty headroom that domain=[1, totalPlayers] would add.
-  const minRank = Math.min(...points.flatMap((p) => [p.gw_rank, p.overall_rank]));
-  const yTop = Math.max(1, Math.floor(minRank * 0.7));
-  const yBottom =
-    totalPlayers > 0 ? totalPlayers : Math.max(...points.map((p) => p.gw_rank));
+  // Build the rank axis from the manager's real range, with modest log-space
+  // padding, so mobile does not waste the top of the chart on unreachable ranks.
+  const rankValues = points.flatMap((p) => [p.gw_rank, p.overall_rank]);
+  const minRank = Math.max(1, Math.min(...rankValues));
+  const maxRank = Math.max(...rankValues);
+  const fieldSize = Math.max(totalPlayers > 0 ? totalPlayers : 0, maxRank);
+  const yTop = niceFloorRank(minRank * 0.82);
+  const yBottom = Math.min(fieldSize, niceCeilRank(maxRank * 1.12));
+  const yTicks = buildRankTicks(yTop, yBottom, isSM ? 4 : 6);
 
   // Match the colour logic of RangeRankCard: compare overall rank entering
   // the range vs overall rank leaving it. emerald = improved, rose = worse,
@@ -169,11 +226,11 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
         })}
       </div>
 
-      <div className="h-80 w-full sm:h-72 md:h-80">
+      <div className="h-56 w-full xs:h-64 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={points}
-            margin={{ top: 8, right: 8, left: isSM ? -4 : 0, bottom: 0 }}
+            margin={{ top: 4, right: 8, left: isSM ? -6 : 0, bottom: 0 }}
           >
             <defs>
               <linearGradient id="rankFill" x1="0" y1="0" x2="0" y2="1">
@@ -188,16 +245,13 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               tick={{ fill: "var(--text)", fontSize: isSM ? 10 : 11, opacity: 0.7 }}
               stroke="var(--accent-4)"
               tickLine={false}
-              // Mobile: show every 4th GW (≈ 9–10 ticks across a season).
+              // Mobile: show every 4th GW (about 9-10 ticks across a season).
               // Desktop: let recharts auto-pick start/end + a few intermediates.
               interval={isSM ? 3 : "preserveStartEnd"}
               minTickGap={isSM ? 12 : 4}
             />
-            {/* Primary axis: rank (log-scale). Mobile uses an explicit
-                tick set so recharts doesn't crowd 7 labels on a narrow
-                axis (which was overlapping into an unreadable column).
-                The fixed ticks span the typical FPL rank range, anchored
-                to powers of 10. Out-of-range ticks just don't render. */}
+            {/* Primary axis: rank (log-scale). Ticks follow the manager's
+                actual range instead of starting at a fixed 10k on mobile. */}
             <YAxis
               yAxisId="rank"
               reversed
@@ -209,8 +263,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               stroke="var(--accent-4)"
               width={isSM ? 38 : 48}
               tickLine={false}
-              ticks={isSM ? [10_000, 100_000, 1_000_000, 6_000_000] : undefined}
-              tickCount={isSM ? undefined : 6}
+              ticks={yTicks}
             />
             {/* Right-hand axis for transfers. Hidden when off so we don't
                 waste horizontal space on a phantom scale. */}

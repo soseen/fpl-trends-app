@@ -41,7 +41,7 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
       <PlayerCardShell
         onClick={() => openDetails(player.player_id)}
         ariaLabel={`Open ${player.web_name} details`}
-        className="h-[88px] w-12 sm:h-[108px] sm:w-16 md:h-[140px] md:w-[84px] lg:h-[160px] lg:w-24"
+        className="h-[112px] w-20 xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
         topLeft={
           <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
             <img
@@ -55,16 +55,17 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
           eo > 0 ? (
             <span
               title={`Effective ownership: ${eoPct.toFixed(1)}%`}
-              className="inline-flex items-center rounded-md bg-accent3/85 px-1 py-0.5 text-[8px] font-semibold leading-none text-text shadow-sm ring-1 ring-inset ring-accent4/40 sm:text-[9px] md:px-1.5 md:py-1 md:text-[10px]"
+              className="rounded-l-md bg-accent3/95 px-1 py-[2px] text-[8px] font-semibold leading-none text-text shadow-md ring-1 ring-inset ring-accent4/60 sm:text-[9px] md:px-1.5 md:text-[10px]"
             >
-              {eoLabel}%
+              EO {eoLabel}%
             </span>
           ) : undefined
         }
+        topRightClassName="bottom-1 top-auto gap-0.5 md:bottom-2"
         image={
           <FootballerImage
             code={player.code}
-            className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+            className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
           />
         }
         name={player.web_name}

@@ -39,8 +39,8 @@ const TeamImpactPitch: React.FC<Props> = ({
 }) => {
   return (
     <div className="mt-4 flex w-full flex-col justify-center md:mt-6">
-      <h3 className="text-center text-sm text-text md:text-xl">{title}</h3>
-      <div className="mt-2 min-h-[380px] w-full bg-[url(src/assets/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[580px] md:mt-6 md:min-h-[660px] md:bg-contain lg:min-h-[900px]">
+      <h3 className="mb-6 text-center text-sm text-text md:mb-12 md:text-xl">{title}</h3>
+      <div className="mt-2 min-h-[350px] w-full bg-[url(src/assets/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0 }}
@@ -50,7 +50,7 @@ const TeamImpactPitch: React.FC<Props> = ({
             className="flex w-full justify-around"
             key={animationKey}
           >
-            <div className="mb-6 mt-0 min-h-[380px] w-full sm:min-h-[580px] md:-mt-1 md:mb-0 md:min-h-[660px] lg:-mt-4 lg:min-h-[900px]">
+            <div className="mb-6 mt-0 min-h-[350px] w-full -translate-y-5 sm:min-h-[550px] sm:-translate-y-7 md:-mt-1 md:mb-0 md:min-h-[620px] md:-translate-y-8 lg:-mt-4 lg:min-h-[860px] lg:-translate-y-10">
               <PitchRow tiles={xi.gk} showRankImpact={showRankImpact} />
               <PitchRow tiles={xi.def} showRankImpact={showRankImpact} />
               <PitchRow tiles={xi.mid} showRankImpact={showRankImpact} />

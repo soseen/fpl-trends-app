@@ -13,9 +13,9 @@ const SkeletonEventCard: React.FC = () => (
       <Skeleton className="h-5 w-20 rounded-md" />
     </div>
     <div className="flex items-center justify-center gap-2 py-2 sm:gap-4">
-      <Skeleton className="h-[80px] w-12 rounded-md sm:h-[100px] sm:w-16 md:h-[120px] md:w-20" />
+      <Skeleton className="h-[112px] w-20 rounded-md xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36" />
       <Skeleton className="h-5 w-5 rounded-full" />
-      <Skeleton className="h-[80px] w-12 rounded-md sm:h-[100px] sm:w-16 md:h-[120px] md:w-20" />
+      <Skeleton className="h-[112px] w-20 rounded-md xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36" />
     </div>
   </div>
 );

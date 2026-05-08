@@ -1,4 +1,3 @@
-import React from "react";
 import BestFootballersXGITab from "./BestFootballersXGITab/best-footballers-xgi-tab";
 import BestDifferentialsTab from "./BestDifferentialsTab/best-differentials-tab";
 import BestDefconsTab from "./BestDefconsTab/best-defcons-tab";
@@ -6,7 +5,7 @@ import OutliersTabRow from "./outliers-tab-row";
 
 const OutliersTab = () => {
   return (
-    <div className="flex w-full flex-col gap-1 md:gap-4">
+    <div className="flex w-full flex-col gap-4">
       <OutliersTabRow component={<BestFootballersXGITab />} />
       <OutliersTabRow component={<BestDefconsTab />} />
       <OutliersTabRow component={<BestDifferentialsTab />} />

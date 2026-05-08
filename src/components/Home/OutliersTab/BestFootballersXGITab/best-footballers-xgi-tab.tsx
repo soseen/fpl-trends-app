@@ -17,7 +17,7 @@ const BestFootballersXGITab = () => {
           ]),
         }).toString()}
       />
-      <div className="grid w-full grid-cols-4 gap-4 md:gap-6 lg:grid-cols-5">
+      <div className="grid w-full grid-cols-4 gap-2 md:gap-6 lg:grid-cols-5">
         {bestXGIFootballers.map((footballer) => (
           <OutlierCard
             key={footballer.id}

@@ -1,4 +1,3 @@
-import React from "react";
 import TeamsTable from "./TeamsTable/teams-table";
 import Pitch from "./BestScoringFootballers/pitch";
 import OutliersTab from "./OutliersTab/outliers-tab";

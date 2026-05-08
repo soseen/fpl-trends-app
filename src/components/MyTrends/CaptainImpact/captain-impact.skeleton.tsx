@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const SkeletonSlot: React.FC = () => (
   <div className="flex flex-col items-center gap-1">
     <Skeleton className="h-2.5 w-12" />
-    <Skeleton className="h-[88px] w-12 rounded-md sm:h-[108px] sm:w-16 md:h-[140px] md:w-[84px] lg:h-[160px] lg:w-24" />
+    <Skeleton className="h-[112px] w-20 rounded-md xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36" />
     <Skeleton className="h-2 w-10" />
   </div>
 );

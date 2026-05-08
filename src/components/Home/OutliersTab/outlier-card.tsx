@@ -1,5 +1,4 @@
 import React from "react";
-import clsx from "clsx";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
@@ -9,7 +8,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
 import StatBadge from "src/components/PlayerCard/stat-badge";
-import { getTeamsBadge } from "src/utils/images";
 
 type Props = {
   footballer: FootballerWithGameweekStats;
@@ -85,43 +83,34 @@ const OutlierCard = ({ footballer, include }: Props) => {
       onClick={() => setFootballer(footballer)}
       ariaLabel={`Open ${footballer.web_name} details`}
       className="h-auto w-full"
-      imageAreaClassName="aspect-[8/9] pt-3 md:pt-4"
+      imageAreaClassName="aspect-[8/9] pt-2 md:pt-3"
       topLeft={
-        <span className="inline-flex items-center gap-1 rounded-md bg-accent3/90 px-1 py-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:gap-1.5 md:px-1.5">
-          <img
-            src={getTeamsBadge(footballer.team_code)}
-            alt={footballer.teams?.short_name}
-            className="block h-3.5 w-3.5 shrink-0 object-contain md:h-4 md:w-4"
-          />
-          {metric && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span
-                  className={clsx(
-                    "inline-flex items-center gap-1 whitespace-nowrap text-[10px] font-semibold leading-none text-text md:text-[12px]",
-                  )}
-                >
-                  <span className="tabular-nums text-magenta">{metric.value}</span>
-                  <span className="text-text/60">{metric.suffix}</span>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{metric.label}</TooltipContent>
-            </Tooltip>
-          )}
-        </span>
+        metric ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex max-w-full items-center gap-0.5 rounded-md bg-accent3/90 px-1 py-0.5 text-[9px] font-semibold leading-none shadow-sm ring-1 ring-inset ring-accent4/40 md:gap-1 md:px-1.5 md:text-xs">
+                <span className="tabular-nums text-magenta">{metric.value}</span>
+                <span className="text-text/60">{metric.suffix}</span>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{metric.label}</TooltipContent>
+          </Tooltip>
+        ) : null
       }
-      topRight={returnStats.map((stat) => (
+      topRight={returnStats.slice(0, 2).map((stat) => (
         <StatBadge
           key={stat.label}
           value={stat.value}
           icon={stat.icon}
           label={stat.label}
+          compact
         />
       ))}
+      topRightClassName="bottom-1 top-auto gap-0.5"
       image={
         <FootballerImage
           code={footballer.code}
-          className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+          className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
         />
       }
       name={footballer?.web_name}

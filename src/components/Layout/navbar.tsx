@@ -18,9 +18,9 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { to: "/", label: "Home", icon: <FaHome /> },
+  { to: "/my-trends", label: "My Trends", icon: <FaChartLine /> },
   { to: "/players", label: "Players", icon: <FaUser /> },
   { to: "/compare", label: "Compare", icon: <FaTools /> },
-  { to: "/my-trends", label: "My Trends", icon: <FaChartLine /> },
 ];
 
 // Mobile shows icons only — labels were wrapping/clumping at 375px.

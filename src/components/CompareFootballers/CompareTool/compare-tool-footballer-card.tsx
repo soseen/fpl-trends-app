@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import React, { useCallback, useMemo } from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useCallback, useMemo } from "react";
+import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { getFootballersImage, getTeamsBadge } from "src/utils/images";
 import CompareToolSearch from "./CompareToolSearch/compare-tool-search";
 import { MdClose as CloseIcon } from "react-icons/md";
@@ -18,7 +18,7 @@ import {
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerPosition } from "src/queries/types";
 import { TbLockFilled } from "react-icons/tb";
-import { RankedFootballer } from "./types";
+import type { RankedFootballer } from "./types";
 import { mapElementTypeToPosition } from "src/utils/strings";
 import { useSelector } from "react-redux";
 import type { RootState } from "src/redux/store";
@@ -107,7 +107,7 @@ const CompareCardFixtures = ({
             </span>
             <span
               className={clsx(
-                "mt-1 inline-flex max-w-full items-center justify-center rounded-sm px-1 py-[2px] text-[8px] font-semibold leading-3 md:px-1.5 md:text-[10px]",
+                "mt-1 inline-flex max-w-full items-center justify-center rounded-sm px-1 py-[2px] text-[7px] font-semibold leading-3 md:px-1.5 md:text-[9px]",
                 getFixtureDifficultyClass(fixture?.difficulty),
               )}
               title={`${fixtureLabel} (${venue}) GW${fixture?.event ?? "-"}`}

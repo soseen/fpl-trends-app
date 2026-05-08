@@ -15,7 +15,7 @@ const BestDifferentialsTab = () => {
           filters: JSON.stringify([{ id: "maxOwnership", value: [0, 10] }]),
         }).toString()}
       />
-      <div className="grid w-full grid-cols-4 gap-4 md:gap-6 lg:grid-cols-5">
+      <div className="grid w-full grid-cols-4 gap-2 md:gap-6 lg:grid-cols-5">
         {bestDifferentials.map((footballer) => (
           <OutlierCard
             key={footballer.id}
@@ -24,9 +24,6 @@ const BestDifferentialsTab = () => {
           />
         ))}
       </div>
-      <p className="text-xs italic text-text md:text-sm">
-        * displayed ownership represents current state
-      </p>
     </div>
   );
 };

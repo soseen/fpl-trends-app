@@ -55,7 +55,7 @@ const PitchCard = ({ footballer }: Props) => {
     <PlayerCardShell
       onClick={() => setFootballer(footballer)}
       ariaLabel={`Open ${footballer.web_name} details`}
-      className="h-[88px] w-16 sm:w-20 md:h-[124px] md:w-24 lg:h-[170px] lg:w-32"
+      className="h-[112px] w-20 xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
       imageAreaClassName="flex-1 pt-1.5 md:pt-2"
       topLeft={
         <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
@@ -75,10 +75,11 @@ const PitchCard = ({ footballer }: Props) => {
           compact
         />
       ))}
+      topRightClassName="bottom-1 top-auto gap-0.5 md:bottom-2"
       image={
         <FootballerImage
           code={footballer.code}
-          className="h-auto max-h-full w-auto max-w-[92%] rounded-none object-contain md:max-h-[88%] md:max-w-[78%]"
+          className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
         />
       }
       name={footballer.web_name}

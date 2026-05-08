@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -47,7 +48,7 @@ const FplIdInput: React.FC<Props> = ({
           onChange={(e) => setRaw(e.target.value)}
           className="h-9 w-full bg-white px-2 text-accent2 focus:outline-none md:w-auto md:min-w-[420px]"
         />
-        <Button type="submit" className="hover:bg-magenta/90 h-9 bg-magenta text-white">
+        <Button type="submit" className="h-9 bg-magenta text-white hover:bg-magenta/90">
           {submitLabel}
         </Button>
       </div>
