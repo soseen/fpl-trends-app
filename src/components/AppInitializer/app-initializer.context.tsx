@@ -195,10 +195,17 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
       .filter((f) => f.element_type !== FootballerPosition.MGR);
 
     dispatch(setEnrichedFootballers(enrichedFootballers));
-  }, [dispatch, list, startGameweek, endGameweek]);
+  }, [
+    dispatch,
+    events,
+    list,
+    startGameweek,
+    endGameweek,
+    totalPlayers,
+  ]);
 
   const appStatus = useMemo(() => {
-    const statuses = [status, teamsStatus, totalPlayersStatus];
+    const statuses = [status, teamsStatus, totalPlayersStatus, eventsStatus];
     if (statuses.includes(AsyncThunkStatus.failed)) {
       return AppInitStatus.error;
     } else if (

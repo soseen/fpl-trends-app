@@ -14,6 +14,9 @@ const initialState: GameweekState = {
   maxGameweek: 0,
 };
 
+const defaultStartGameweek = (maxGameweek: number): number =>
+  Math.max(1, maxGameweek - 4);
+
 const gameweeksSlice = createSlice({
   name: "gameweeks",
   initialState,
@@ -23,9 +26,12 @@ const gameweeksSlice = createSlice({
       state.endGameweek = action.payload.end;
     },
     initializeGameweekRange: (state, action: PayloadAction<number>) => {
-      state.maxGameweek = action.payload;
-      state.endGameweek = action.payload;
-      state.startGameweek = Math.max(1, action.payload - 4);
+      const maxGameweek = action.payload;
+      if (maxGameweek < 1) return;
+
+      state.maxGameweek = maxGameweek;
+      state.endGameweek = maxGameweek;
+      state.startGameweek = defaultStartGameweek(maxGameweek);
     },
   },
 });
