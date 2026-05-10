@@ -3,15 +3,12 @@ import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGa
 import { getDefconThreshold } from "src/utils/defcon";
 
 export type CompareMetricKey =
-  | "totalPoints"
   | "pointsPerGame"
-  | "totalGoals"
   | "goalsPer90"
-  | "totalAssists"
   | "assistsPer90"
-  | "totalXGI"
-  | "totalXGS"
-  | "totalXA"
+  | "xGIPerGame"
+  | "xGSPerGame"
+  | "xAPerGame"
   | "xGCPer90"
   | "minPerGame"
   | "totalBonus"
@@ -63,100 +60,14 @@ const hasKeeperOrDefender = (footballers: FootballerWithGameweekStats[]): boolea
 
 export const COMPARE_METRICS: CompareMetric[] = [
   {
-    key: "totalPoints",
-    label: "Points",
-    shortLabel: "Pts",
-    group: "Output",
-    better: "higher",
-    defaultSelected: true,
-    format: formatInt,
-    getValue: (footballer) => footballer.totalPoints,
-  },
-  {
     key: "pointsPerGame",
     label: "Points / game",
     shortLabel: "Pts/g",
     group: "Output",
     better: "higher",
+    defaultSelected: true,
     format: formatOne,
     getValue: (footballer) => footballer.pointsPerGame,
-  },
-  {
-    key: "totalGoals",
-    label: "Goals",
-    shortLabel: "G",
-    group: "Attack",
-    better: "higher",
-    defaultSelected: true,
-    format: formatInt,
-    getValue: (footballer) => footballer.totalGoals,
-  },
-  {
-    key: "goalsPer90",
-    label: "Goals / 90",
-    shortLabel: "G/90",
-    group: "Attack",
-    better: "higher",
-    format: formatTwo,
-    getValue: (footballer) => footballer.goalsPer90,
-  },
-  {
-    key: "totalAssists",
-    label: "Assists",
-    shortLabel: "A",
-    group: "Attack",
-    better: "higher",
-    defaultSelected: true,
-    format: formatInt,
-    getValue: (footballer) => footballer.totalAssists,
-  },
-  {
-    key: "assistsPer90",
-    label: "Assists / 90",
-    shortLabel: "A/90",
-    group: "Attack",
-    better: "higher",
-    format: formatTwo,
-    getValue: (footballer) => footballer.assistsPer90,
-  },
-  {
-    key: "totalXGI",
-    label: "xGI",
-    shortLabel: "xGI",
-    group: "Attack",
-    better: "higher",
-    defaultSelected: true,
-    format: formatTwo,
-    getValue: (footballer) => footballer.totalXGI,
-  },
-  {
-    key: "totalXGS",
-    label: "xG",
-    shortLabel: "xG",
-    group: "Attack",
-    better: "higher",
-    defaultSelected: true,
-    format: formatTwo,
-    getValue: (footballer) => footballer.totalXGS,
-  },
-  {
-    key: "totalXA",
-    label: "xA",
-    shortLabel: "xA",
-    group: "Attack",
-    better: "higher",
-    defaultSelected: true,
-    format: formatTwo,
-    getValue: (footballer) => footballer.totalXA,
-  },
-  {
-    key: "minPerGame",
-    label: "Minutes / game",
-    shortLabel: "Min/g",
-    group: "Role",
-    better: "higher",
-    format: formatMinutes,
-    getValue: (footballer) => footballer.minPerGame,
   },
   {
     key: "totalBonus",
@@ -175,6 +86,65 @@ export const COMPARE_METRICS: CompareMetric[] = [
     better: "higher",
     format: formatInt,
     getValue: (footballer) => footballer.totalHauls,
+  },
+  {
+    key: "goalsPer90",
+    label: "Goals / 90",
+    shortLabel: "G/90",
+    group: "Attack",
+    better: "higher",
+    defaultSelected: true,
+    format: formatTwo,
+    getValue: (footballer) => footballer.goalsPer90,
+  },
+  {
+    key: "assistsPer90",
+    label: "Assists / 90",
+    shortLabel: "A/90",
+    group: "Attack",
+    better: "higher",
+    defaultSelected: true,
+    format: formatTwo,
+    getValue: (footballer) => footballer.assistsPer90,
+  },
+  {
+    key: "xGIPerGame",
+    label: "xGI / game",
+    shortLabel: "xGI/g",
+    group: "Attack",
+    better: "higher",
+    defaultSelected: true,
+    format: formatTwo,
+    getValue: (footballer) => numberOrZero(footballer.xGIPerGame),
+  },
+  {
+    key: "xGSPerGame",
+    label: "xG / game",
+    shortLabel: "xG/g",
+    group: "Attack",
+    better: "higher",
+    defaultSelected: true,
+    format: formatTwo,
+    getValue: (footballer) => numberOrZero(footballer.xGSPerGame),
+  },
+  {
+    key: "xAPerGame",
+    label: "xA / game",
+    shortLabel: "xA/g",
+    group: "Attack",
+    better: "higher",
+    defaultSelected: true,
+    format: formatTwo,
+    getValue: (footballer) => numberOrZero(footballer.xAPerGame),
+  },
+  {
+    key: "minPerGame",
+    label: "Minutes / game",
+    shortLabel: "Min/g",
+    group: "Role",
+    better: "higher",
+    format: formatMinutes,
+    getValue: (footballer) => footballer.minPerGame,
   },
   {
     key: "pointsPerMillion",
