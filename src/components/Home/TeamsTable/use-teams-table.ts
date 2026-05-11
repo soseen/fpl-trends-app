@@ -56,6 +56,7 @@ export const useTeamsTable = () => {
         return {
           ...team,
           avg,
+          gamesPlayed: selectedGameweeks.length,
           totalCleanSheets: selectedGameweeks.filter((gw) => gw.goals_conceded === 0).length,
           totalGoals: selectedGameweeks.reduce((sum, gw) => sum + gw.goals, 0)
         }

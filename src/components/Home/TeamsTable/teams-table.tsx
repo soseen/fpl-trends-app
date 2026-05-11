@@ -60,6 +60,7 @@ const TeamsTable = () => {
           <TableRow className="border-transparent">
             <TableHead className="w-[50px] p-2">#</TableHead>
             <TableHead className="p-2">Team</TableHead>
+            <TableHead className="p-2 text-right">GP</TableHead>
             <TableHead className="p-2 text-right">
               {isDefensiveStats ? "Avg xGC" : "Avg xGS"}
             </TableHead>
@@ -110,6 +111,8 @@ const TeamsTable = () => {
                     )}
                   </div>
                 </TableCell>
+
+                <TableCell className="p-2 text-right">{team?.gamesPlayed}</TableCell>
 
                 <TableCell className="flex items-center justify-end p-2 text-right">
                   <p>{team?.avg?.toFixed(2)}</p>

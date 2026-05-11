@@ -39,6 +39,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
             totalDefcons,
             totalDefconBonuses,
             returns,
+            teamAvgXGC,
+            teamGoalsInRange,
           } = bestAttributes[footballer.id] || {};
 
           const contribution = ((returns ?? 0) / (totalTeamGoals ?? 0)) * 100;
@@ -133,7 +135,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                       🚀 Best attacking team
                     </p>
                     <p className="">
-                      His team scored <b className="text-magenta">{totalTeamGoals}</b>{" "}
+                      His team scored <b className="text-magenta">{teamGoalsInRange}</b>{" "}
                       goals in GW {startGameweek}-{endGameweek}
                     </p>
                   </span>
@@ -171,8 +173,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                     <p className="">
                       Plays for a defense that accumulated{" "}
-                      <b className="text-magenta">{footballer?.xGCPer90?.value}</b>{" "}
-                      expected goals conceded per 90
+                      <b className="text-magenta">{teamAvgXGC?.toFixed(2)}</b>{" "}
+                      expected goals conceded per game
                     </p>
                   </span>
                 )}

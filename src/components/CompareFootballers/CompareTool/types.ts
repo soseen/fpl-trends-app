@@ -39,5 +39,7 @@ export type BestAttributes = Record<
     totalDefcons: number;
     totalDefconBonuses: number;
     returns: number;
+    teamAvgXGC: number;
+    teamGoalsInRange: number;
   }
 >;

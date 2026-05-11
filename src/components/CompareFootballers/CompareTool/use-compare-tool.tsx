@@ -28,6 +28,26 @@ export const useCompareTool = () => {
   const { footballers } = useSelector(
     (state: RootState) => state.footballersGameweekStats,
   );
+  const teams = useSelector((state: RootState) => state.teams.list);
+
+  const teamStatsById = useMemo(() => {
+    const result: Record<
+      number,
+      { avgXGC: number; goalsInRange: number; gamesPlayed: number }
+    > = {};
+    teams.forEach((team) => {
+      const inRange = team.team_history.filter(
+        (gw) => gw.round >= startGameweek && gw.round <= endGameweek,
+      );
+      const games = inRange.length;
+      result[team.id] = {
+        avgXGC: games ? inRange.reduce((sum, gw) => sum + gw.teamXGC, 0) / games : 0,
+        goalsInRange: inRange.reduce((sum, gw) => sum + gw.goals, 0),
+        gamesPlayed: games,
+      };
+    });
+    return result;
+  }, [teams, startGameweek, endGameweek]);
 
   const [selectedFootballers, setSelectedFootballers] = useState<
     (FootballerWithGameweekStats | null)[]
@@ -138,13 +158,12 @@ export const useCompareTool = () => {
     const bestFixtures = Math.min(
       ...validFootballers.map((f) => f?.fixtureDifficultyRank?.rank ?? 99),
     );
-    const bestDefenderValue = Math.min(
-      ...validFootballers
-        .filter((f) =>
-          f.history.some((h) => h.round >= startGameweek && h.round <= endGameweek),
-        )
-        .map((f) => parseFloat(f?.xGCPer90?.value as string) ?? 0),
+    const footballersWithTeamGames = validFootballers.filter(
+      (f) => (teamStatsById[f.team]?.gamesPlayed ?? 0) > 0,
     );
+    const bestTeamDefenseXGC = footballersWithTeamGames.length
+      ? Math.min(...footballersWithTeamGames.map((f) => teamStatsById[f.team]!.avgXGC))
+      : Infinity;
     const bestAttackerValue = Math.max(
       ...validFootballers.map((f) => parseFloat(f?.xGSPer90 as string) ?? 0),
     );
@@ -167,8 +186,8 @@ export const useCompareTool = () => {
     const bestFixturesPlayers = validFootballers.filter(
       (f) => (f?.fixtureDifficultyRank?.rank ?? 99) === bestFixtures,
     );
-    const bestDefendersPlayers = validFootballers.filter(
-      (f) => (parseFloat(f?.xGCPer90?.value as string) ?? 0) === bestDefenderValue,
+    const bestDefendersPlayers = footballersWithTeamGames.filter(
+      (f) => teamStatsById[f.team]!.avgXGC === bestTeamDefenseXGC,
     );
     const bestAttackersPlayers = validFootballers.filter((f) => {
       const xGSPer90Value = parseFloat(f?.xGSPer90 as string) || 0;
@@ -220,33 +239,15 @@ export const useCompareTool = () => {
       (f) => calculateAvgGoals(f) === minLowScoringGames,
     );
 
-    // Find best attacking team
-    const bestAttackingTeamValue = Math.max(
-      ...validFootballers.map((f) =>
-        f?.history
-          .filter((game) => game.round >= startGameweek && game.round <= endGameweek)
-          .reduce(
-            (sum, game) =>
-              sum +
-              (f.team === game.opponent_team
-                ? (game.team_a_score ?? 0)
-                : (game.team_h_score ?? 0)),
-            0,
-          ),
-      ),
-    );
-    const bestAttackingTeamPlayers = validFootballers.filter(
-      (f) =>
-        f?.history
-          .filter((game) => game.round >= startGameweek && game.round <= endGameweek)
-          .reduce(
-            (sum, game) =>
-              sum +
-              (f.team === game.opponent_team
-                ? (game.team_a_score ?? 0)
-                : (game.team_h_score ?? 0)),
-            0,
-          ) === bestAttackingTeamValue,
+    // Find best attacking team — use the team's actual goals across the range,
+    // not the player's per-game share (which depended on whether they featured).
+    const bestAttackingTeamValue = footballersWithTeamGames.length
+      ? Math.max(
+          ...footballersWithTeamGames.map((f) => teamStatsById[f.team]!.goalsInRange),
+        )
+      : 0;
+    const bestAttackingTeamPlayers = footballersWithTeamGames.filter(
+      (f) => teamStatsById[f.team]!.goalsInRange === bestAttackingTeamValue,
     );
     haulsCount.forEach(({ footballer, haulCount }) => {
       if (!footballer) return;
@@ -295,11 +296,13 @@ export const useCompareTool = () => {
         totalDefcons: footballer.totalDefcons,
         totalDefconBonuses: footballer.totalDefconBonuses,
         returns,
+        teamAvgXGC: teamStatsById[footballer.team]?.avgXGC ?? 0,
+        teamGoalsInRange: teamStatsById[footballer.team]?.goalsInRange ?? 0,
       };
     });
 
     return best;
-  }, [endGameweek, footballersComparisonArray, startGameweek]);
+  }, [endGameweek, footballersComparisonArray, startGameweek, teamStatsById]);
 
   return {
     footballersComparisonArray,

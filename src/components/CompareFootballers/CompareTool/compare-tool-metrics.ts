@@ -152,7 +152,6 @@ export const COMPARE_METRICS: CompareMetric[] = [
     shortLabel: "Pts/m",
     group: "Value",
     better: "higher",
-    defaultSelected: true,
     format: formatOne,
     getValue: (footballer) => {
       const price = footballer.now_cost / 10;
