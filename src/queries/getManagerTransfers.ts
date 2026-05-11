@@ -18,10 +18,18 @@ export type TransferImpactPlayer = {
   //             transferred OUT, or endGw if still owned). For Free Hit
   //             transfers the window is [fhGw, fhGw] (single GW).
   //   IN side -> starter-aware (benched = 0, captaincy is not doubled).
-  //   OUT side -> raw points across the window, with chip-event bench
-  //             players scaled by their pre-chip start rate.
+  //   OUT side -> raw points scaled by the player's pre-transfer start
+  //             rate in the user's lineup. Applies to all transfer types
+  //             (normal, WC, FH). Dead-bench picks contribute ~0;
+  //             rotational players get partial credit; true starters
+  //             get full raw.
   // See backend type comment for the full rationale.
   points_in_window: number;
+  // True when the model treats this player as a non-starter for this
+  // manager (UI renders a bench badge on the tile). IN: based on the
+  // multiplier across the pair window. OUT: based on pre-transfer
+  // start rate. Both require >= 2 GWs of data to flag.
+  bench_role: boolean;
   // Positive for IN point contribution, negative for OUT points left behind.
   rank_impact: number | null;
   avg_ownership_pct: number | null;

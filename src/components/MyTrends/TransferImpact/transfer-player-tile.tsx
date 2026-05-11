@@ -1,6 +1,6 @@
 import type React from "react";
 import clsx from "clsx";
-import { Redo } from "lucide-react";
+import { Armchair, Redo } from "lucide-react";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { getTeamsBadge } from "src/utils/images";
 import type { TransferImpactPlayer } from "src/queries/getManagerTransfers";
@@ -31,23 +31,33 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
   const showSoldBadge = !isOut && typeof soldGw === "number";
 
   return (
-    <div
-      className={clsx(
-        "relative flex",
-        isOut && "opacity-60 grayscale-[40%]",
-      )}
-    >
+    <div className={clsx("relative flex", isOut && "opacity-60 grayscale-[40%]")}>
       <PlayerCardShell
         onClick={() => openDetails(player.player_id)}
         ariaLabel={`Open ${player.web_name} details`}
         className="h-[112px] w-20 xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
         topLeft={
-          <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
+          <span className="relative inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
             <img
               src={getTeamsBadge(player.team_code)}
               alt=""
               className="block h-3 w-3 object-contain md:h-4 md:w-4"
             />
+            {player.bench_role && (
+              <span
+                className="absolute -bottom-1 -right-1 inline-flex items-center justify-center rounded-full bg-accent3/95 p-[1px] shadow-md ring-1 ring-inset ring-accent4/60"
+                title={
+                  isOut
+                    ? "Bench role — rarely fielded by this manager before the sale"
+                    : "Bench role — rarely in the starting XI while owned"
+                }
+              >
+                <Armchair
+                  className="h-3 w-3 text-text/80 md:h-3.5 md:w-3.5"
+                  aria-hidden
+                />
+              </span>
+            )}
           </span>
         }
         topRight={
