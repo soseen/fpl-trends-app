@@ -18,13 +18,14 @@ export type TransferImpactPlayer = {
   //             transferred OUT, or endGw if still owned). For Free Hit
   //             the window collapses to the single FH GW.
   //   IN side -> starter-aware (benched = 0, captaincy is not doubled).
-  //   OUT side -> raw points scaled by the player's pre-transfer start
-  //             rate in the user's lineup, skipping any FH GW that
-  //             falls inside the window (FH is a one-GW team; the
-  //             normal squad is dormant during it). Applies to all
-  //             transfer types. Dead-bench picks contribute ~0;
-  //             rotational players get partial credit; true starters
-  //             get full raw.
+  //   OUT side -> raw points scaled by an effective start-rate (user's
+  //             pre-sale ratio first, with a coarse global starter
+  //             check as tiebreaker when the pre-sale sample is small
+  //             or ambiguous). FH GWs inside the window are skipped
+  //             (FH is a one-GW team; normal squad is dormant). Clear
+  //             starters get full raw; bench fillers zero out with a
+  //             badge; rotational fringe players get linear scaling
+  //             with a "~" prefix on the displayed value.
   // See backend type comment for the full rationale.
   points_in_window: number;
   // True when the model treats this player as a non-starter for this
