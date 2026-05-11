@@ -16,11 +16,13 @@ export type TransferImpactPlayer = {
   //   Window  = [transfer.gw, lastOwnedGw] for normal transfers (where
   //             lastOwnedGw is the GW before the IN player was next
   //             transferred OUT, or endGw if still owned). For Free Hit
-  //             transfers the window is [fhGw, fhGw] (single GW).
+  //             the window collapses to the single FH GW.
   //   IN side -> starter-aware (benched = 0, captaincy is not doubled).
   //   OUT side -> raw points scaled by the player's pre-transfer start
-  //             rate in the user's lineup. Applies to all transfer types
-  //             (normal, WC, FH). Dead-bench picks contribute ~0;
+  //             rate in the user's lineup, skipping any FH GW that
+  //             falls inside the window (FH is a one-GW team; the
+  //             normal squad is dormant during it). Applies to all
+  //             transfer types. Dead-bench picks contribute ~0;
   //             rotational players get partial credit; true starters
   //             get full raw.
   // See backend type comment for the full rationale.
