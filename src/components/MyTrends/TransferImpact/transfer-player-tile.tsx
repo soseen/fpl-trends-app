@@ -67,7 +67,14 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
         }
         name={player.web_name}
         points={
-          <span className="inline-flex items-center gap-1">
+          <span
+            className="inline-flex items-center gap-1"
+            title={
+              player.points_approximated
+                ? "Approximate — scaled by this manager's rotational use of the player before the sale. See the methodology note for the full formula."
+                : undefined
+            }
+          >
             {player.bench_role && (
               <span
                 className="inline-flex"
@@ -80,7 +87,7 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
                 <Armchair className="h-3 w-3 md:h-3.5 md:w-3.5" aria-label="Bench role" />
               </span>
             )}
-            {`${player.points_in_window} pts`}
+            {`${player.points_approximated ? "~" : ""}${player.points_in_window} pts`}
           </span>
         }
       />

@@ -32,6 +32,12 @@ export type TransferImpactPlayer = {
   // multiplier across the pair window. OUT: based on pre-transfer
   // start rate. Both require >= 2 GWs of data to flag.
   bench_role: boolean;
+  // True when `points_in_window` was scaled by a non-1 effective rate
+  // (only set on OUT-side tiles in the rotational 25-50% range). The
+  // UI shows a "~" prefix on the points text + a tooltip explaining
+  // the math. Clear starters (rate >= 50%) round up to full raw with
+  // no flag; bench-role picks zero out instead.
+  points_approximated: boolean;
   // Positive for IN point contribution, negative for OUT points left behind.
   rank_impact: number | null;
   avg_ownership_pct: number | null;
