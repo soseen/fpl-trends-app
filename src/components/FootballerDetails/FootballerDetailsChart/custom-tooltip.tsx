@@ -5,7 +5,14 @@ import { getTeamsBadge } from "src/utils/images";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
 import { FootballerPosition, History } from "src/queries/types";
-import { FaClock, FaFutbol, FaHandshake, FaLock, FaShieldAlt } from "react-icons/fa";
+import {
+  FaClock,
+  FaFutbol,
+  FaHandshake,
+  FaLock,
+  FaShieldAlt,
+  FaStar,
+} from "react-icons/fa";
 import { TbRectangleVerticalFilled as CardIcon } from "react-icons/tb";
 import { getDefconThreshold } from "src/utils/defcon";
 
@@ -35,6 +42,11 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
           icon: <FaFutbol />,
         },
         { key: "assists", value: history.assists, icon: <FaHandshake /> },
+        {
+          key: "bonus",
+          value: history.bonus,
+          icon: <FaStar className="text-amber-400" />,
+        },
         ...([FootballerPosition.DEF, FootballerPosition.GK].includes(elementType)
           ? [{ key: "cs", value: history.clean_sheets, icon: <FaLock /> }]
           : []),

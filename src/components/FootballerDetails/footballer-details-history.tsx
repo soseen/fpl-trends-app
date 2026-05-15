@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { History } from "src/queries/types";
 import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { GiWinterGloves as GlovesIcon } from "react-icons/gi";
-import { FaFutbol, FaHandshake, FaLock, FaShieldAlt } from "react-icons/fa";
+import { FaFutbol, FaHandshake, FaLock, FaShieldAlt, FaStar } from "react-icons/fa";
 import { getTeamsBadge } from "src/utils/images";
 import { hasDefconBonus } from "src/utils/defcon";
 import clsx from "clsx";
@@ -22,6 +22,10 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
       const baseValues = [
         { icon: <FaFutbol />, value: event.goals_scored },
         { icon: <FaHandshake />, value: event.assists },
+        {
+          icon: <FaStar className="text-amber-400" title="Bonus points" />,
+          value: event.bonus,
+        },
       ];
       const additionalValues = (() => {
         switch (footballer?.element_type) {

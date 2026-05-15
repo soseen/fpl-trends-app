@@ -153,7 +153,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
               maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
               totalMinutes: accumulatedMinutes,
               minPerGame: safeDivide(accumulatedMinutes, finishedFixturesCount),
-              totalBonus: acc.totalBonus + val.bonus,
+              totalBonus: acc.totalBonus + (val.bonus ?? 0),
               totalHauls: acc.totalHauls + (val.total_points >= 9 ? 1 : 0),
             };
           },
