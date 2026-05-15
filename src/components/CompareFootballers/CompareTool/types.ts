@@ -6,11 +6,12 @@ import {
 export type SelectedStatKey = keyof Pick<
   AdditionalStats,
   | "xGIPer90"
+  | "pointsPer90"
   | "goalsPer90"
   | "assistsPer90"
   | "minPerGame"
   | "xGCPer90"
-  | "defconsPerGame"
+  | "defconsPer90"
 >;
 
 export type RankedFootballer = Omit<FootballerWithGameweekStats, SelectedStatKey> & {

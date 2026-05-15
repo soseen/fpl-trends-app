@@ -11,12 +11,13 @@ import { rankFixtures } from "./rankings/rankFixtures";
 import { getDefconThreshold } from "src/utils/defcon";
 
 export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string }> = [
+  { key: "pointsPer90", label: "Pts/90" },
   { key: "goalsPer90", label: "Goals/90" },
   { key: "assistsPer90", label: "Assists/90" },
   { key: "xGIPer90", label: "xGI/90" },
   { key: "xGCPer90", label: "xGC/90" },
-  { key: "defconsPerGame", label: "Def/g" },
-  { key: "minPerGame", label: "Min/g" },
+  { key: "defconsPer90", label: "Def/90" },
+  { key: "minPerGame", label: "Min/GW" },
 ];
 
 export const useCompareTool = () => {
@@ -173,7 +174,7 @@ export const useCompareTool = () => {
     const bestDefconValue = Math.max(
       ...validFootballers
         .filter((f) => getDefconThreshold(f.element_type) !== null)
-        .map((f) => parseFloat(f.defconsPerGame.value as string) || 0),
+        .map((f) => parseFloat(f.defconsPer90.value as string) || 0),
     );
 
     // Find all players that match the best values
@@ -200,7 +201,7 @@ export const useCompareTool = () => {
     const bestDefconPlayers = validFootballers.filter(
       (f) =>
         getDefconThreshold(f.element_type) !== null &&
-        (parseFloat(f.defconsPerGame.value as string) || 0) === bestDefconValue,
+        (parseFloat(f.defconsPer90.value as string) || 0) === bestDefconValue,
     );
 
     // Find max haul count

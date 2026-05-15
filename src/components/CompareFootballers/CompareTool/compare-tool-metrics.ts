@@ -3,19 +3,19 @@ import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGa
 import { getDefconThreshold } from "src/utils/defcon";
 
 export type CompareMetricKey =
-  | "pointsPerGame"
+  | "pointsPer90"
   | "goalsPer90"
   | "assistsPer90"
-  | "xGIPerGame"
-  | "xGSPerGame"
-  | "xAPerGame"
+  | "xGIPer90"
+  | "xGSPer90"
+  | "xAPer90"
   | "xGCPer90"
   | "minPerGame"
   | "totalBonus"
   | "totalHauls"
   | "totalCleanSheets"
   | "totalSaves"
-  | "defconsPerGame"
+  | "defconsPer90"
   | "totalDefconBonuses"
   | "pointsPerMillion";
 
@@ -60,14 +60,14 @@ const hasKeeperOrDefender = (footballers: FootballerWithGameweekStats[]): boolea
 
 export const COMPARE_METRICS: CompareMetric[] = [
   {
-    key: "pointsPerGame",
-    label: "Points / game",
-    shortLabel: "Pts/g",
+    key: "pointsPer90",
+    label: "Points / 90",
+    shortLabel: "Pts/90",
     group: "Output",
     better: "higher",
     defaultSelected: true,
     format: formatOne,
-    getValue: (footballer) => footballer.pointsPerGame,
+    getValue: (footballer) => footballer.pointsPer90,
   },
   {
     key: "totalBonus",
@@ -108,39 +108,39 @@ export const COMPARE_METRICS: CompareMetric[] = [
     getValue: (footballer) => footballer.assistsPer90,
   },
   {
-    key: "xGIPerGame",
-    label: "xGI / game",
-    shortLabel: "xGI/g",
+    key: "xGIPer90",
+    label: "xGI / 90",
+    shortLabel: "xGI/90",
     group: "Attack",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.xGIPerGame),
+    getValue: (footballer) => numberOrZero(footballer.xGIPer90),
   },
   {
-    key: "xGSPerGame",
-    label: "xG / game",
-    shortLabel: "xG/g",
+    key: "xGSPer90",
+    label: "xG / 90",
+    shortLabel: "xG/90",
     group: "Attack",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.xGSPerGame),
+    getValue: (footballer) => numberOrZero(footballer.xGSPer90),
   },
   {
-    key: "xAPerGame",
-    label: "xA / game",
-    shortLabel: "xA/g",
+    key: "xAPer90",
+    label: "xA / 90",
+    shortLabel: "xA/90",
     group: "Attack",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.xAPerGame),
+    getValue: (footballer) => numberOrZero(footballer.xAPer90),
   },
   {
     key: "minPerGame",
-    label: "Minutes / game",
-    shortLabel: "Min/g",
+    label: "Minutes / team GW",
+    shortLabel: "Min/GW",
     group: "Role",
     better: "higher",
     format: formatMinutes,
@@ -159,14 +159,14 @@ export const COMPARE_METRICS: CompareMetric[] = [
     },
   },
   {
-    key: "defconsPerGame",
-    label: "Defcons / game",
-    shortLabel: "Def/g",
+    key: "defconsPer90",
+    label: "Defcons / 90",
+    shortLabel: "Def/90",
     group: "Defense",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.defconsPerGame),
+    getValue: (footballer) => numberOrZero(footballer.defconsPer90),
     isAvailable: hasOutfieldDefconPlayer,
   },
   {
@@ -222,15 +222,21 @@ export const getAvailableCompareMetrics = (
   );
 
 export const normaliseMetricValue = (
-  _metric: CompareMetric,
+  metric: CompareMetric,
   value: number,
   allValues: number[],
 ): number => {
   const safeValues = allValues.map(numberOrZero);
   const safeValue = numberOrZero(value);
+  const min = Math.min(...safeValues);
   const max = Math.max(...safeValues);
 
   if (max <= 0) return 0;
+
+  if (metric.better === "lower") {
+    if (min === max) return 100;
+    return Math.max(0, Math.min(100, ((max - safeValue) / (max - min)) * 100));
+  }
 
   return Math.max(0, Math.min(100, (safeValue / max) * 100));
 };

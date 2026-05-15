@@ -144,11 +144,13 @@ const CompareToolFootballerCard = ({
     (key: keyof RankedFootballer) => {
       if (!footballer) return;
       const gamesPer90 = footballer?.minutes / 90;
-      const seasonAppearances = footballer.history.filter(
+      const completedTeamGames = footballer.history.filter(
         (h) => h.team_a_score !== null && h.team_h_score !== null,
       ).length;
 
       switch (key) {
+        case "pointsPer90":
+          return gamesPer90 > 0 ? footballer?.total_points / gamesPer90 : 0;
         case "goalsPer90":
           return gamesPer90 > 0 ? footballer?.goals_scored / gamesPer90 : 0;
         case "assistsPer90":
@@ -157,13 +159,13 @@ const CompareToolFootballerCard = ({
           return footballer?.expected_goal_involvements_per_90;
         case "xGCPer90":
           return footballer?.expected_goals_conceded_per_90;
-        case "defconsPerGame": {
-          return seasonAppearances > 0
-            ? (footballer.defensive_contribution ?? 0) / seasonAppearances
+        case "defconsPer90": {
+          return gamesPer90 > 0
+            ? (footballer.defensive_contribution ?? 0) / gamesPer90
             : 0;
         }
         case "minPerGame":
-          return seasonAppearances > 0 ? footballer?.minutes / seasonAppearances : 0;
+          return completedTeamGames > 0 ? footballer?.minutes / completedTeamGames : 0;
         default:
           return 0;
       }
@@ -269,7 +271,11 @@ const CompareToolFootballerCard = ({
                     {(footballer.now_cost / 10).toFixed(1)}m
                   </span>
                   <span className="rounded-sm bg-accent3 px-1.5 py-[2px]">
-                    {footballer.pointsPerGame.toFixed(1)} pts/g
+                    {(isNumber(footballer.pointsPer90.value)
+                      ? footballer.pointsPer90.value
+                      : parseFloat(footballer.pointsPer90.value as string)
+                    ).toFixed(1)}{" "}
+                    pts/90
                   </span>
                 </div>
               </div>

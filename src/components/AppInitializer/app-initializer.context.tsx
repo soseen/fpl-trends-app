@@ -33,6 +33,12 @@ const parseStat = (value: string | number | null | undefined): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const safeDivide = (numerator: number, denominator: number): number =>
+  denominator > 0 ? numerator / denominator : 0;
+
+const formatRate = (value: number): string =>
+  Number.isFinite(value) ? value.toFixed(2) : "0.00";
+
 export const AppInitializerProvider = ({ children }: AppInitializerProviderProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { status, list } = useSelector((state: RootState) => state.footballers);
@@ -68,11 +74,14 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
     const enrichedFootballers = list
       .map((footballer) => {
         const historyInRange = footballer.history.filter(
-          (h) => h.round >= startGameweek && h.round <= endGameweek,
+          (h) =>
+            h.round >= startGameweek &&
+            h.round <= endGameweek &&
+            h.team_a_score !== null &&
+            h.team_h_score !== null,
         );
-        const gameweeksCount = historyInRange.filter(
-          (val) => val.team_a_score !== null && val.team_h_score !== null,
-        ).length;
+        const finishedFixturesCount = historyInRange.length;
+        const appearancesCount = historyInRange.filter((h) => h.minutes > 0).length;
 
         const totalDefconBonuses = historyInRange.filter((h) =>
           hasDefconBonus(h, footballer.element_type),
@@ -82,9 +91,12 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
           (sum, h) => sum + (h.defensive_contribution ?? 0),
           0,
         );
-        const defconsPerGame = (
-          gameweeksCount > 0 ? totalDefcons / gameweeksCount : 0
-        ).toFixed(2);
+        const totalMinutes = historyInRange.reduce((sum, h) => sum + h.minutes, 0);
+        const minutesPer90 = totalMinutes / 90;
+        const defconsPerGame = formatRate(
+          safeDivide(totalDefcons, appearancesCount),
+        );
+        const defconsPer90 = formatRate(safeDivide(totalDefcons, minutesPer90));
 
         const additionalInfo = historyInRange.reduce(
           (acc, val) => {
@@ -92,6 +104,12 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             const ownershipPercent =
               (val.selected / (gameweekEvent?.ranked_count ?? totalPlayers)) * 100;
             const per90Count = (acc.totalMinutes + val.minutes) / 90;
+            const totalPoints = acc.totalPoints + val.total_points;
+            const totalGoals = acc.totalGoals + val.goals_scored;
+            const totalAssists = acc.totalAssists + val.assists;
+            const totalSaves = acc.totalSaves + val.saves;
+            const totalXGI =
+              acc.totalXGI + parseStat(val.expected_goal_involvements);
             const expectedAssists =
               val.expected_assists === undefined || val.expected_assists === null
                 ? Math.max(
@@ -100,53 +118,41 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
                       parseStat(val.expected_goals),
                   )
                 : parseStat(val.expected_assists);
+            const totalXA = acc.totalXA + expectedAssists;
+            const totalXGS = acc.totalXGS + parseStat(val.expected_goals);
+            const totalXGC =
+              acc.totalXGC + parseStat(val.expected_goals_conceded);
+            const accumulatedMinutes = acc.totalMinutes + val.minutes;
 
             return {
-              totalPoints: acc.totalPoints + val.total_points,
-              pointsPerGame: (acc.totalPoints + val.total_points) / gameweeksCount,
-              totalGoals: acc.totalGoals + val.goals_scored,
-              goalsPerGame: (acc.totalGoals + val.goals_scored) / gameweeksCount,
-              goalsPer90: (acc.totalGoals + val.goals_scored) / per90Count,
-              totalAssists: acc.totalAssists + val.assists,
-              assistsPerGame: (acc.totalAssists + val.assists) / gameweeksCount,
-              assistsPer90: (acc.totalAssists + val.assists) / per90Count,
+              totalPoints,
+              pointsPerGame: safeDivide(totalPoints, appearancesCount),
+              pointsPer90: safeDivide(totalPoints, per90Count),
+              totalGoals,
+              goalsPerGame: safeDivide(totalGoals, appearancesCount),
+              goalsPer90: safeDivide(totalGoals, per90Count),
+              totalAssists,
+              assistsPerGame: safeDivide(totalAssists, appearancesCount),
+              assistsPer90: safeDivide(totalAssists, per90Count),
               totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
-              totalSaves: acc.totalSaves + val.saves,
-              savesPerGame: (acc.totalSaves + val.saves) / gameweeksCount,
-              totalXGI: acc.totalXGI + parseStat(val.expected_goal_involvements),
-              xGIPerGame: (
-                (acc.totalXGI + parseStat(val.expected_goal_involvements)) /
-                gameweeksCount
-              ).toFixed(2),
-              xGIPer90: (
-                (acc.totalXGI + parseStat(val.expected_goal_involvements)) /
-                per90Count
-              ).toFixed(2),
-              totalXA: acc.totalXA + expectedAssists,
-              xAPerGame: ((acc.totalXA + expectedAssists) / gameweeksCount).toFixed(2),
-              xAPer90: ((acc.totalXA + expectedAssists) / per90Count).toFixed(2),
-              totalXGS: acc.totalXGS + parseStat(val.expected_goals),
-              xGSPerGame: (
-                (acc.totalXGS + parseStat(val.expected_goals)) /
-                gameweeksCount
-              ).toFixed(2),
-              xGSPer90: (
-                (acc.totalXGS + parseStat(val.expected_goals)) /
-                per90Count
-              ).toFixed(2),
-              totalXGC: acc.totalXGC + parseStat(val.expected_goals_conceded),
-              xGCPerGame: (
-                (acc.totalXGC + parseStat(val.expected_goals_conceded)) /
-                gameweeksCount
-              ).toFixed(2),
-              xGCPer90: (
-                (acc.totalXGC + parseStat(val.expected_goals_conceded)) /
-                per90Count
-              ).toFixed(2),
+              totalSaves,
+              savesPerGame: safeDivide(totalSaves, appearancesCount),
+              totalXGI,
+              xGIPerGame: formatRate(safeDivide(totalXGI, appearancesCount)),
+              xGIPer90: formatRate(safeDivide(totalXGI, per90Count)),
+              totalXA,
+              xAPerGame: formatRate(safeDivide(totalXA, appearancesCount)),
+              xAPer90: formatRate(safeDivide(totalXA, per90Count)),
+              totalXGS,
+              xGSPerGame: formatRate(safeDivide(totalXGS, appearancesCount)),
+              xGSPer90: formatRate(safeDivide(totalXGS, per90Count)),
+              totalXGC,
+              xGCPerGame: formatRate(safeDivide(totalXGC, appearancesCount)),
+              xGCPer90: formatRate(safeDivide(totalXGC, per90Count)),
               teamName: footballer.teams.name,
               maxOwnership: Math.max(ownershipPercent, acc.maxOwnership),
-              totalMinutes: acc.totalMinutes + val.minutes,
-              minPerGame: (acc.totalMinutes + val.minutes) / historyInRange.length,
+              totalMinutes: accumulatedMinutes,
+              minPerGame: safeDivide(accumulatedMinutes, finishedFixturesCount),
               totalBonus: acc.totalBonus + val.bonus,
               totalHauls: acc.totalHauls + (val.total_points >= 9 ? 1 : 0),
             };
@@ -154,6 +160,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
           {
             totalPoints: 0,
             pointsPerGame: 0,
+            pointsPer90: 0,
             totalGoals: 0,
             goalsPerGame: 0,
             goalsPer90: 0,
@@ -190,6 +197,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
           totalDefconBonuses,
           totalDefcons,
           defconsPerGame,
+          defconsPer90,
         };
       })
       .filter((f) => f.element_type !== FootballerPosition.MGR);

@@ -21,6 +21,7 @@ export type AdditionalStats = {
   xGCPerGame: string;
   xGCPer90: string;
   pointsPerGame: number;
+  pointsPer90: number;
   goalsPerGame: number;
   goalsPer90: number;
   assistsPerGame: number;
@@ -35,6 +36,7 @@ export type AdditionalStats = {
   totalDefconBonuses: number;
   totalDefcons: number;
   defconsPerGame: string;
+  defconsPer90: string;
 };
 
 export type FootballerWithGameweekStats = Footballer & AdditionalStats;

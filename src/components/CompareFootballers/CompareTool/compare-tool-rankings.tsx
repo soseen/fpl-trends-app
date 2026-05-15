@@ -66,7 +66,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                       <b className="text-magenta">
                         {(footballer?.minPerGame?.value as number).toFixed(0)}{" "}
                       </b>
-                      min. per game
+                      min. per team GW
                     </p>
                   </span>
                 )}
