@@ -1,4 +1,4 @@
-import { useState, type React } from "react";
+import { useState, type FC } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ type Props = {
   query: UseQueryResult<TeamImpact>;
 };
 
-const TeamImpactView: React.FC<Props> = ({ query }) => {
+const TeamImpactView: FC<Props> = ({ query }) => {
   const [expanded, setExpanded] = useState(false);
 
   if (query.isPending) {

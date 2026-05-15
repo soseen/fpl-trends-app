@@ -1,5 +1,4 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import React from "react";
 const CompareToolSkeleton = () => {
   return (
     <div className="mt-4 flex w-full items-center justify-center gap-4 rounded-sm bg-accent3 p-2 pb-4 lg:gap-8 lg:pb-8 lg:text-xl">

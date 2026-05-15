@@ -19,7 +19,7 @@ type Props = {
 const PlayerImpactAccordion: React.FC<Props> = ({ players, showRankImpact }) => {
   if (players.length === 0) {
     return (
-      <div className="text-text/60 px-4 py-6 text-center text-sm">
+      <div className="px-4 py-6 text-center text-sm text-text/60">
         No player data for this gameweek range yet.
       </div>
     );

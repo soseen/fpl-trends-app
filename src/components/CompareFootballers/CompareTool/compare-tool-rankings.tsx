@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
-import { BestAttributes, RankedFootballer } from "./types";
+import { useMemo } from "react";
+import { type BestAttributes, type RankedFootballer } from "./types";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
+import { type RootState } from "src/redux/store";
 import FootballerUpcomingFixtures from "src/components/FootballerDetails/footballer-upcoming-fixtures";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 type Props = {
   bestAttributes: BestAttributes;
@@ -173,8 +173,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                     <p className="">
                       Plays for a defense that accumulated{" "}
-                      <b className="text-magenta">{teamAvgXGC?.toFixed(2)}</b>{" "}
-                      expected goals conceded per game
+                      <b className="text-magenta">{teamAvgXGC?.toFixed(2)}</b> expected
+                      goals conceded per game
                     </p>
                   </span>
                 )}

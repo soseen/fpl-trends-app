@@ -1,7 +1,6 @@
 "use client";
 import { TrendingUp } from "lucide-react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
-import React from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,

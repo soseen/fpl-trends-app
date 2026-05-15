@@ -1,5 +1,5 @@
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { SelectedStatKey } from "../types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type SelectedStatKey } from "../types";
 
 export const rankStats = (
   footballers: FootballerWithGameweekStats[],

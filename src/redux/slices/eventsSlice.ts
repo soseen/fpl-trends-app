@@ -1,13 +1,13 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { AsyncThunkStatus } from "../types";
-import { Event } from "src/queries/types";
+import { type Event } from "src/queries/types";
 import { getEventsData } from "src/queries/getEvents";
 
-type  EventsState = {
+type EventsState = {
   events: Event[];
   status: AsyncThunkStatus;
   error: string | null;
-}
+};
 
 const initialState: EventsState = {
   events: [],
@@ -41,13 +41,10 @@ const eventsSlice = createSlice({
       .addCase(fetchEvents.pending, (state) => {
         state.status = AsyncThunkStatus.loading;
       })
-      .addCase(
-        fetchEvents.fulfilled,
-        (state, action: PayloadAction<Event[]>) => {
-          state.status = AsyncThunkStatus.success;
-          state.events = action.payload;
-        },
-      )
+      .addCase(fetchEvents.fulfilled, (state, action: PayloadAction<Event[]>) => {
+        state.status = AsyncThunkStatus.success;
+        state.events = action.payload;
+      })
       .addCase(fetchEvents.rejected, (state, action) => {
         state.status = AsyncThunkStatus.failed;
         state.error = action.payload as string;

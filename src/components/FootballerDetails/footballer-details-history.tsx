@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { History } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import type React from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { type History } from "src/queries/types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { GiWinterGloves as GlovesIcon } from "react-icons/gi";
 import { FaFutbol, FaHandshake, FaLock, FaShieldAlt, FaStar } from "react-icons/fa";
 import { getTeamsBadge } from "src/utils/images";
 import { hasDefconBonus } from "src/utils/defcon";
 import clsx from "clsx";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
+import { type RootState } from "src/redux/store";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;

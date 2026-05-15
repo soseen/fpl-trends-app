@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
-import { BestScoringFootballer } from "./use-best-scoring-footballers";
+import type React from "react";
+import { useMemo } from "react";
+import { type BestScoringFootballer } from "./use-best-scoring-footballers";
 import { getTeamsBadge } from "src/utils/images";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import PlayerCardShell from "src/components/PlayerCard/player-card-shell";

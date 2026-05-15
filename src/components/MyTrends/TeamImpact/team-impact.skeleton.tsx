@@ -46,7 +46,7 @@ const PlayerRowSkeleton: React.FC = () => (
   // right, plus a stat-chip strip below. Heights/widths chosen to leave
   // the row at the same total height as a real row to avoid jank when
   // data arrives.
-  <div className="border-accent4/20 flex w-full flex-col gap-1 border-b px-2 py-2 sm:gap-1.5 sm:px-3">
+  <div className="flex w-full flex-col gap-1 border-b border-accent4/20 px-2 py-2 sm:gap-1.5 sm:px-3">
     <div className="flex w-full items-center gap-2 sm:gap-3">
       <Skeleton className="h-9 w-9 shrink-0 rounded-full sm:h-11 sm:w-11" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -68,7 +68,7 @@ const PlayerRowSkeleton: React.FC = () => (
 );
 
 const PlayerBreakdownSkeleton: React.FC = () => (
-  <div className="border-accent4/40 rounded-md border bg-primary p-2 sm:p-3">
+  <div className="rounded-md border border-accent4/40 bg-primary p-2 sm:p-3">
     <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
       <Skeleton className="h-4 w-32 sm:h-5 sm:w-40" />
       <Skeleton className="h-3 w-44 sm:w-56" />

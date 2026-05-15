@@ -80,10 +80,7 @@ export default (_env, argv) => {
         ],
       }),
       ...(isDevelopment
-        ? [
-            new webpack.HotModuleReplacementPlugin(),
-            new ReactRefreshWebpackPlugin(),
-          ]
+        ? [new webpack.HotModuleReplacementPlugin(), new ReactRefreshWebpackPlugin()]
         : []),
     ],
   };

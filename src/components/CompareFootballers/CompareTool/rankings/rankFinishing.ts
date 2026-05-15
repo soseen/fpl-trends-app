@@ -1,4 +1,4 @@
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 export const rankFinishing = (footballers: FootballerWithGameweekStats[]) => {
   const sortedByFinishing = [...footballers]

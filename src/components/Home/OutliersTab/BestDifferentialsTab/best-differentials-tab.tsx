@@ -1,4 +1,3 @@
-import React from "react";
 import OutlierCard from "../outlier-card";
 import { useBestDifferentials } from "./use-best-differentials";
 import OutliersHeader from "../outliers-header";

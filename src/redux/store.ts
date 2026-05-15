@@ -14,7 +14,7 @@ export const store = configureStore({
     gameweeks: gameweeksSlice,
     events: eventsSlice,
     totalPlayers: totalPlayersSlice,
-    footballersGameweekStats: footballersGameweekStatsSlice
+    footballersGameweekStats: footballersGameweekStatsSlice,
   },
 });
 
@@ -27,9 +27,7 @@ const latestIngestedEvent = () => {
 
   return Math.max(
     0,
-    ...events
-      .filter((event) => event.finished)
-      .map((event) => event.id),
+    ...events.filter((event) => event.finished).map((event) => event.id),
   );
 };
 

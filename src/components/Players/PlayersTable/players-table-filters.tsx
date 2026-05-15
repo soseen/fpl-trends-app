@@ -71,6 +71,13 @@ const PlayersTableFilters = ({
     () => Object.keys(columnVisibility)?.map((key) => key),
     [columnVisibility],
   );
+  const searchFilterValue = (columnFilters[0]?.value as string | undefined) ?? "";
+  const ownershipFilterValue = (columnFilters[1]?.value as number[] | undefined) ?? [];
+  const maxOwnership = ownershipFilterValue[1] ?? 100;
+  const teamFilterValue = (columnFilters[2]?.value as string | undefined) ?? "";
+  const positionFilterValue = (columnFilters[3]?.value as number[] | undefined) ?? [];
+  const priceFilterValue = (columnFilters[4]?.value as number[] | undefined) ?? [];
+  const maxPrice = priceFilterValue[1] ?? 150;
 
   const modifyColumnVisibility = useCallback(
     (value: string[]) => {
@@ -92,14 +99,14 @@ const PlayersTableFilters = ({
               className="h-6 w-fit min-w-[185px] border-transparent bg-accent3 p-2 text-xs text-text focus:outline-none md:h-8 md:min-w-[300px] md:text-sm"
               onChange={(e) => setFilterProperty(0, removeAccents(e.target.value))}
               placeholder="Search player..."
-              value={columnFilters[0]?.value as string}
+              value={searchFilterValue}
             />
             <div className="flex flex-col gap-1">
               <Select
                 onValueChange={(value) =>
                   setFilterProperty(2, value === "none" ? "" : value)
                 }
-                value={columnFilters[2].value as string}
+                value={teamFilterValue}
               >
                 <SelectTrigger className="h-6 w-[106px] border-transparent bg-magenta px-2 py-1 text-text sm:w-[120px] md:h-8">
                   <SelectValue placeholder="Team" />
@@ -164,7 +171,7 @@ const PlayersTableFilters = ({
             type="multiple"
             className="flex justify-start gap-1 md:self-end"
             defaultValue={["1", "2", "3", "4"]}
-            value={(columnFilters[3].value as number[]).map((v) => v.toString())}
+            value={positionFilterValue.map((v) => v.toString())}
             onValueChange={(value) =>
               setFilterProperty(
                 3,
@@ -174,51 +181,57 @@ const PlayersTableFilters = ({
           >
             {Object.values(FootballerPosition)
               .filter((value) => typeof value === "string" && value !== "MGR")
-              .map((key) => (
-                <ToggleGroupItem
-                  key={key}
-                  value={FootballerPosition[
-                    key as keyof typeof FootballerPosition
-                  ].toString()}
-                  className={clsx(
-                    "flex h-7 min-w-[28px] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] sm:h-9 sm:min-w-[44px] sm:px-3 sm:py-1 sm:text-xs md:text-sm lg:px-4",
-                    (columnFilters[3].value as number[]).includes(
-                      FootballerPosition[key as keyof typeof FootballerPosition],
-                    )
-                      ? "bg-magenta data-[state=on]:bg-magenta"
-                      : "bg-secondary",
-                  )}
-                >
-                  {key}
-                </ToggleGroupItem>
-              ))}
+              .map((key) => {
+                const position =
+                  FootballerPosition[key as keyof typeof FootballerPosition];
+
+                if (typeof position !== "number") {
+                  return null;
+                }
+
+                return (
+                  <ToggleGroupItem
+                    key={key}
+                    value={position.toString()}
+                    className={clsx(
+                      "flex h-7 min-w-[28px] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] sm:h-9 sm:min-w-[44px] sm:px-3 sm:py-1 sm:text-xs md:text-sm lg:px-4",
+                      positionFilterValue.includes(position)
+                        ? "bg-magenta data-[state=on]:bg-magenta"
+                        : "bg-secondary",
+                    )}
+                  >
+                    {key}
+                  </ToggleGroupItem>
+                );
+              })}
           </ToggleGroup>
           <div className="flex flex-wrap justify-center gap-3 md:justify-end">
             <div className="flex w-[180px] flex-col gap-1">
               <Label className="text-xs sm:text-sm">
-                Max ownership: {(columnFilters[1].value as number[])[1]} %
+                Max ownership: {maxOwnership} %
               </Label>
               <Slider
                 key={`ownership-${isClearState}`}
-                defaultValue={[(columnFilters[1].value as number[])[1]]}
+                defaultValue={[maxOwnership]}
                 max={100}
                 min={1}
                 step={1}
-                onValueCommit={(value) => setFilterProperty(1, [0, value[0]])}
+                onValueCommit={(value) =>
+                  setFilterProperty(1, [0, value[0] ?? maxOwnership])
+                }
               />
             </div>
             <div className="flex w-[180px] flex-col gap-1">
               <Label className="text-xs sm:text-sm">
-                Max price: £
-                {(((columnFilters[4]?.value as number[])?.[1] ?? 150) / 10).toFixed(1)}m
+                Max price: £{(maxPrice / 10).toFixed(1)}m
               </Label>
               <Slider
                 key={`price-${isClearState}`}
-                defaultValue={[(columnFilters[4]?.value as number[])?.[1] ?? 150]}
+                defaultValue={[maxPrice]}
                 max={150}
                 min={35}
                 step={1}
-                onValueCommit={(value) => setFilterProperty(4, [0, value[0]])}
+                onValueCommit={(value) => setFilterProperty(4, [0, value[0] ?? maxPrice])}
               />
             </div>
           </div>

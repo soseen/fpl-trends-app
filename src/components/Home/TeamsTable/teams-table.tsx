@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React from "react";
 import { useTeamsTable } from "./use-teams-table";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import {

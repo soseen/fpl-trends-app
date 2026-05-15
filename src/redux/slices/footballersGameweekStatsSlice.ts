@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "src/redux/store";
-import { Footballer } from "src/queries/types";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { type RootState } from "src/redux/store";
+import { type Footballer } from "src/queries/types";
 
 export type AdditionalStats = {
   totalPoints: number;

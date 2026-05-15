@@ -162,8 +162,7 @@ const GameweekSlider = () => {
             {TICKS.map((tick) => {
               if (tick >= max) return null;
               const percent = ((tick - 1) / (max - 1)) * 100;
-              const inRange =
-                tick >= currentRange[0] && tick <= currentRange[1];
+              const inRange = tick >= currentRange[0] && tick <= currentRange[1];
               return (
                 <span
                   key={tick}

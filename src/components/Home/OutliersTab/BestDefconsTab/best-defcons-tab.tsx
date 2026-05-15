@@ -1,4 +1,3 @@
-import React from "react";
 import { useBestDefcons } from "./use-best-defcons";
 import OutlierCard from "../outlier-card";
 import OutliersHeader from "../outliers-header";

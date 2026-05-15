@@ -9,6 +9,12 @@
     "start": "serve -s dist",
     "dev": "webpack serve --mode development --open",
     "build": "webpack --mode production",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx,js}\" \"@/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js}\" \"@/**/*.{ts,tsx}\" --fix",
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check --ignore-unknown .",
+    "check": "npm run typecheck && npm run lint && npm run format:check",
     "deploy": "git pull && npm install && NODE_OPTIONS=--max-old-space-size=1536 npm run build"
   },
   "dependencies": {

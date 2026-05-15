@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import type React from "react";
 
 // Shimmer skeleton: a horizontal gradient that animates from right to left
 // via the `shimmer` keyframe (defined in tailwind.config.cjs). The

@@ -1,10 +1,10 @@
-import { TooltipProps } from "recharts";
+import { type TooltipProps } from "recharts";
 import { Card } from "@/components/ui/card";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { getTeamsBadge } from "src/utils/images";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
-import { FootballerPosition, History } from "src/queries/types";
+import { type RootState } from "src/redux/store";
+import { FootballerPosition, type History } from "src/queries/types";
 import {
   FaClock,
   FaFutbol,
@@ -30,9 +30,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
       const defconThreshold = getDefconThreshold(elementType);
       const defconValue = history.defensive_contribution;
       const hasDefcon =
-        defconThreshold !== null &&
-        typeof defconValue === "number" &&
-        defconValue > 0;
+        defconThreshold !== null && typeof defconValue === "number" && defconValue > 0;
 
       const events = [
         { key: "minutes", value: history.minutes, icon: <FaClock /> },
@@ -53,10 +51,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
         ...(hasDefcon
           ? [
               {
-                key:
-                  defconValue >= defconThreshold!
-                    ? "defcons (+2)"
-                    : "defcons",
+                key: defconValue >= defconThreshold! ? "defcons (+2)" : "defcons",
                 value: defconValue,
                 icon: <FaShieldAlt />,
               },
@@ -92,56 +87,56 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
     <div style={{ transform: "translate(calc(-100% - 12px), calc(-100% - 12px))" }}>
       <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
         <p className="text-center text-xs font-bold">Gameweek {label}</p>
-      {matchInfo.map((history, index) => {
-        const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
-        const homeTeamBadge = getTeamsBadge(
-          history.was_home ? data?.team_code : opponentTeamCode,
-        );
-        const awayTeamBadge = getTeamsBadge(
-          history.was_home ? opponentTeamCode : data?.team_code,
-        );
-        const gameweekEvents = getGameweekEvents(history);
+        {matchInfo.map((history, index) => {
+          const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
+          const homeTeamBadge = getTeamsBadge(
+            history.was_home ? data?.team_code : opponentTeamCode,
+          );
+          const awayTeamBadge = getTeamsBadge(
+            history.was_home ? opponentTeamCode : data?.team_code,
+          );
+          const gameweekEvents = getGameweekEvents(history);
 
-        return (
-          <div key={index} className="mb-2 w-full">
-            <div className="m-auto my-1 mb-2 flex w-fit items-center justify-center gap-1 text-text">
-              <img
-                src={homeTeamBadge}
-                className="h-4 w-4 object-contain md:h-5 md:w-5"
-                alt="Home Team Badge"
-              />
-              <span className="m-auto mx-1">
-                {history.team_h_score}:{history.team_a_score}
-              </span>
-              <img
-                src={awayTeamBadge}
-                className="h-4 w-4 object-contain md:h-5 md:w-5"
-                alt="Away Team Badge"
-              />
-            </div>
-            {!!gameweekEvents.length && (
-              <div className="flex w-full flex-col items-start gap-[2px] rounded-md bg-secondary p-1 py-[4px] text-xs md:gap-1">
-                {gameweekEvents.map((event, index) => (
-                  <div
-                    key={index}
-                    className="flex w-full flex-grow items-center justify-between gap-1"
-                  >
-                    <span className="flex items-center gap-1 text-[10px] text-chart3 md:gap-2 md:text-xs">
-                      {event.key} {event.icon}
-                    </span>
-                    <p>{event.value}</p>
-                  </div>
-                ))}
-
-                <span className="w-fit self-end justify-self-end rounded-sm bg-magenta p-[2px] py-[1px] shadow-sm">
-                  {history.total_points} pts
+          return (
+            <div key={index} className="mb-2 w-full">
+              <div className="m-auto my-1 mb-2 flex w-fit items-center justify-center gap-1 text-text">
+                <img
+                  src={homeTeamBadge}
+                  className="h-4 w-4 object-contain md:h-5 md:w-5"
+                  alt="Home Team Badge"
+                />
+                <span className="m-auto mx-1">
+                  {history.team_h_score}:{history.team_a_score}
                 </span>
+                <img
+                  src={awayTeamBadge}
+                  className="h-4 w-4 object-contain md:h-5 md:w-5"
+                  alt="Away Team Badge"
+                />
               </div>
-            )}
-            <div className="flex justify-items-end"></div>
-          </div>
-        );
-      })}
+              {!!gameweekEvents.length && (
+                <div className="flex w-full flex-col items-start gap-[2px] rounded-md bg-secondary p-1 py-[4px] text-xs md:gap-1">
+                  {gameweekEvents.map((event, index) => (
+                    <div
+                      key={index}
+                      className="flex w-full flex-grow items-center justify-between gap-1"
+                    >
+                      <span className="flex items-center gap-1 text-[10px] text-chart3 md:gap-2 md:text-xs">
+                        {event.key} {event.icon}
+                      </span>
+                      <p>{event.value}</p>
+                    </div>
+                  ))}
+
+                  <span className="w-fit self-end justify-self-end rounded-sm bg-magenta p-[2px] py-[1px] shadow-sm">
+                    {history.total_points} pts
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-items-end" />
+            </div>
+          );
+        })}
       </Card>
     </div>
   );

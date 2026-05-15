@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TeamData } from "src/queries/types";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { type TeamData } from "src/queries/types";
 import { AsyncThunkStatus } from "../types";
 import { getTeamsData } from "src/queries/getTeams";
 
@@ -26,7 +26,6 @@ export const fetchTeams = createAsyncThunk(
     }
   },
 );
-
 
 const teamsSlice = createSlice({
   name: "teams",

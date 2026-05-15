@@ -210,7 +210,6 @@ export type Event = {
   most_vice_captained: number;
 };
 
-
 export type Fixture = {
   id: number;
   code: number;
@@ -229,10 +228,10 @@ export type Fixture = {
 };
 
 export type Footballer = Element & {
-  teams: Team
-  history: History[],
-  footballer_fixtures: Fixture[]
-}
+  teams: Team;
+  history: History[];
+  footballer_fixtures: Fixture[];
+};
 
 export type TeamHistory = {
   round: number;
@@ -240,9 +239,9 @@ export type TeamHistory = {
   teamXGS: number;
   goals: number;
   goals_conceded: number;
-}
+};
 
-export type TeamData = Team & {team_history: TeamHistory[]}
+export type TeamData = Team & { team_history: TeamHistory[] };
 
 export enum FootballerPosition {
   GK = 1,

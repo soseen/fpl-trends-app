@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from "react";
 
 import { useDimensions } from "src/hooks/use-dimensions";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import FootballerDetailsModal from "./footballer-details-modal";
 import FootballerDetailsDrawer from "./footballer-details-drawer";
 

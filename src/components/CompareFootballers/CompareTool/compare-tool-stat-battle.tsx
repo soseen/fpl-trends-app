@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";

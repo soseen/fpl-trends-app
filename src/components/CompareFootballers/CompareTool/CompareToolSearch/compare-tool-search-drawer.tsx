@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useState } from "react";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { RankedFootballer } from "../types";
+import { type RankedFootballer } from "../types";
 import { FaPlus } from "react-icons/fa";
 import CompareToolSearchCommand from "./compare-tool-search-command";
 

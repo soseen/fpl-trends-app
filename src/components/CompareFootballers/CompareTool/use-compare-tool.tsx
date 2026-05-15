@@ -2,9 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { useDimensions } from "src/hooks/use-dimensions";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RootState } from "src/redux/store";
-import { BestAttributes, RankedFootballer, SelectedStatKey } from "./types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RootState } from "src/redux/store";
+import {
+  type BestAttributes,
+  type RankedFootballer,
+  type SelectedStatKey,
+} from "./types";
 import { rankStats } from "./rankings/rankStats";
 import { rankFinishing } from "./rankings/rankFinishing";
 import { rankFixtures } from "./rankings/rankFixtures";

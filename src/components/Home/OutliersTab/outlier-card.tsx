@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
 import { TbLockFilled } from "react-icons/tb";
 import { FootballerPosition } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import FootballerImage from "src/components/FootballerImage/footballer-image";

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CompareToolFootballerCard from "./compare-tool-footballer-card";
 import { Button } from "@/components/ui/button";
 import { FaPlus, FaTools } from "react-icons/fa";

@@ -39,9 +39,7 @@ const niceFloorRank = (value: number): number => {
   if (!Number.isFinite(value) || value <= 1) return 1;
   const power = 10 ** Math.floor(Math.log10(value));
   const normalized = value / power;
-  const lowerFactors = NICE_RANK_FACTORS.filter(
-    (candidate) => candidate <= normalized,
-  );
+  const lowerFactors = NICE_RANK_FACTORS.filter((candidate) => candidate <= normalized);
   const factor = lowerFactors[lowerFactors.length - 1] ?? 1;
   return Math.max(1, Math.round(factor * power));
 };
@@ -75,13 +73,11 @@ const buildRankTicks = (top: number, bottom: number, maxTicks: number): number[]
   const selected = new Set<number>([top, bottom]);
 
   for (let index = 1; index < maxTicks - 1; index += 1) {
-    const target =
-      logTop + ((logBottom - logTop) * index) / Math.max(maxTicks - 1, 1);
+    const target = logTop + ((logBottom - logTop) * index) / Math.max(maxTicks - 1, 1);
     const closest = sorted
       .filter((tick) => !selected.has(tick))
       .sort(
-        (a, b) =>
-          Math.abs(Math.log10(a) - target) - Math.abs(Math.log10(b) - target),
+        (a, b) => Math.abs(Math.log10(a) - target) - Math.abs(Math.log10(b) - target),
       )[0];
     if (closest) selected.add(closest);
   }
@@ -207,7 +203,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-text/60 mr-1 text-[10px] uppercase sm:text-xs">Show</span>
+        <span className="mr-1 text-[10px] uppercase text-text/60 sm:text-xs">Show</span>
         {SERIES.map((s) => {
           const on = enabled[s.key];
           return (
@@ -216,7 +212,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
               size="sm"
               pressed={on}
               onPressedChange={(p) => setEnabled((prev) => ({ ...prev, [s.key]: p }))}
-              className={`border-accent4/40 h-7 rounded-md border bg-transparent px-2 text-[11px] data-[state=on]:bg-magenta2 data-[state=on]:text-text sm:text-xs ${
+              className={`h-7 rounded-md border border-accent4/40 bg-transparent px-2 text-[11px] data-[state=on]:bg-magenta2 data-[state=on]:text-text sm:text-xs ${
                 on ? s.activeColor : "text-text/60 hover:bg-accent3/40"
               }`}
             >

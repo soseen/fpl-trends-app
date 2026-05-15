@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Table } from "@tanstack/react-table";
-import React from "react";
+import { type Table } from "@tanstack/react-table";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 type Props = {
   table: Table<FootballerWithGameweekStats>;

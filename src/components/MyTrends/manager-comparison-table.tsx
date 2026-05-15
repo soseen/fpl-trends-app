@@ -134,8 +134,7 @@ const diffColor = (
   comparator: number | null | undefined,
   direction: Direction,
 ): string => {
-  if (user == null || comparator == null || direction === "neutral")
-    return "text-text";
+  if (user == null || comparator == null || direction === "neutral") return "text-text";
   if (user === comparator) return "text-text";
   const userIsBetter = direction === "high-good" ? user > comparator : user < comparator;
   return userIsBetter ? "text-emerald-400" : "text-rose-400";
@@ -170,11 +169,11 @@ const ChipBarSegment: React.FC<{
     <TooltipTrigger asChild>
       <div className="flex cursor-help items-center gap-1.5">
         {copyLabel && (
-          <span className="text-text/60 w-5 shrink-0 text-right text-[9px] font-semibold sm:text-[10px]">
+          <span className="w-5 shrink-0 text-right text-[9px] font-semibold text-text/60 sm:text-[10px]">
             {copyLabel}
           </span>
         )}
-        <div className="border-accent4/60 relative h-4 w-[58px] overflow-hidden rounded-sm border bg-accent3 sm:w-[90px]">
+        <div className="relative h-4 w-[58px] overflow-hidden rounded-sm border border-accent4/60 bg-accent3 sm:w-[90px]">
           <div
             className="absolute inset-y-0 left-0 bg-magenta transition-[width] duration-300"
             style={{ width: `${pct}%` }}
@@ -182,7 +181,7 @@ const ChipBarSegment: React.FC<{
           {TICK_POSITIONS.map((t) => (
             <div
               key={t}
-              className="bg-text/40 absolute top-1/2 h-1.5 w-px -translate-y-1/2"
+              className="absolute top-1/2 h-1.5 w-px -translate-y-1/2 bg-text/40"
               style={{ left: `${t}%` }}
               aria-hidden
             />
@@ -209,7 +208,7 @@ const ChipCell: React.FC<{
   const h2Pct = rateToPct(h2Rate);
 
   if (h1Pct === null && h2Pct === null) {
-    return <div className="text-text/60 text-right">—</div>;
+    return <div className="text-right text-text/60">—</div>;
   }
 
   const showBoth = h1Pct !== null && h2Pct !== null;
@@ -250,19 +249,19 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
     <Table className="text-[11px] sm:text-xs md:text-sm">
       <TableHeader>
         <TableRow className="border-b border-accent4 hover:bg-transparent">
-          <TableHead className="text-text/70 h-8 px-1.5 sm:px-2">Stat</TableHead>
-          <TableHead className="text-text/70 h-8 px-1.5 text-right sm:px-2">
+          <TableHead className="h-8 px-1.5 text-text/70 sm:px-2">Stat</TableHead>
+          <TableHead className="h-8 px-1.5 text-right text-text/70 sm:px-2">
             You
           </TableHead>
-          <TableHead className="text-text/70 h-8 px-1.5 text-right sm:px-2">
+          <TableHead className="h-8 px-1.5 text-right text-text/70 sm:px-2">
             <span className="sm:hidden">Avg</span>
             <span className="hidden sm:inline">Average</span>
           </TableHead>
-          <TableHead className="text-text/70 h-8 px-1.5 text-right sm:px-2">
+          <TableHead className="h-8 px-1.5 text-right text-text/70 sm:px-2">
             <span className="sm:hidden">T100k</span>
             <span className="hidden sm:inline">Top 100k</span>
           </TableHead>
-          <TableHead className="text-text/70 h-8 px-1.5 text-right sm:px-2">
+          <TableHead className="h-8 px-1.5 text-right text-text/70 sm:px-2">
             <span className="sm:hidden">T10k</span>
             <span className="hidden sm:inline">Top 10k</span>
           </TableHead>
@@ -274,21 +273,21 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
             return (
               <TableRow
                 key={row.label}
-                className="border-accent4/40 border-b border-accent4 hover:bg-transparent"
+                className="border-b border-accent4 border-accent4/40 hover:bg-transparent"
               >
-                <TableCell className="text-text/80 px-1.5 py-2 sm:px-2">
+                <TableCell className="px-1.5 py-2 text-text/80 sm:px-2">
                   {row.label}
                 </TableCell>
                 <TableCell className="px-1.5 py-2 text-right font-semibold text-text sm:px-2">
                   {row.user ?? "—"}
                 </TableCell>
-                <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+                <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                   {row.average ?? "—"}
                 </TableCell>
-                <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+                <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                   {row.top100k ?? "—"}
                 </TableCell>
-                <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+                <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                   {row.top10k ?? "—"}
                 </TableCell>
               </TableRow>
@@ -299,9 +298,9 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
             return (
               <TableRow
                 key={row.label}
-                className="border-accent4/40 border-b border-accent4 hover:bg-transparent"
+                className="border-b border-accent4 border-accent4/40 hover:bg-transparent"
               >
-                <TableCell className="text-text/80 px-1.5 py-2 sm:px-2">
+                <TableCell className="px-1.5 py-2 text-text/80 sm:px-2">
                   {row.label}
                 </TableCell>
                 <TableCell className="px-1.5 py-2 text-right font-semibold text-text sm:px-2">
@@ -338,9 +337,9 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
           return (
             <TableRow
               key={row.label}
-              className="border-accent4/40 border-b border-accent4 hover:bg-transparent"
+              className="border-b border-accent4 border-accent4/40 hover:bg-transparent"
             >
-              <TableCell className="text-text/80 px-1.5 py-2 sm:px-2">
+              <TableCell className="px-1.5 py-2 text-text/80 sm:px-2">
                 {row.label}
               </TableCell>
               <TableCell
@@ -352,14 +351,14 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
               >
                 {formatNumber(row.stat.user, decimals)}
               </TableCell>
-              <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+              <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                 {formatComparator(
                   row.stat.average,
                   row.stat.average !== null && row.stat.average < 10 ? 1 : 0,
                   row.approximate ?? false,
                 )}
               </TableCell>
-              <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+              <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                 {formatComparator(
                   row.stat.top100k_average,
                   row.stat.top100k_average !== null && row.stat.top100k_average < 10
@@ -368,7 +367,7 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
                   false,
                 )}
               </TableCell>
-              <TableCell className="text-text/80 px-1.5 py-2 text-right sm:px-2">
+              <TableCell className="px-1.5 py-2 text-right text-text/80 sm:px-2">
                 {formatComparator(
                   row.stat.top10k_average,
                   row.stat.top10k_average !== null && row.stat.top10k_average < 10

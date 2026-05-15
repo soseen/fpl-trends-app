@@ -1,6 +1,5 @@
-import React from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RankedFootballer } from "../types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RankedFootballer } from "../types";
 import { useDimensions } from "src/hooks/use-dimensions";
 import CompareToolSearchDrawer from "./compare-tool-search-drawer";
 import CompareToolSearchPopover from "./compare-tool-search-popover";

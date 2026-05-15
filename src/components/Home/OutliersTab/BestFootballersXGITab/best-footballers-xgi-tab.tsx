@@ -1,4 +1,3 @@
-import React from "react";
 import { useBestXGIFootballers } from "./use-best-xgi-footballers";
 import OutlierCard from "../outlier-card";
 import OutliersHeader from "../outliers-header";

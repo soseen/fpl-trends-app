@@ -21,7 +21,7 @@ const HeaderRow: React.FC = () => (
 );
 
 const DataRow: React.FC = () => (
-  <div className="border-accent4/40 grid grid-cols-12 items-center gap-2 border-b py-2.5">
+  <div className="grid grid-cols-12 items-center gap-2 border-b border-accent4/40 py-2.5">
     <Skeleton className="col-span-4 h-3.5" />
     <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />
     <Skeleton className="col-span-2 ml-auto h-3.5 w-12" />

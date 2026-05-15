@@ -1,6 +1,6 @@
 import { createContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import React from "react";
+import type React from "react";
 
 type AppContextProviderProps = {
   children: React.ReactNode;

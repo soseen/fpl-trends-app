@@ -21,11 +21,38 @@ Common commands:
 ```bash
 npm run dev
 npm run build
+npm run typecheck
+npm run lint
+npm run lint:fix
+npm run format
+npm run format:check
+npm run check
 npm start
 ```
 
 `npm run dev` starts webpack dev server on port 5000 and opens a browser.
 `npm run build` produces static files in `dist/`.
+
+## Code Quality Workflow
+
+Before finishing changes, format and lint the files you touched:
+
+```bash
+npx prettier --write --ignore-unknown <changed files>
+npx eslint --fix <changed files>
+```
+
+Use `npm run lint` for a whole-app lint pass, `npm run typecheck` for
+TypeScript validation, and `npm run check` when you need the full local
+quality gate. ESLint is for code quality/import correctness; Prettier is
+the formatter, including Tailwind class ordering.
+
+Type-only imports are required, but mixed value/type imports should stay
+clean with inline type specifiers when possible:
+
+```ts
+import { useMemo, type ReactNode } from "react";
+```
 
 ## Important Build Behavior
 
@@ -186,4 +213,3 @@ scannable, and work-focused.
 - API base URL is build-time only
 - Some older docs still describe React Query as unused; current My Trends
   pages do use TanStack Query
-

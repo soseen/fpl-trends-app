@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { AsyncThunkStatus } from "../types";
 import { getTotalPlayersData } from "src/queries/getTotalPlayers";
 
@@ -6,7 +6,7 @@ type FootballersState = {
   totalPlayers: number;
   status: AsyncThunkStatus;
   error: string | null;
-}
+};
 
 const initialState: FootballersState = {
   totalPlayers: 0,
@@ -39,13 +39,10 @@ const totalPlayersSlice = createSlice({
       .addCase(fetchTotalPlayers.pending, (state) => {
         state.status = AsyncThunkStatus.loading;
       })
-      .addCase(
-        fetchTotalPlayers.fulfilled,
-        (state, action: PayloadAction<number>) => {
-          state.status = AsyncThunkStatus.success;
-          state.totalPlayers = action.payload;
-        },
-      )
+      .addCase(fetchTotalPlayers.fulfilled, (state, action: PayloadAction<number>) => {
+        state.status = AsyncThunkStatus.success;
+        state.totalPlayers = action.payload;
+      })
       .addCase(fetchTotalPlayers.rejected, (state, action) => {
         state.status = AsyncThunkStatus.failed;
         state.error = action.payload as string;

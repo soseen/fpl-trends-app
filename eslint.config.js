@@ -5,7 +5,6 @@ import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 import eslintConfigPrettier from "eslint-config-prettier";
-import eslintPluginPrettier from "eslint-plugin-prettier";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -31,7 +30,6 @@ export default [
     plugins: {
       "react-hooks": pluginReactHooks,
       "unused-imports": pluginUnusedImports,
-      prettier: eslintPluginPrettier,
     },
     settings: {
       react: {
@@ -39,17 +37,6 @@ export default [
       },
     },
     rules: {
-      /* Prettier */
-      "prettier/prettier": [
-        "error",
-        {
-          tabWidth: 2,
-          useTabs: false,
-          semi: true,
-          singleQuote: false,
-        },
-      ],
-
       /* React */
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
@@ -66,7 +53,7 @@ export default [
       ],
       "@typescript-eslint/consistent-type-imports": [
         "error",
-        { prefer: "type-imports" },
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
 
       /* Unused imports (auto-fixable) */
@@ -74,8 +61,8 @@ export default [
 
       /* General quality */
       "no-console": ["warn", { allow: ["warn", "error"] }],
-      "no-duplicate-imports": "error",
-      eqeqeq: ["error", "always"],
+      "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
+      eqeqeq: ["error", "always", { null: "ignore" }],
     },
   },
   {

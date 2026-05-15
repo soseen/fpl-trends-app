@@ -1,6 +1,6 @@
 import {
-  AdditionalStats,
-  FootballerWithGameweekStats,
+  type AdditionalStats,
+  type FootballerWithGameweekStats,
 } from "src/redux/slices/footballersGameweekStatsSlice";
 
 export type SelectedStatKey = keyof Pick<

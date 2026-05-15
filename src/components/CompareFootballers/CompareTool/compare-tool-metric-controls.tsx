@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import React from "react";
 
 import type { CompareMetric, CompareMetricKey } from "./compare-tool-metrics";
 import { MIN_SELECTED_COMPARE_METRICS } from "./compare-tool-metrics";

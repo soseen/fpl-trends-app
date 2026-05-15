@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { getFootballersImage } from "src/utils/images";
 
@@ -56,11 +56,7 @@ const FootballerImage = ({ code, className }: Props) => {
     <img
       ref={imgRef}
       src={getFootballersImage(code)}
-      className={clsx(
-        "object-contain",
-        loaded ? "opacity-100" : "opacity-0",
-        className,
-      )}
+      className={clsx("object-contain", loaded ? "opacity-100" : "opacity-0", className)}
       decoding="async"
       loading="lazy"
       onLoad={() => setLoaded(true)}

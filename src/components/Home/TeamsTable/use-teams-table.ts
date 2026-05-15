@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { TeamData } from "src/queries/types";
-import { RootState } from "src/redux/store";
+import { type TeamData } from "src/queries/types";
+import { type RootState } from "src/redux/store";
 
 export const useTeamsTable = () => {
   const { list } = useSelector((state: RootState) => state.teams);
@@ -20,10 +20,12 @@ export const useTeamsTable = () => {
     return [...list].map((team) => ({
       ...team,
       avgXGCFullSeason:
-        team.team_history.reduce((sum, gw) => sum + gw.teamXGC, 0) / team.team_history.length || 0,
+        team.team_history.reduce((sum, gw) => sum + gw.teamXGC, 0) /
+          team.team_history.length || 0,
       avgXGSFullSeason:
-        team.team_history.reduce((sum, gw) => sum + gw.teamXGS, 0) / team.team_history.length || 0,
-      fullSeasonRank: 0
+        team.team_history.reduce((sum, gw) => sum + gw.teamXGS, 0) /
+          team.team_history.length || 0,
+      fullSeasonRank: 0,
     }));
   }, [list]);
 
@@ -50,18 +52,22 @@ export const useTeamsTable = () => {
           (gw) => gw.round >= startGameweek && gw.round <= endGameweek,
         );
 
-        const selectedStatTotal = selectedGameweeks.reduce((sum, gw) => sum + (isDefensiveStats ? gw.teamXGC : gw.teamXGS), 0);
+        const selectedStatTotal = selectedGameweeks.reduce(
+          (sum, gw) => sum + (isDefensiveStats ? gw.teamXGC : gw.teamXGS),
+          0,
+        );
         const avg = selectedStatTotal / selectedGameweeks.length || 0;
 
         return {
           ...team,
           avg,
           gamesPlayed: selectedGameweeks.length,
-          totalCleanSheets: selectedGameweeks.filter((gw) => gw.goals_conceded === 0).length,
-          totalGoals: selectedGameweeks.reduce((sum, gw) => sum + gw.goals, 0)
-        }
+          totalCleanSheets: selectedGameweeks.filter((gw) => gw.goals_conceded === 0)
+            .length,
+          totalGoals: selectedGameweeks.reduce((sum, gw) => sum + gw.goals, 0),
+        };
       })
-      .sort((a, b) => isDefensiveStats ? (a!.avg - b!.avg) : (b!.avg - a!.avg));
+      .sort((a, b) => (isDefensiveStats ? a!.avg - b!.avg : b!.avg - a!.avg));
 
     return sortedByCurrentRange
       .map((team, index) => ({

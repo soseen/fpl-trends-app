@@ -1,7 +1,6 @@
 import { FaFutbol, FaHandshake, FaLock } from "react-icons/fa";
 import { FootballerPosition } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import React from "react";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 const CustomXAxisTick = ({
   x,

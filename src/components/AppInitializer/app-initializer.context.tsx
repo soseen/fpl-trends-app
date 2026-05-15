@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import type React from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents } from "src/redux/slices/eventsSlice";
 import { fetchFootballersData } from "src/redux/slices/footballersSlice";
 import { fetchTeams } from "src/redux/slices/teamsSlice";
 import { fetchTotalPlayers } from "src/redux/slices/totalPlayersSlice";
-import { AppDispatch, RootState } from "src/redux/store";
+import { type AppDispatch, type RootState } from "src/redux/store";
 import { AsyncThunkStatus } from "src/redux/types";
 import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition } from "src/queries/types";
@@ -93,9 +94,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
         );
         const totalMinutes = historyInRange.reduce((sum, h) => sum + h.minutes, 0);
         const minutesPer90 = totalMinutes / 90;
-        const defconsPerGame = formatRate(
-          safeDivide(totalDefcons, appearancesCount),
-        );
+        const defconsPerGame = formatRate(safeDivide(totalDefcons, appearancesCount));
         const defconsPer90 = formatRate(safeDivide(totalDefcons, minutesPer90));
 
         const additionalInfo = historyInRange.reduce(
@@ -108,8 +107,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             const totalGoals = acc.totalGoals + val.goals_scored;
             const totalAssists = acc.totalAssists + val.assists;
             const totalSaves = acc.totalSaves + val.saves;
-            const totalXGI =
-              acc.totalXGI + parseStat(val.expected_goal_involvements);
+            const totalXGI = acc.totalXGI + parseStat(val.expected_goal_involvements);
             const expectedAssists =
               val.expected_assists === undefined || val.expected_assists === null
                 ? Math.max(
@@ -120,8 +118,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
                 : parseStat(val.expected_assists);
             const totalXA = acc.totalXA + expectedAssists;
             const totalXGS = acc.totalXGS + parseStat(val.expected_goals);
-            const totalXGC =
-              acc.totalXGC + parseStat(val.expected_goals_conceded);
+            const totalXGC = acc.totalXGC + parseStat(val.expected_goals_conceded);
             const accumulatedMinutes = acc.totalMinutes + val.minutes;
 
             return {
@@ -203,14 +200,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
       .filter((f) => f.element_type !== FootballerPosition.MGR);
 
     dispatch(setEnrichedFootballers(enrichedFootballers));
-  }, [
-    dispatch,
-    events,
-    list,
-    startGameweek,
-    endGameweek,
-    totalPlayers,
-  ]);
+  }, [dispatch, events, list, startGameweek, endGameweek, totalPlayers]);
 
   const appStatus = useMemo(() => {
     const statuses = [status, teamsStatus, totalPlayersStatus, eventsStatus];

@@ -1,13 +1,13 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { getFootballersData } from "src/queries/getFootballers";
 import { AsyncThunkStatus } from "../types";
-import { Footballer } from "src/queries/types";
+import { type Footballer } from "src/queries/types";
 
-type  FootballersState = {
+type FootballersState = {
   list: Footballer[];
   status: AsyncThunkStatus;
   error: string | null;
-}
+};
 
 const initialState: FootballersState = {
   list: [],

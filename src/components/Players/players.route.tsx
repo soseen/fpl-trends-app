@@ -1,4 +1,3 @@
-import React from "react";
 import PlayersTable from "./PlayersTable/players-table";
 
 const Players = () => {

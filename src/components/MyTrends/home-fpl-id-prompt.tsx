@@ -1,6 +1,5 @@
-import React from "react";
+import type React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import { useLocalStorage } from "src/hooks/useLocalStorage";
 import FplIdInput from "./fpl-id-input";
 import { FPL_ID_STORAGE_KEY } from "./my-trends.route";

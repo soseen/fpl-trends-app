@@ -1,5 +1,5 @@
 import api from "src/lib/axios";
-import { Footballer } from "./types";
+import { type Footballer } from "./types";
 
 export const getFootballersData = async () => {
   const response = await api.get<Footballer[]>("footballersData");

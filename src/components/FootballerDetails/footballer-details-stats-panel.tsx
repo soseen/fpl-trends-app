@@ -1,5 +1,5 @@
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import React, { useMemo } from "react";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useMemo } from "react";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;

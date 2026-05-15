@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { FootballerPosition } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RootState } from "src/redux/store";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RootState } from "src/redux/store";
 
 export type BestScoringFootballer = FootballerWithGameweekStats & {
   isBestScoringPlayer?: boolean;

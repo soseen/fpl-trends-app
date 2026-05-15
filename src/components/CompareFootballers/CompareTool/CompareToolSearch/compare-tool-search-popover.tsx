@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useState } from "react";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { FaPlus } from "react-icons/fa";
-import { RankedFootballer } from "../types";
+import { type RankedFootballer } from "../types";
 import CompareToolSearchCommand from "./compare-tool-search-command";
 type Props = {
   index: number;

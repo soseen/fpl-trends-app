@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
+import { type RootState } from "src/redux/store";
 import FootballerAvatar from "../FootballerAvatar/footballer-avatar";
 import { AnimatePresence, motion } from "motion/react";
 import { roundToThousands } from "src/utils/strings";

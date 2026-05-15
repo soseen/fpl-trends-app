@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { FootballerPosition } from "src/queries/types";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RootState } from "src/redux/store";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RootState } from "src/redux/store";
 import { getDefconThreshold } from "src/utils/defcon";
 
 const MIN_GAMES_IN_RANGE = 3;

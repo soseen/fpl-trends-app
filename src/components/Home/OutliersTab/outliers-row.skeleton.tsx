@@ -1,4 +1,3 @@
-import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const OutliersRowSkeleton = () => {
@@ -9,7 +8,7 @@ const OutliersRowSkeleton = () => {
         {[...Array(5).keys()].map((_, index) => (
           <Skeleton
             key={index}
-            className="xs:h-[140px] flex h-[105px] w-full md:h-[190px] xl:h-[240px]"
+            className="flex h-[105px] w-full xs:h-[140px] md:h-[190px] xl:h-[240px]"
           />
         ))}
       </div>

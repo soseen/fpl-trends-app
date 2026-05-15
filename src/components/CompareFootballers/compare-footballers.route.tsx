@@ -1,4 +1,3 @@
-import React from "react";
 import CompareTool from "./CompareTool/compare-tool";
 
 const CompareFootballers = () => {

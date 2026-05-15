@@ -109,12 +109,12 @@ src/
 
 ## Routes
 
-| Path         | Component          | Description                                                |
-| ------------ | ------------------ | ---------------------------------------------------------- |
-| `/`          | Home               | Best XI pitch, outliers, teams table, FPL ID prompt        |
-| `/players`   | Players            | Full data table with 25+ stat columns                      |
-| `/compare`   | CompareFootballers | Side-by-side player comparison (2–4 players)               |
-| `/my-trends` | MyTrends           | Personal range-rank vs season overall rank for an FPL ID   |
+| Path         | Component          | Description                                              |
+| ------------ | ------------------ | -------------------------------------------------------- |
+| `/`          | Home               | Best XI pitch, outliers, teams table, FPL ID prompt      |
+| `/players`   | Players            | Full data table with 25+ stat columns                    |
+| `/compare`   | CompareFootballers | Side-by-side player comparison (2–4 players)             |
+| `/my-trends` | MyTrends           | Personal range-rank vs season overall rank for an FPL ID |
 
 All routes are wrapped in `<Layout>` (navbar + footer + GW slider).
 
@@ -124,14 +124,14 @@ All routes are wrapped in `<Layout>` (navbar + footer + GW slider).
 
 ### Redux slices (6)
 
-| Slice | Holds | Async thunk |
-|---|---|---|
-| `footballersSlice` | `Footballer[]` from API | `fetchFootballersData` |
-| `teamsSlice` | `TeamData[]` from API | `fetchTeams` |
-| `gameweeksSlice` | `{ startGameweek, endGameweek }` | — (slider-controlled) |
-| `eventsSlice` | `Event[]` from API | `fetchEvents` |
-| `totalPlayersSlice` | `number` from API | `fetchTotalPlayers` |
-| `footballersGameweekStatsSlice` | Per-range enriched stats | — (computed locally) |
+| Slice                           | Holds                            | Async thunk            |
+| ------------------------------- | -------------------------------- | ---------------------- |
+| `footballersSlice`              | `Footballer[]` from API          | `fetchFootballersData` |
+| `teamsSlice`                    | `TeamData[]` from API            | `fetchTeams`           |
+| `gameweeksSlice`                | `{ startGameweek, endGameweek }` | — (slider-controlled)  |
+| `eventsSlice`                   | `Event[]` from API               | `fetchEvents`          |
+| `totalPlayersSlice`             | `number` from API                | `fetchTotalPlayers`    |
+| `footballersGameweekStatsSlice` | Per-range enriched stats         | — (computed locally)   |
 
 ### Enriched stats (client-side, per GW range)
 
@@ -182,7 +182,7 @@ The frontend is a thin wrapper around the API endpoints. The actual rank estimat
 
 The range-rank card respects the `confidence` field returned by the API:
 
-- `exact` — user is in the top 10k *and* stratum 1 is fully sampled. Number shown without prefix.
+- `exact` — user is in the top 10k _and_ stratum 1 is fully sampled. Number shown without prefix.
 - `estimated` — sample-based extrapolation (cross-stratum sum × Bernoulli-urn scaling). Prefixed with `≈`.
 - `approximate` — no sample yet anywhere. Falls back to overall rank, prefixed with `≈`.
 
@@ -199,21 +199,21 @@ If `notes.captain_average_partial` (or `hits_average_partial` / `bench_average_p
 
 ### Files
 
-| File | Purpose |
-|---|---|
-| `src/components/MyTrends/my-trends.route.tsx` | Page. Reads ID from `useLocalStorage`, GW range from Redux, fans out four React Query hooks. |
-| `src/components/MyTrends/my-trends-section.tsx` | Section wrapper combining the four panes. |
-| `src/components/MyTrends/fpl-id-input.tsx` | Reusable validated input (numeric, 1–20M). |
-| `src/components/MyTrends/range-rank-card.tsx` | Renders overall vs range rank with green/red colour logic and confidence label. |
-| `src/components/MyTrends/rank-trajectory-chart.tsx` | Recharts line chart — cumulative overall rank per GW, derived from the FPL history payload. |
-| `src/components/MyTrends/manager-comparison-table.tsx` | Stat × cohort table (You / Average / Top 10k / Diff). Renders both numeric and text rows. |
-| `src/components/MyTrends/accuracy-meter.tsx` | Three-bar meter; lights up as the stratum sample target fills. |
-| `src/components/MyTrends/home-fpl-id-prompt.tsx` | Home-page card that collapses to a link once an ID is stored. |
-| `src/hooks/useLocalStorage.ts` | Generic `useState`-backed `localStorage` hook. |
-| `src/queries/getManagerSummary.ts` | `GET /api/manager/:id/summary`. |
-| `src/queries/getManagerRangeRank.ts` | `GET /api/manager/:id/range-rank?start=X&end=Y`. |
-| `src/queries/getManagerTrajectory.ts` | `GET /api/manager/:id/trajectory?start=X&end=Y`. |
-| `src/queries/getManagerComparison.ts` | `GET /api/manager/:id/comparison?start=X&end=Y`. |
+| File                                                   | Purpose                                                                                      |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `src/components/MyTrends/my-trends.route.tsx`          | Page. Reads ID from `useLocalStorage`, GW range from Redux, fans out four React Query hooks. |
+| `src/components/MyTrends/my-trends-section.tsx`        | Section wrapper combining the four panes.                                                    |
+| `src/components/MyTrends/fpl-id-input.tsx`             | Reusable validated input (numeric, 1–20M).                                                   |
+| `src/components/MyTrends/range-rank-card.tsx`          | Renders overall vs range rank with green/red colour logic and confidence label.              |
+| `src/components/MyTrends/rank-trajectory-chart.tsx`    | Recharts line chart — cumulative overall rank per GW, derived from the FPL history payload.  |
+| `src/components/MyTrends/manager-comparison-table.tsx` | Stat × cohort table (You / Average / Top 10k / Diff). Renders both numeric and text rows.    |
+| `src/components/MyTrends/accuracy-meter.tsx`           | Three-bar meter; lights up as the stratum sample target fills.                               |
+| `src/components/MyTrends/home-fpl-id-prompt.tsx`       | Home-page card that collapses to a link once an ID is stored.                                |
+| `src/hooks/useLocalStorage.ts`                         | Generic `useState`-backed `localStorage` hook.                                               |
+| `src/queries/getManagerSummary.ts`                     | `GET /api/manager/:id/summary`.                                                              |
+| `src/queries/getManagerRangeRank.ts`                   | `GET /api/manager/:id/range-rank?start=X&end=Y`.                                             |
+| `src/queries/getManagerTrajectory.ts`                  | `GET /api/manager/:id/trajectory?start=X&end=Y`.                                             |
+| `src/queries/getManagerComparison.ts`                  | `GET /api/manager/:id/comparison?start=X&end=Y`.                                             |
 
 ### Privacy
 

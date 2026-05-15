@@ -5,11 +5,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { RootState } from "src/redux/store";
-import { RankedFootballer } from "../types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RootState } from "src/redux/store";
+import { type RankedFootballer } from "../types";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { removeAccents } from "src/utils/strings";

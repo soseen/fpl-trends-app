@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
 import Layout from "./components/Layout/layout";
 import Home from "./components/Home/home.route";

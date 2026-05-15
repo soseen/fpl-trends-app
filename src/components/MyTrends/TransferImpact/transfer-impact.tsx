@@ -69,6 +69,7 @@ const TransferImpactView: FC<Props> = ({ query }) => {
       <TransferImpactSummary
         totalNet={data.total_net_points}
         totalTransfers={data.total_transfers}
+        totalRankImpact={data.total_rank_impact}
       />
 
       {data.incomplete && (

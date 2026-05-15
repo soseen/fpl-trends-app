@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo } from "react";
-import { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { useCallback, useMemo } from "react";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
+import { type RootState } from "src/redux/store";
 import { getTeamsBadge } from "src/utils/images";
 import clsx from "clsx";
-import { Fixture } from "src/queries/types";
+import { type Fixture } from "src/queries/types";
 import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
 
 type Props = {

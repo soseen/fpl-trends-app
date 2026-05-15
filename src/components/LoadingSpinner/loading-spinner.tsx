@@ -1,5 +1,4 @@
 import { FaSpinner } from "react-icons/fa";
-import React from "react";
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center">
