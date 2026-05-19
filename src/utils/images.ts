@@ -16,7 +16,7 @@ export const getFootballersImage = (
   size: FootballerImageSize = "regular",
 ) => {
   const dimensions = FOOTBALLER_IMAGE_DIMENSIONS[size].path;
-  return `${apiBaseUrl}/player-image/${dimensions}/${code}.png`;
+  return `${apiBaseUrl}/player-image/${dimensions}/${code}`;
 };
 
 export const getTeamsBadge = (code?: number) =>
