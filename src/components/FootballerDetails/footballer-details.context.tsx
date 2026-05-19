@@ -1,9 +1,10 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { lazy, Suspense, useCallback, useContext, useState } from "react";
 
 import { useDimensions } from "src/hooks/use-dimensions";
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import FootballerDetailsModal from "./footballer-details-modal";
-import FootballerDetailsDrawer from "./footballer-details-drawer";
+
+const FootballerDetailsModal = lazy(() => import("./footballer-details-modal"));
+const FootballerDetailsDrawer = lazy(() => import("./footballer-details-drawer"));
 
 type FootballerDetailsStateProvider = {
   children: React.ReactNode;
@@ -28,10 +29,14 @@ export const FootballerDetailsProvider = ({
 
   return (
     <FootballerDetailsContext.Provider value={{ footballer, setFootballer, onClose }}>
-      {isMD ? (
-        <FootballerDetailsDrawer footballer={footballer} onClose={onClose} />
-      ) : (
-        <FootballerDetailsModal footballer={footballer} onClose={onClose} />
+      {footballer && (
+        <Suspense fallback={null}>
+          {isMD ? (
+            <FootballerDetailsDrawer footballer={footballer} onClose={onClose} />
+          ) : (
+            <FootballerDetailsModal footballer={footballer} onClose={onClose} />
+          )}
+        </Suspense>
       )}
       {children}
     </FootballerDetailsContext.Provider>

@@ -24,7 +24,7 @@ const FootballerAvatar = ({
   >
     <AvatarImage
       className={`rounded-lg object-cover object-top ${imageClassName ?? ""}`}
-      src={getFootballersImage(footballer.code)}
+      src={getFootballersImage(footballer.code, "small")}
     />
     <AvatarFallback>{footballer.code}</AvatarFallback>
   </Avatar>

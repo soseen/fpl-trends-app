@@ -40,7 +40,7 @@ const TeamImpactPitch: React.FC<Props> = ({
   return (
     <div className="mt-4 flex w-full flex-col justify-center md:mt-6">
       <h3 className="mb-6 text-center text-sm text-text md:mb-12 md:text-xl">{title}</h3>
-      <div className="mt-2 min-h-[350px] w-full bg-[url(src/assets/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
+      <div className="mt-2 min-h-[350px] w-full bg-[url(/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[550px] md:mt-6 md:min-h-[620px] md:bg-contain lg:min-h-[860px]">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0 }}

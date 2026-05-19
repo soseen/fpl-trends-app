@@ -47,7 +47,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
   const { status: totalPlayersStatus, totalPlayers } = useSelector(
     (state: RootState) => state.totalPlayers,
   );
-  const { startGameweek, endGameweek } = useSelector(
+  const { startGameweek, endGameweek, maxGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
   const { status: eventsStatus, events } = useSelector(
@@ -203,18 +203,22 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
   }, [dispatch, events, list, startGameweek, endGameweek, totalPlayers]);
 
   const appStatus = useMemo(() => {
-    const statuses = [status, teamsStatus, totalPlayersStatus, eventsStatus];
-    if (statuses.includes(AsyncThunkStatus.failed)) {
+    if (status === AsyncThunkStatus.failed) {
       return AppInitStatus.error;
-    } else if (
-      statuses.includes(AsyncThunkStatus.loading) ||
-      statuses.includes(AsyncThunkStatus.idle)
+    }
+
+    if (
+      status === AsyncThunkStatus.loading ||
+      status === AsyncThunkStatus.idle ||
+      (maxGameweek === 0 &&
+        (eventsStatus === AsyncThunkStatus.loading ||
+          eventsStatus === AsyncThunkStatus.idle))
     ) {
       return AppInitStatus.loading;
-    } else {
-      return AppInitStatus.idle;
     }
-  }, [status, teamsStatus, totalPlayersStatus, eventsStatus]);
+
+    return AppInitStatus.idle;
+  }, [status, maxGameweek, eventsStatus]);
 
   return (
     <AppInitializerContext.Provider value={{ status: appStatus }}>

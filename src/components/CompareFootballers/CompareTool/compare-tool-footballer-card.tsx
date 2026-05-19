@@ -6,7 +6,6 @@ import CompareToolSearch from "./CompareToolSearch/compare-tool-search";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { COMPARE_TOOL_STAT_KEYS } from "./use-compare-tool";
-import { isNumber } from "lodash";
 import {
   FaArrowDown,
   FaArrowUp,
@@ -27,6 +26,8 @@ type SelectedStats = Pick<
   RankedFootballer,
   "totalGoals" | "totalAssists" | "totalCleanSheets" | "totalDefconBonuses"
 >;
+
+const isNumber = (value: unknown): value is number => typeof value === "number";
 
 const getIcon = (key: keyof SelectedStats) => {
   switch (key) {

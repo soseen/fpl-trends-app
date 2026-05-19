@@ -1,14 +1,16 @@
 import type React from "react";
+import { lazy, Suspense } from "react";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
-import TransfersPanel from "./transfersPanel";
 import {
   AppInitStatus,
   useAppInitContext,
 } from "../AppInitializer/app-initializer.context";
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 import logo from "../../assets/logo.png";
-import { FaChartLine, FaHome, FaTools, FaUser } from "react-icons/fa";
+import { ChartLine, House, User, Wrench } from "lucide-react";
+
+const TransfersPanel = lazy(() => import("./transfersPanel"));
 
 type NavItem = {
   to: string;
@@ -17,10 +19,10 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { to: "/", label: "Home", icon: <FaHome /> },
-  { to: "/my-trends", label: "My Trends", icon: <FaChartLine /> },
-  { to: "/players", label: "Players", icon: <FaUser /> },
-  { to: "/compare", label: "Compare", icon: <FaTools /> },
+  { to: "/", label: "Home", icon: <House /> },
+  { to: "/my-trends", label: "My Trends", icon: <ChartLine /> },
+  { to: "/players", label: "Players", icon: <User /> },
+  { to: "/compare", label: "Compare", icon: <Wrench /> },
 ];
 
 // Mobile shows icons only — labels were wrapping/clumping at 375px.
@@ -70,7 +72,11 @@ const Navbar: React.FC = () => {
         </div>
         <GameweekSlider />
       </nav>
-      {status === AppInitStatus.idle && <TransfersPanel />}
+      {status === AppInitStatus.idle && (
+        <Suspense fallback={null}>
+          <TransfersPanel />
+        </Suspense>
+      )}
     </>
   );
 };

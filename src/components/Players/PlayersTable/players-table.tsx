@@ -30,10 +30,11 @@ import { usePlayersTableColumns } from "./use-players-table-columns";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 import PlayersTableFilters from "./players-table-filters";
 import { useTableFiltersFromParams } from "./use-table-filters-from-params";
-import { isEqual } from "lodash";
 import PlayersTablePagination from "./players-table-pagination";
 
 const DEFAULT_SORTING = [{ desc: true, id: "totalPoints" }];
+const areFilterValuesEqual = (a: unknown, b: unknown) =>
+  JSON.stringify(a) === JSON.stringify(b);
 
 export const FILTERS_DEFAULT_STATE: ColumnFiltersState = [
   { id: "web_name", value: "" },
@@ -73,14 +74,18 @@ const PlayersTable = () => {
       sorting.length === DEFAULT_SORTING.length &&
       sorting.every((sortingValue) => {
         const defaultSorting = DEFAULT_SORTING.find((s) => s.id === sortingValue.id);
-        return defaultSorting ? isEqual(sortingValue.desc, defaultSorting.desc) : false;
+        return defaultSorting
+          ? areFilterValuesEqual(sortingValue.desc, defaultSorting.desc)
+          : false;
       });
 
     const isDefaultFilters =
       columnFilters.length === FILTERS_DEFAULT_STATE.length &&
       columnFilters.every((filter) => {
         const defaultFilter = FILTERS_DEFAULT_STATE.find((f) => f.id === filter.id);
-        return defaultFilter ? isEqual(filter.value, defaultFilter.value) : false;
+        return defaultFilter
+          ? areFilterValuesEqual(filter.value, defaultFilter.value)
+          : false;
       });
 
     return isDefaultSorting && isDefaultFilters;

@@ -87,7 +87,16 @@ module.exports = {
         "accordion-up": "accordion-up 0.25s cubic-bezier(0.87, 0, 0.13, 1)",
         shimmer: "shimmer 1.8s ease-in-out infinite",
       },
-      fontFamily: { roboto: ["Roboto", "sans-serif"] },
+      fontFamily: {
+        roboto: [
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "sans-serif",
+        ],
+      },
       screens: { xs: "510px" },
     },
   },

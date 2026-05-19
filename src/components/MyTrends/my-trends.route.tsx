@@ -37,8 +37,7 @@ import AccuracyMeter from "./accuracy-meter";
 import TeamAndRankKillersView from "./TeamImpact/team-and-rank-killers";
 import TransfersCaptaincyView from "./TransfersCaptaincy/transfers-captaincy";
 import { getCaptainImpact, type CaptainImpact } from "src/queries/getCaptainImpact";
-
-export const FPL_ID_STORAGE_KEY = "fpl_manager_id";
+import { FPL_ID_STORAGE_KEY } from "./constants";
 
 const MyTrends: React.FC = () => {
   const [entryId, setEntryId] = useLocalStorage<number>(FPL_ID_STORAGE_KEY);

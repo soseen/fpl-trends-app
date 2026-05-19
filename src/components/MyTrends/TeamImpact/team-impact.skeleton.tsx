@@ -29,7 +29,7 @@ const PitchRow: React.FC<{ count: number }> = ({ count }) => (
 const PitchSkeleton: React.FC = () => (
   <div className="mt-4 flex w-full flex-col justify-center md:mt-6">
     <Skeleton className="mx-auto h-5 w-64 md:h-7 md:w-96" />
-    <div className="mt-2 min-h-[380px] w-full bg-[url(src/assets/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[580px] md:mt-6 md:min-h-[660px] md:bg-contain lg:min-h-[900px]">
+    <div className="mt-2 min-h-[380px] w-full bg-[url(/pitch.png)] bg-cover bg-center bg-no-repeat sm:min-h-[580px] md:mt-6 md:min-h-[660px] md:bg-contain lg:min-h-[900px]">
       <div className="mb-6 mt-0 min-h-[380px] w-full sm:min-h-[580px] md:-mt-1 md:mb-0 md:min-h-[660px] lg:-mt-4 lg:min-h-[900px]">
         <PitchRow count={1} />
         <PitchRow count={4} />

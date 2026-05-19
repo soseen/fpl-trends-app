@@ -21,6 +21,7 @@ export default (_env, argv) => {
       // Content-hash in production for cache-busting; stable name in dev
       // so HMR/refresh doesn't break.
       filename: isDevelopment ? "bundle.js" : "bundle.[contenthash].js",
+      chunkFilename: isDevelopment ? "[name].js" : "[name].[contenthash].js",
       publicPath: "/",
       clean: true, // wipe stale hashed bundles from previous builds
     },
@@ -65,7 +66,18 @@ export default (_env, argv) => {
         },
         {
           test: /\.css$/i,
-          use: ["style-loader", "css-loader", "postcss-loader"],
+          use: [
+            "style-loader",
+            {
+              loader: "css-loader",
+              options: {
+                url: {
+                  filter: (url) => !url.startsWith("/"),
+                },
+              },
+            },
+            "postcss-loader",
+          ],
         },
       ],
     },
@@ -77,6 +89,7 @@ export default (_env, argv) => {
       new CopyWebpackPlugin({
         patterns: [
           { from: "public", to: "", globOptions: { ignore: ["**/index.html"] } },
+          { from: "src/assets/pitch.png", to: "pitch.png" },
         ],
       }),
       ...(isDevelopment

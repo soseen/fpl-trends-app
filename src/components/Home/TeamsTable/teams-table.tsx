@@ -16,18 +16,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTeamsBadge } from "src/utils/images";
-import {
-  AppInitStatus,
-  useAppInitContext,
-} from "src/components/AppInitializer/app-initializer.context";
 import TeamsTableSkeleton from "./teams-table.skeleton";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
+import type { RootState } from "src/redux/store";
+import { AsyncThunkStatus } from "src/redux/types";
 
 const TeamsTable = () => {
   const { teams, isDefensiveStats, onSelectValueChange } = useTeamsTable();
-  const { status } = useAppInitContext();
+  const teamsStatus = useSelector((state: RootState) => state.teams.status);
 
-  if (status === AppInitStatus.loading) return <TeamsTableSkeleton />;
+  if (teamsStatus === AsyncThunkStatus.loading || teamsStatus === AsyncThunkStatus.idle) {
+    return <TeamsTableSkeleton />;
+  }
 
   return (
     <div className="flex w-full flex-col text-text">

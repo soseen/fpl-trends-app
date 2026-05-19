@@ -2,8 +2,7 @@ import type React from "react";
 import { useMemo } from "react";
 import { type BestScoringFootballer } from "./use-best-scoring-footballers";
 import { getTeamsBadge } from "src/utils/images";
-import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
-import { TbLockFilled } from "react-icons/tb";
+import { CircleDot, Handshake, LockKeyhole, Shield } from "lucide-react";
 import { FootballerPosition } from "src/queries/types";
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
@@ -20,10 +19,10 @@ type StatKey = "totalGoals" | "totalAssists" | "totalCleanSheets" | "totalDefcon
 type SelectedStats = Pick<FootballerWithGameweekStats, StatKey>;
 
 const STAT_META: Record<StatKey, { icon: React.ReactNode; label: string }> = {
-  totalGoals: { icon: <FaFutbol />, label: "Goals" },
-  totalAssists: { icon: <FaHandshake />, label: "Assists" },
-  totalCleanSheets: { icon: <TbLockFilled />, label: "Clean sheets" },
-  totalDefconBonuses: { icon: <FaShieldAlt />, label: "Defcons" },
+  totalGoals: { icon: <CircleDot />, label: "Goals" },
+  totalAssists: { icon: <Handshake />, label: "Assists" },
+  totalCleanSheets: { icon: <LockKeyhole />, label: "Clean sheets" },
+  totalDefconBonuses: { icon: <Shield />, label: "Defcons" },
 };
 
 const PitchCard = ({ footballer }: Props) => {
@@ -80,6 +79,7 @@ const PitchCard = ({ footballer }: Props) => {
       image={
         <FootballerImage
           code={footballer.code}
+          mobileSize="small"
           className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
         />
       }
