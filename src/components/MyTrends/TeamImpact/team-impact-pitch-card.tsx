@@ -19,7 +19,7 @@ const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
       onClick={() => openDetails(tile.player_id)}
       ariaLabel={`Open ${tile.web_name} details`}
       className="h-[104px] w-[68px] xs:h-[128px] xs:w-24 md:h-[152px] md:w-28 lg:h-[182px] lg:w-36"
-      imageAreaClassName="flex-1 pt-1.5 md:pt-2"
+      imageAreaClassName="min-h-0 flex-1 pt-1.5 md:pt-2"
       topLeft={
         <span className="inline-flex items-center rounded-md bg-accent3/85 p-0.5 shadow-sm ring-1 ring-inset ring-accent4/40 md:p-1">
           <img
@@ -46,7 +46,7 @@ const TeamImpactPitchCard: React.FC<Props> = ({ tile, showRankImpact }) => {
       image={
         <FootballerImage
           code={tile.code}
-          className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
+          className="h-[62px] w-auto max-w-[86%] rounded-none object-contain xs:h-[82px] md:h-[98px] md:max-w-[78%] lg:h-[120px]"
         />
       }
       name={tile.web_name}

@@ -1,13 +1,10 @@
-import type React from "react";
-import { FaFutbol, FaHandshake, FaShieldAlt } from "react-icons/fa";
-import { TbLockFilled } from "react-icons/tb";
-import { FootballerPosition } from "src/queries/types";
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
 import StatBadge from "src/components/PlayerCard/stat-badge";
+import { buildReturnStats } from "src/components/PlayerCard/return-stats";
 
 type Props = {
   footballer: FootballerWithGameweekStats;
@@ -18,32 +15,6 @@ type Props = {
     defcons?: boolean;
     totalPoints?: boolean;
   };
-};
-
-type ReturnStat = { icon: React.ReactNode; label: string; value: number };
-
-const buildReturnStats = (f: FootballerWithGameweekStats): ReturnStat[] => {
-  const stats: ReturnStat[] = [];
-  if (f.totalGoals)
-    stats.push({ icon: <FaFutbol />, label: "Goals", value: f.totalGoals });
-  if (f.totalAssists)
-    stats.push({ icon: <FaHandshake />, label: "Assists", value: f.totalAssists });
-  if (
-    f.totalCleanSheets &&
-    [FootballerPosition.DEF, FootballerPosition.GK].includes(f.element_type)
-  )
-    stats.push({
-      icon: <TbLockFilled />,
-      label: "Clean sheets",
-      value: f.totalCleanSheets,
-    });
-  if (f.totalDefconBonuses)
-    stats.push({
-      icon: <FaShieldAlt />,
-      label: "Defcons",
-      value: f.totalDefconBonuses,
-    });
-  return stats;
 };
 
 type MetricChip = { value: string; suffix: string; label: string };
@@ -99,7 +70,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
       }
       topRight={returnStats.slice(0, 2).map((stat) => (
         <StatBadge
-          key={stat.label}
+          key={stat.key}
           value={stat.value}
           icon={stat.icon}
           label={stat.label}
