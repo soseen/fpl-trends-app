@@ -172,6 +172,7 @@ const MyTrends: React.FC = () => {
             <AccuracyMeter
               stratum={rangeRankQuery.data?.stratum_used ?? null}
               sampleSize={rangeRankQuery.data?.sample_size ?? 0}
+              sampleStatus={rangeRankQuery.data?.sample_status}
               isLoading={rangeRankQuery.isPending || trajectoryQuery.isPending}
             />
           }

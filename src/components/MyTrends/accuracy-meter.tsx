@@ -5,6 +5,7 @@ type Props = {
   stratum: 1 | 2 | 3 | null;
   sampleSize: number;
   isLoading: boolean;
+  sampleStatus?: "final" | "refreshing" | "stale";
 };
 
 // Sample size at which we'd consider the rank estimate fully reliable, per
@@ -48,7 +49,12 @@ const colorFor = (bars: 1 | 2 | 3): string => {
   return "bg-rose-400";
 };
 
-const AccuracyMeter: React.FC<Props> = ({ stratum, sampleSize, isLoading }) => {
+const AccuracyMeter: React.FC<Props> = ({
+  stratum,
+  sampleSize,
+  isLoading,
+  sampleStatus = "final",
+}) => {
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-xs text-text/70 md:text-sm">
@@ -62,16 +68,27 @@ const AccuracyMeter: React.FC<Props> = ({ stratum, sampleSize, isLoading }) => {
   const bars = bucketFor(pct);
   const fillColor = colorFor(bars);
   const target = stratum === null ? 0 : TARGET_SAMPLE[stratum];
-  const tooltip =
-    stratum === null
+  const isRefreshing = sampleStatus === "refreshing";
+  const isStale = sampleStatus === "stale";
+  const label = isStale
+    ? "Updating"
+    : isRefreshing
+      ? `Refreshing ${pct}%`
+      : `Accuracy ${pct}%`;
+  const tooltip = isStale
+    ? "The latest finished gameweek sample is being reset before ranks are shown."
+    : stratum === null
       ? "No rank data yet for this manager."
-      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} probes in your stratum. Target: ${target.toLocaleString("en-GB")} for full accuracy. Sample resets at the start of each gameweek and grows as the cron runs.`;
+      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} probes in your stratum. Target: ${target.toLocaleString("en-GB")} for full accuracy. The sample is refreshed after each gameweek finalizes.`;
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="flex items-center gap-2 text-xs text-text/80 md:text-sm">
-          <span>Accuracy {pct}%</span>
+          {isStale || isRefreshing ? (
+            <FaSpinner className="h-3.5 w-3.5 animate-spin text-magenta" />
+          ) : null}
+          <span>{label}</span>
           <div className="flex items-end gap-[2px]" aria-hidden>
             {[1, 2, 3].map((i) => (
               <div

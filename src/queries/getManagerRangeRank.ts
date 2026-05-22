@@ -19,6 +19,8 @@ export type ManagerRangeRank = {
   stratum_used: 1 | 2 | 3 | null;
   confidence: "exact" | "estimated" | "approximate";
   sample_size: number;
+  sample_status: "final" | "refreshing" | "stale";
+  sample_finalized: boolean;
 };
 
 export const getManagerRangeRank = async (
