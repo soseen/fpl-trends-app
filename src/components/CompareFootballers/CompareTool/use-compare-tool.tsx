@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { useDimensions } from "src/hooks/use-dimensions";
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
@@ -24,7 +25,13 @@ export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string
   { key: "minPerGame", label: "Min/GW" },
 ];
 
+type RankedStatKey = SelectedStatKey | "finishingRank" | "fixtureDifficultyRank";
+type RankedStatValue = { value: number | string; rank: number; label: string };
+
 export const useCompareTool = () => {
+  const [searchParams] = useSearchParams();
+  const preselectedPlayerIdsParam = searchParams.get("players");
+  const hydratedPlayersParamRef = useRef<string | null>(null);
   const { startGameweek, endGameweek, maxGameweek } = useSelector(
     (state: RootState) => state.gameweeks,
   );
@@ -57,6 +64,44 @@ export const useCompareTool = () => {
   const [selectedFootballers, setSelectedFootballers] = useState<
     (FootballerWithGameweekStats | null)[]
   >([null, null]);
+  const maxComparePlayers = isSM ? 2 : isMD ? 3 : 4;
+
+  useEffect(() => {
+    if (
+      !preselectedPlayerIdsParam ||
+      hydratedPlayersParamRef.current === preselectedPlayerIdsParam ||
+      !footballers.length
+    ) {
+      return;
+    }
+
+    const parsedIds = preselectedPlayerIdsParam
+      .split(",")
+      .reduce<number[]>((acc, rawId) => {
+        const id = Number.parseInt(rawId, 10);
+        if (Number.isFinite(id) && id > 0 && !acc.includes(id)) {
+          acc.push(id);
+        }
+        return acc;
+      }, [])
+      .slice(0, maxComparePlayers);
+
+    const preselectedFootballers = parsedIds
+      .map((id) => footballers.find((footballer) => footballer.id === id))
+      .filter(Boolean) as FootballerWithGameweekStats[];
+
+    hydratedPlayersParamRef.current = preselectedPlayerIdsParam;
+    if (!preselectedFootballers.length) return;
+
+    const nextSelectedFootballers: (FootballerWithGameweekStats | null)[] = [
+      ...preselectedFootballers,
+    ];
+    while (nextSelectedFootballers.length < 2) {
+      nextSelectedFootballers.push(null);
+    }
+
+    setSelectedFootballers(nextSelectedFootballers);
+  }, [footballers, maxComparePlayers, preselectedPlayerIdsParam]);
 
   useEffect(() => {
     setSelectedFootballers((current) =>
@@ -77,8 +122,8 @@ export const useCompareTool = () => {
   );
 
   const canAddNewCard = useMemo(
-    () => displayedSelectedFootballers.length < (isSM ? 2 : isMD ? 3 : 4),
-    [displayedSelectedFootballers, isMD, isSM],
+    () => displayedSelectedFootballers.length < maxComparePlayers,
+    [displayedSelectedFootballers, maxComparePlayers],
   );
 
   const validFootballers = useMemo(
@@ -120,10 +165,7 @@ export const useCompareTool = () => {
 
   const footballersComparisonArray: (RankedFootballer | null)[] = useMemo(() => {
     const rankedFootballers = validFootballers.map((footballer) => {
-      const updatedStats: Record<
-        SelectedStatKey | "finishingRank" | "fixtureDifficultyRank",
-        { value: number | string; rank: number; label: string }
-      > = {} as any;
+      const updatedStats: Partial<Record<RankedStatKey, RankedStatValue>> = {};
 
       COMPARE_TOOL_STAT_KEYS.forEach((stat) => {
         updatedStats[stat.key] = rankStats(validFootballers, stat.key)(footballer);
@@ -138,7 +180,7 @@ export const useCompareTool = () => {
 
       return {
         ...footballer,
-        ...updatedStats,
+        ...(updatedStats as Record<RankedStatKey, RankedStatValue>),
       };
     });
 
