@@ -34,8 +34,8 @@ import { mapElementTypeToPosition } from "src/utils/strings";
 const TOP_PLAYERS_PER_AXIS = 30;
 const DESKTOP_LABEL_LIMIT = 14;
 const MOBILE_LABEL_LIMIT = 8;
-const DEFAULT_X_METRIC: CompareMetricKey = "xGIPer90";
-const DEFAULT_Y_METRIC: CompareMetricKey = "pointsPer90";
+const DEFAULT_X_METRIC: CompareMetricKey = "pointsPer90";
+const DEFAULT_Y_METRIC: CompareMetricKey = "xGIPer90";
 const HOME_SCATTER_EXCLUDED_METRIC_KEYS = new Set<CompareMetricKey>([
   "totalBonus",
   "totalDefconBonuses",
