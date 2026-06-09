@@ -13,26 +13,49 @@ const TransfersPanel = () => {
   const { list } = useSelector((state: RootState) => state.footballers);
   const [displayMostTransferredIn, setDisplayMostTransferredIn] = useState(true);
 
-  const footballersData = useMemo(() => {
-    const footballersToDisplay = [...list]
-      .sort((a, b) =>
-        displayMostTransferredIn
-          ? b.transfers_in_event - a.transfers_in_event
-          : b.transfers_out_event - a.transfers_out_event,
-      )
-      .slice(0, MAX_TRANSFER_CHIPS);
+  const hasTransfersIn = useMemo(
+    () => list.some((footballer) => footballer.transfers_in_event > 0),
+    [list],
+  );
+  const hasTransfersOut = useMemo(
+    () => list.some((footballer) => footballer.transfers_out_event > 0),
+    [list],
+  );
 
-    return footballersToDisplay;
-  }, [list, displayMostTransferredIn]);
+  const isTransfersIn =
+    displayMostTransferredIn && hasTransfersIn
+      ? true
+      : !displayMostTransferredIn && hasTransfersOut
+        ? false
+        : hasTransfersIn;
+
+  const footballersData = useMemo(
+    () =>
+      [...list]
+        .filter((footballer) =>
+          isTransfersIn
+            ? footballer.transfers_in_event > 0
+            : footballer.transfers_out_event > 0,
+        )
+        .sort((a, b) =>
+          isTransfersIn
+            ? b.transfers_in_event - a.transfers_in_event
+            : b.transfers_out_event - a.transfers_out_event,
+        )
+        .slice(0, MAX_TRANSFER_CHIPS),
+    [list, isTransfersIn],
+  );
 
   useEffect(() => {
+    if (!hasTransfersIn || !hasTransfersOut) return;
+
     const interval = setInterval(() => {
       setDisplayMostTransferredIn((prev) => !prev);
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [hasTransfersIn, hasTransfersOut]);
 
-  const isTransfersIn = displayMostTransferredIn;
+  if (!hasTransfersIn && !hasTransfersOut) return null;
 
   return (
     <div className="hidden h-[64px] w-full overflow-hidden border-b border-accent4/70 bg-accent5 px-4 py-2 md:flex">

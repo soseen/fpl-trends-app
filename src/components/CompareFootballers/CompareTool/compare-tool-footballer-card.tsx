@@ -1,7 +1,8 @@
 import clsx from "clsx";
 import { useCallback, useMemo } from "react";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { getFootballersImage, getTeamsBadge } from "src/utils/images";
+import { getTeamsBadge } from "src/utils/images";
+import FootballerImage from "src/components/FootballerImage/footballer-image";
 import CompareToolSearch from "./CompareToolSearch/compare-tool-search";
 import { MdClose as CloseIcon } from "react-icons/md";
 import { Button } from "@/components/ui/button";
@@ -245,8 +246,8 @@ const CompareToolFootballerCard = ({
                     </span>
                   ))}
               </div>
-              <img
-                src={getFootballersImage(footballer.code)}
+              <FootballerImage
+                code={footballer.code}
                 className="absolute inset-x-0 bottom-0 m-auto h-[92%] w-auto object-contain px-2 pt-8"
               />
             </div>
