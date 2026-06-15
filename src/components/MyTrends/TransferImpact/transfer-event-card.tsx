@@ -138,7 +138,8 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
                   : undefined
               }
               rankImpact={showRank ? combined_rank_impact : null}
-              title="Estimated transfer impact in points and rank"
+              rankTitle="Estimated rank swing from base transfer points. Captaincy is shown separately."
+              title="Estimated transfer impact in base points and rank"
             />
           )}
           {isBenchBoostOnly && (

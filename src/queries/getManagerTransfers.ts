@@ -39,7 +39,8 @@ export type TransferImpactPlayer = {
   // the math. Clear starters (rate >= 50%) round up to full raw with
   // no flag; bench-role picks zero out instead.
   points_approximated: boolean;
-  // Positive for IN point contribution, negative for OUT points left behind.
+  // Estimated rank swing from this side's base point contribution:
+  // positive for IN, negative for OUT. Captaincy is shown separately.
   rank_impact: number | null;
   avg_ownership_pct: number | null;
 };

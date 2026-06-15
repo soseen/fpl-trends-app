@@ -46,7 +46,10 @@ const TransferImpactSummary: React.FC<Props> = ({
         {formatSigned(totalNet)}
       </span>
       {totalRankImpact != null && (
-        <span className="rounded-full bg-accent4/30 px-2.5 py-0.5 text-xs sm:text-sm">
+        <span
+          className="rounded-full bg-accent4/30 px-2.5 py-0.5 text-xs sm:text-sm"
+          title="Estimated rank swing from base transfer points. Captaincy is shown separately."
+        >
           rank{" "}
           <span className={rankImpactColorClass(totalRankImpact)}>
             {formatRankDelta(totalRankImpact)}

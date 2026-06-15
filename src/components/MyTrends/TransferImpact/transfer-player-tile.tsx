@@ -52,7 +52,7 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
                 "rounded-l-md bg-accent3/95 px-1 py-[2px] text-[8px] font-semibold tabular-nums leading-none shadow-md ring-1 ring-inset ring-accent4/60 sm:text-[9px] md:px-1.5 md:text-[10px]",
                 rankImpactColorClass(player.rank_impact),
               )}
-              title="Estimated rank impact"
+              title="Estimated rank swing from base transfer points. Captaincy is shown separately."
             >
               {formatRankDelta(player.rank_impact)}
             </span>
