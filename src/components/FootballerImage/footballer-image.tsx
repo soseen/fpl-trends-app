@@ -10,6 +10,7 @@ import {
 type Props = {
   code: number;
   className?: string;
+  fallbackClassName?: string;
   alt?: string;
   fetchPriority?: "high" | "low" | "auto";
   loading?: "eager" | "lazy";
@@ -32,6 +33,7 @@ type Props = {
 const FootballerImage = ({
   code,
   className,
+  fallbackClassName,
   alt = "",
   fetchPriority = "auto",
   loading = "lazy",
@@ -68,7 +70,7 @@ const FootballerImage = ({
   if (imageError) {
     return (
       <CircleUserRound
-        className={clsx("h-auto object-contain text-accent4", className)}
+        className={clsx("object-contain text-accent4", fallbackClassName ?? className)}
       />
     );
   }

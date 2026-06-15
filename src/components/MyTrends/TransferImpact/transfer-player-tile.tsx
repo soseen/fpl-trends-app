@@ -63,6 +63,7 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
           <FootballerImage
             code={player.code}
             className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
+            fallbackClassName="h-10 w-10 self-center text-accent4/80 xs:h-12 xs:w-12 md:h-14 md:w-14 lg:h-16 lg:w-16"
           />
         }
         name={player.web_name}

@@ -23,7 +23,12 @@ const FootballerUpcomingFixtures = ({
   const { list: teams } = useSelector((state: RootState) => state.teams);
 
   const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
-    const start = footballer?.footballer_fixtures[0]?.event ?? 0;
+    const start = footballer?.footballer_fixtures[0]?.event;
+
+    if (!start) {
+      return {};
+    }
+
     const end = Math.min(start + (max ? max - 1 : 7), TOTAL_GAMEWEEKS_COUNT);
 
     const footballerFixturesObject: Record<number, Fixture | undefined> = {};
@@ -56,6 +61,10 @@ const FootballerUpcomingFixtures = ({
         return "bg-fixDif3";
     }
   }, []);
+
+  if (!Object.keys(upcomingFixtures).length) {
+    return null;
+  }
 
   return (
     <div className="flex w-full items-center gap-4">
