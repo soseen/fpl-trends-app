@@ -248,6 +248,7 @@ const CompareToolFootballerCard = ({
               </div>
               <FootballerImage
                 code={footballer.code}
+                teamCode={footballer.team_code}
                 className="absolute inset-x-0 bottom-0 m-auto h-[92%] w-auto object-contain px-2 pt-8"
               />
             </div>

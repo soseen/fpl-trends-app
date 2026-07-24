@@ -55,7 +55,7 @@ const CompareToolSearchCommand = ({
         );
       })
       .slice(0, isMD ? 20 : 10);
-  }, [search, sortedFootballers, selectedFootballers]);
+  }, [isMD, search, sortedFootballers, selectedFootballers]);
 
   const onSearch = useCallback((value: string) => setSearch(value), []);
 
@@ -82,6 +82,7 @@ const CompareToolSearchCommand = ({
               >
                 <FootballerImage
                   code={f.code}
+                  teamCode={f.team_code}
                   className="h-10 w-auto rounded-none md:h-7 md:w-auto lg:h-9"
                 />
                 {f.web_name}

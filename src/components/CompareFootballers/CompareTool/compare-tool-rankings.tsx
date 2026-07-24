@@ -51,6 +51,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
               <div className="mb-4 flex w-full items-center gap-1 bg-accent5 px-2 pr-8 pt-1 shadow-md md:pt-2 lg:gap-2">
                 <FootballerImage
                   code={footballer.code}
+                  teamCode={footballer.team_code}
                   className="h-8 w-8 rounded-none md:h-12 md:w-12 lg:h-16 lg:w-16"
                 />
                 <p className="lg:text-xl">{footballer.web_name}</p>

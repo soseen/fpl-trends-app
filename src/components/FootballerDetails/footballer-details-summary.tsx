@@ -96,6 +96,7 @@ const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
           )}
           <FootballerImage
             code={footballer.code}
+            teamCode={footballer.team_code}
             className={clsx(
               "mx-auto rounded-none px-1",
               compact ? "h-36 w-28 self-end" : "h-[280px] w-full md:h-[360px]",

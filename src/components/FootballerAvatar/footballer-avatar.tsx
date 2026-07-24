@@ -24,6 +24,7 @@ const FootballerAvatar = ({
   >
     <FootballerImage
       code={footballer.code}
+      teamCode={footballer.team_code}
       size="small"
       className={`h-full w-full rounded-lg object-cover object-top ${imageClassName ?? ""}`}
     />

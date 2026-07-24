@@ -81,6 +81,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
       image={
         <FootballerImage
           code={footballer.code}
+          teamCode={footballer.team_code}
           className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
         />
       }

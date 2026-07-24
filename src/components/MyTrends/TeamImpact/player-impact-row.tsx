@@ -132,7 +132,11 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
         className="relative h-14 w-12 shrink-0 overflow-hidden rounded-md border border-accent4 bg-secondary transition hover:ring-2 hover:ring-magenta/60 sm:h-14 sm:w-12 md:h-16 md:w-14"
         aria-label={`Open ${player.web_name} details`}
       >
-        <FootballerImage code={player.code} className="h-full w-full object-contain" />
+        <FootballerImage
+          code={player.code}
+          teamCode={player.team_code}
+          className="h-full w-full object-contain"
+        />
       </button>
 
       <div className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left">

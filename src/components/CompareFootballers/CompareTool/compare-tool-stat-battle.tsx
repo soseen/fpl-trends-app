@@ -44,6 +44,7 @@ const CompareToolStatBattle = ({ footballers, metrics }: Props) => {
                 />
                 <FootballerImage
                   code={footballer.code}
+                  teamCode={footballer.team_code}
                   className="h-7 w-7 rounded-none object-contain"
                 />
                 <span className="overflow-hidden text-ellipsis whitespace-nowrap font-semibold text-text">

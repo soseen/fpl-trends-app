@@ -5,10 +5,12 @@ import {
   FOOTBALLER_IMAGE_DIMENSIONS,
   type FootballerImageSize,
   getFootballersImage,
+  getTeamsBadge,
 } from "src/utils/images";
 
 type Props = {
   code: number;
+  teamCode: number;
   className?: string;
   fallbackClassName?: string;
   alt?: string;
@@ -18,8 +20,11 @@ type Props = {
   size?: FootballerImageSize;
 };
 
-// Renders the player photo with a graceful fallback when the FPL CDN
-// 404s. Two failure modes worth knowing about:
+// Renders the player photo, falling back to a size-matched club badge
+// when the FPL CDN 404s. The generic icon is retained as a last resort
+// in case the badge cannot load either.
+//
+// Two failure modes worth knowing about:
 //
 // 1. Browser cache: if the photo is already cached, the <img> can fire
 //    `load` (or `error`) before React attaches its handlers — onLoad
@@ -32,6 +37,7 @@ type Props = {
 //    is the canonical "broken" signal.
 const FootballerImage = ({
   code,
+  teamCode,
   className,
   fallbackClassName,
   alt = "",
@@ -41,6 +47,7 @@ const FootballerImage = ({
   size = "regular",
 }: Props) => {
   const [imageError, setImageError] = useState(false);
+  const [badgeError, setBadgeError] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const dimensions = FOOTBALLER_IMAGE_DIMENSIONS[size];
@@ -51,8 +58,9 @@ const FootballerImage = ({
   // modal-reopen swaps in a player whose photo would actually load.
   useEffect(() => {
     setImageError(false);
+    setBadgeError(false);
     setLoaded(false);
-  }, [code]);
+  }, [code, teamCode]);
 
   // Detect cached images that completed before React's handlers were
   // attached. Runs after each render so it catches both the initial
@@ -68,6 +76,23 @@ const FootballerImage = ({
   }, [code, imageError, loaded]);
 
   if (imageError) {
+    if (!badgeError) {
+      return (
+        <img
+          src={getTeamsBadge(teamCode)}
+          alt={alt}
+          width={dimensions.width}
+          height={dimensions.height}
+          className={clsx("object-contain", className)}
+          style={{ objectFit: "contain" }}
+          decoding="async"
+          fetchPriority={fetchPriority}
+          loading={loading}
+          onError={() => setBadgeError(true)}
+        />
+      );
+    }
+
     return (
       <CircleUserRound
         className={clsx("object-contain text-accent4", fallbackClassName ?? className)}

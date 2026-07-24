@@ -43,6 +43,7 @@ const PitchCard = ({ footballer }: Props) => {
       image={
         <FootballerImage
           code={footballer.code}
+          teamCode={footballer.team_code}
           className="h-[62px] w-auto max-w-[86%] rounded-none object-contain xs:h-[82px] md:h-[98px] md:max-w-[78%] lg:h-[120px]"
         />
       }

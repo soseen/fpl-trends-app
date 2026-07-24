@@ -65,6 +65,7 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
         image={
           <FootballerImage
             code={player.code}
+            teamCode={player.team_code}
             className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
           />
         }
