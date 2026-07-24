@@ -1,5 +1,6 @@
 import type React from "react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 import {
@@ -9,6 +10,10 @@ import {
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 import logo from "../../assets/logo.png";
 import { ChartLine, House, User, Wrench } from "lucide-react";
+import type { RootState } from "src/redux/store";
+import { AsyncThunkStatus } from "src/redux/types";
+import { getSeasonStart } from "src/utils/season";
+import PreseasonNotice from "./preseason-notice";
 
 const TransfersPanel = lazy(() => import("./transfersPanel"));
 
@@ -53,6 +58,16 @@ const NavPill: React.FC<{ item: NavItem }> = ({ item }) => (
 
 const Navbar: React.FC = () => {
   const { status } = useAppInitContext();
+  const maxGameweek = useSelector((state: RootState) => state.gameweeks.maxGameweek);
+  const eventsStatus = useSelector((state: RootState) => state.events.status);
+  const footballers = useSelector((state: RootState) => state.footballers.list);
+  const seasonStart = useMemo(() => getSeasonStart(footballers), [footballers]);
+  const isPreseason =
+    status === AppInitStatus.idle &&
+    eventsStatus === AsyncThunkStatus.success &&
+    maxGameweek === 0 &&
+    seasonStart !== null;
+
   return (
     <>
       <nav className="sticky top-0 z-[300] w-full border-b-2 border-secondary bg-primary text-text">
@@ -70,7 +85,7 @@ const Navbar: React.FC = () => {
             ))}
           </div>
         </div>
-        <GameweekSlider />
+        {isPreseason ? <PreseasonNotice seasonStart={seasonStart} /> : <GameweekSlider />}
       </nav>
       {status === AppInitStatus.idle && (
         <Suspense fallback={null}>
