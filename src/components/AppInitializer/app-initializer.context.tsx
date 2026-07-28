@@ -10,6 +10,7 @@ import { AsyncThunkStatus } from "src/redux/types";
 import { setEnrichedFootballers } from "src/redux/slices/footballersGameweekStatsSlice";
 import { FootballerPosition } from "src/queries/types";
 import { hasDefconBonus } from "src/utils/defcon";
+import { getPreseasonFootballerStats } from "src/utils/preseason";
 
 type AppInitializerProviderProps = {
   children: React.ReactNode;
@@ -23,10 +24,14 @@ export enum AppInitStatus {
 
 type AppInitializerState = {
   status: AppInitStatus;
+  isPreseason: boolean;
+  analysisSeasonLabel: string | null;
 };
 
 const AppInitializerContext = createContext<AppInitializerState>({
   status: AppInitStatus.loading,
+  isPreseason: false,
+  analysisSeasonLabel: null,
 });
 
 const parseStat = (value: string | number | null | undefined): number => {
@@ -47,9 +52,8 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
   const { status: totalPlayersStatus, totalPlayers } = useSelector(
     (state: RootState) => state.totalPlayers,
   );
-  const { startGameweek, endGameweek, maxGameweek } = useSelector(
-    (state: RootState) => state.gameweeks,
-  );
+  const { startGameweek, endGameweek, maxGameweek, isPreseason, analysisSeasonLabel } =
+    useSelector((state: RootState) => state.gameweeks);
   const { status: eventsStatus, events } = useSelector(
     (state: RootState) => state.events,
   );
@@ -74,6 +78,20 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
 
     const enrichedFootballers = list
       .map((footballer) => {
+        if (isPreseason) {
+          const preseasonStats = getPreseasonFootballerStats(
+            footballer,
+            analysisSeasonLabel,
+          );
+          if (preseasonStats) {
+            return {
+              ...footballer,
+              ...preseasonStats.base,
+              ...preseasonStats.additional,
+            };
+          }
+        }
+
         const historyInRange = footballer.history.filter(
           (h) =>
             h.round >= startGameweek &&
@@ -200,7 +218,16 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
       .filter((f) => f.element_type !== FootballerPosition.MGR);
 
     dispatch(setEnrichedFootballers(enrichedFootballers));
-  }, [dispatch, events, list, startGameweek, endGameweek, totalPlayers]);
+  }, [
+    dispatch,
+    events,
+    list,
+    startGameweek,
+    endGameweek,
+    totalPlayers,
+    isPreseason,
+    analysisSeasonLabel,
+  ]);
 
   const appStatus = useMemo(() => {
     if (status === AsyncThunkStatus.failed) {
@@ -221,7 +248,9 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
   }, [status, maxGameweek, eventsStatus]);
 
   return (
-    <AppInitializerContext.Provider value={{ status: appStatus }}>
+    <AppInitializerContext.Provider
+      value={{ status: appStatus, isPreseason, analysisSeasonLabel }}
+    >
       {children}
     </AppInitializerContext.Provider>
   );

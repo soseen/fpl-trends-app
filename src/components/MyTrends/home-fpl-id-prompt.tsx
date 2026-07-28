@@ -4,10 +4,15 @@ import { useLocalStorage } from "src/hooks/useLocalStorage";
 import FplIdInput from "./fpl-id-input";
 import { FPL_ID_STORAGE_KEY } from "./constants";
 import { ChartLine } from "lucide-react";
+import { useSelector } from "react-redux";
+import type { RootState } from "src/redux/store";
 
 const HomeFplIdPrompt: React.FC = () => {
   const [entryId, setEntryId] = useLocalStorage<number>(FPL_ID_STORAGE_KEY);
   const navigate = useNavigate();
+  const isPreseason = useSelector((state: RootState) => state.gameweeks.isPreseason);
+
+  if (isPreseason) return null;
 
   if (entryId !== null) {
     return (

@@ -11,7 +11,6 @@ import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 import logo from "../../assets/logo.png";
 import { ChartLine, House, User, Wrench } from "lucide-react";
 import type { RootState } from "src/redux/store";
-import { AsyncThunkStatus } from "src/redux/types";
 import { getSeasonStart } from "src/utils/season";
 import PreseasonNotice from "./preseason-notice";
 
@@ -58,15 +57,13 @@ const NavPill: React.FC<{ item: NavItem }> = ({ item }) => (
 
 const Navbar: React.FC = () => {
   const { status } = useAppInitContext();
-  const maxGameweek = useSelector((state: RootState) => state.gameweeks.maxGameweek);
-  const eventsStatus = useSelector((state: RootState) => state.events.status);
+  const { isPreseason, analysisSeasonLabel } = useSelector(
+    (state: RootState) => state.gameweeks,
+  );
   const footballers = useSelector((state: RootState) => state.footballers.list);
   const seasonStart = useMemo(() => getSeasonStart(footballers), [footballers]);
-  const isPreseason =
-    status === AppInitStatus.idle &&
-    eventsStatus === AsyncThunkStatus.success &&
-    maxGameweek === 0 &&
-    seasonStart !== null;
+  const showPreseasonNotice =
+    status === AppInitStatus.idle && isPreseason && seasonStart !== null;
 
   return (
     <>
@@ -85,7 +82,14 @@ const Navbar: React.FC = () => {
             ))}
           </div>
         </div>
-        {isPreseason ? <PreseasonNotice seasonStart={seasonStart} /> : <GameweekSlider />}
+        {showPreseasonNotice ? (
+          <PreseasonNotice
+            seasonStart={seasonStart}
+            analysisSeasonLabel={analysisSeasonLabel}
+          />
+        ) : (
+          <GameweekSlider />
+        )}
       </nav>
       {status === AppInitStatus.idle && (
         <Suspense fallback={null}>

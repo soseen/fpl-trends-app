@@ -43,14 +43,17 @@ const rememberNotice = (storageKey: string) => {
 
 type PreseasonNoticeProps = {
   seasonStart: SeasonStart;
+  analysisSeasonLabel: string | null;
 };
 
-const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
-  const [open, setOpen] = useState(() => !hasSeenNotice(seasonStart.storageKey));
+const PreseasonNotice = ({ seasonStart, analysisSeasonLabel }: PreseasonNoticeProps) => {
+  const noticeStorageKey = `${seasonStart.storageKey}:analytics`;
+  const [open, setOpen] = useState(() => !hasSeenNotice(noticeStorageKey));
+  const statsSeason = analysisSeasonLabel ?? "previous season";
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
-    if (!nextOpen) rememberNotice(seasonStart.storageKey);
+    if (!nextOpen) rememberNotice(noticeStorageKey);
   };
 
   return (
@@ -58,7 +61,7 @@ const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
       <DialogTrigger asChild>
         <button
           type="button"
-          aria-label={`No match data yet. Premier League starts ${seasonStart.date} at ${seasonStart.kickoffTime}. Open details.`}
+          aria-label={`Preseason mode using ${statsSeason} performance data. Premier League starts ${seasonStart.date} at ${seasonStart.kickoffTime}. Open details.`}
           className="group flex w-full items-center gap-3 border-t border-accent4/70 bg-accent5 px-3 py-2 text-left transition-colors hover:bg-accent3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-magenta md:px-4"
         >
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-magenta/35 bg-magenta/10 text-magenta">
@@ -67,15 +70,15 @@ const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
 
           <span className="min-w-0 flex-1">
             <span className="block truncate text-xs font-semibold text-text sm:text-sm">
-              No match data yet
+              Preseason mode
             </span>
             <span className="block truncate text-[11px] text-text/55 sm:text-xs">
               <span className="sm:hidden">
-                PL starts {seasonStart.shortDate} · {seasonStart.kickoffTime}
+                {statsSeason} stats · {seasonStart.seasonLabel} prices
               </span>
               <span className="hidden sm:inline">
-                The {seasonStart.seasonLabel} Premier League season starts{" "}
-                {seasonStart.date} at {seasonStart.kickoffTime}
+                Using {statsSeason} performance with {seasonStart.seasonLabel} prices,
+                clubs and fixtures
               </span>
             </span>
           </span>
@@ -111,15 +114,15 @@ const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
               />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-highlight">
-              Season warm-up
+              Preseason analytics
             </p>
             <DialogTitle className="text-2xl leading-tight text-text sm:text-3xl">
-              The pitch is ready. The data isn&apos;t—yet.
+              Last season&apos;s signal. This season&apos;s squad.
             </DialogTitle>
             <DialogDescription className="max-w-md pt-2 leading-6 text-text/70">
-              The {seasonStart.seasonLabel} FPL season is live, but no Premier League
-              matches have been played. Trends, comparisons, and player form will fill in
-              as soon as results start rolling in.
+              No {seasonStart.seasonLabel} matches have been played yet, so player
+              analytics use {statsSeason} totals while prices, clubs, availability and
+              upcoming fixtures stay current.
             </DialogDescription>
           </DialogHeader>
 
@@ -128,19 +131,19 @@ const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
               <CalendarDays className="h-5 w-5 shrink-0 text-magenta" aria-hidden />
               <div>
                 <p className="text-[11px] uppercase tracking-wider text-text/50">
-                  Season starts
+                  Analytics season
                 </p>
-                <p className="text-sm font-semibold text-text">{seasonStart.date}</p>
+                <p className="text-sm font-semibold text-text">{statsSeason}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 sm:border-l sm:border-accent4 sm:pl-4">
               <Clock3 className="h-5 w-5 shrink-0 text-highlight" aria-hidden />
               <div>
                 <p className="text-[11px] uppercase tracking-wider text-text/50">
-                  Kick-off · your time
+                  New season starts
                 </p>
                 <p className="text-sm font-semibold text-text">
-                  {seasonStart.kickoffTime}
+                  {seasonStart.shortDate} · {seasonStart.kickoffTime}
                 </p>
               </div>
             </div>
@@ -160,19 +163,19 @@ const PreseasonNotice = ({ seasonStart }: PreseasonNoticeProps) => {
 
           <div className="mt-4 space-y-2 text-xs leading-5 text-text/60">
             <p>
-              You can still explore the app, but analytics may be empty or show zeroes
-              before kick-off.
+              Best XI, Players, Compare and the metric map are ready for preseason
+              research. Players without prior Premier League history show zeroes.
             </p>
             <p>
-              The gameweek range will return here automatically once live match data is
-              available.
+              Gameweek-level charts, team trends and My Trends will return when current
+              match data is available.
             </p>
           </div>
 
           <DialogFooter className="mt-6 sm:justify-center">
             <DialogClose asChild>
               <Button className="h-10 bg-magenta px-6 text-white hover:bg-magenta2">
-                Got it — see you at kick-off
+                Explore preseason stats
               </Button>
             </DialogClose>
           </DialogFooter>

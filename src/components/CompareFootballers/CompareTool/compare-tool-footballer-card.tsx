@@ -22,6 +22,7 @@ import type { RankedFootballer } from "./types";
 import { mapElementTypeToPosition } from "src/utils/strings";
 import { useSelector } from "react-redux";
 import type { RootState } from "src/redux/store";
+import { getHistoryPastForSeason } from "src/utils/preseason";
 
 type SelectedStats = Pick<
   RankedFootballer,
@@ -141,6 +142,9 @@ const CompareToolFootballerCard = ({
   openFootballersProfile,
 }: Props) => {
   const { isMD } = useDimensions();
+  const analysisSeasonLabel = useSelector(
+    (state: RootState) => state.gameweeks.analysisSeasonLabel,
+  );
 
   const seasonTotalComparison = useCallback(
     (key: keyof RankedFootballer) => {
@@ -149,6 +153,10 @@ const CompareToolFootballerCard = ({
       const completedTeamGames = footballer.history.filter(
         (h) => h.team_a_score !== null && h.team_h_score !== null,
       ).length;
+      const appearances =
+        completedTeamGames ||
+        getHistoryPastForSeason(footballer, analysisSeasonLabel)?.starts ||
+        0;
 
       switch (key) {
         case "pointsPer90":
@@ -167,12 +175,12 @@ const CompareToolFootballerCard = ({
             : 0;
         }
         case "minPerGame":
-          return completedTeamGames > 0 ? footballer?.minutes / completedTeamGames : 0;
+          return appearances > 0 ? footballer?.minutes / appearances : 0;
         default:
           return 0;
       }
     },
-    [footballer],
+    [analysisSeasonLabel, footballer],
   );
 
   const selectedStats = useMemo(() => {

@@ -269,6 +269,21 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
     [defconThreshold, defconDataAvailable],
   );
 
+  if (!footballer?.history.length) {
+    return (
+      <Card className="relative overflow-hidden rounded-md border border-accent4/70 bg-accent2 text-text shadow-large">
+        <div className="absolute inset-x-0 top-0 h-1 bg-magenta" />
+        <CardContent className="px-4 py-8 text-center">
+          <p className="text-sm font-semibold">Gameweek trends return after kick-off</p>
+          <p className="mt-2 text-xs leading-5 text-text/55 md:text-sm">
+            Preseason player totals are available, but the official historical summary
+            does not include a gameweek-by-gameweek breakdown.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="relative overflow-hidden rounded-md border border-accent4/70 bg-accent2 text-text shadow-large">
       <div className="absolute inset-x-0 top-0 h-1 bg-magenta" />

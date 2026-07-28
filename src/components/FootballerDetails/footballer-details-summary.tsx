@@ -7,6 +7,7 @@ import { mapElementTypeToPosition, roundToThousands } from "src/utils/strings";
 import FootballerImage from "../FootballerImage/footballer-image";
 import FootballerDetailsStatsPanel from "./footballer-details-stats-panel";
 import FootballerUpcomingFixtures from "./footballer-upcoming-fixtures";
+import { useAppInitContext } from "../AppInitializer/app-initializer.context";
 
 type Props = {
   footballer: FootballerWithGameweekStats;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
+  const { isPreseason, analysisSeasonLabel } = useAppInitContext();
   const info = useMemo(() => {
     const price = footballer.now_cost ? footballer.now_cost / 10 : 0;
     const position = mapElementTypeToPosition(footballer.element_type);
@@ -37,7 +39,10 @@ const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
 
   const featureStats = useMemo(
     () => [
-      { label: "Range pts", value: footballer.totalPoints ?? footballer.total_points },
+      {
+        label: isPreseason ? `${analysisSeasonLabel ?? "Previous"} pts` : "Range pts",
+        value: footballer.totalPoints ?? footballer.total_points,
+      },
       {
         label: "Pts/g",
         value:
@@ -58,7 +63,7 @@ const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
             : "-",
       },
     ],
-    [footballer],
+    [analysisSeasonLabel, footballer, isPreseason],
   );
 
   return (

@@ -41,13 +41,15 @@ import { FPL_ID_STORAGE_KEY } from "./constants";
 
 const MyTrends: React.FC = () => {
   const [entryId, setEntryId] = useLocalStorage<number>(FPL_ID_STORAGE_KEY);
-  const { startGameweek, endGameweek } = useSelector(selectGameweekRange);
+  const { startGameweek, endGameweek, isPreseason, analysisSeasonLabel } =
+    useSelector(selectGameweekRange);
   const [switchOpen, setSwitchOpen] = useState(false);
+  const canLoadManager = !isPreseason && typeof entryId === "number";
 
   const summaryQuery = useQuery<ManagerSummary>({
     queryKey: ["manager-summary", entryId],
     queryFn: () => getManagerSummary(entryId as number),
-    enabled: typeof entryId === "number",
+    enabled: canLoadManager,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
@@ -56,7 +58,7 @@ const MyTrends: React.FC = () => {
     queryKey: ["manager-range-rank", entryId, startGameweek, endGameweek],
     queryFn: ({ signal }) =>
       getManagerRangeRank(entryId as number, startGameweek, endGameweek, signal),
-    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
   });
@@ -64,7 +66,7 @@ const MyTrends: React.FC = () => {
   const trajectoryQuery = useQuery<ManagerTrajectory>({
     queryKey: ["manager-trajectory", entryId],
     queryFn: () => getManagerTrajectory(entryId as number),
-    enabled: typeof entryId === "number",
+    enabled: canLoadManager,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
@@ -73,7 +75,7 @@ const MyTrends: React.FC = () => {
     queryKey: ["manager-comparison", entryId, startGameweek, endGameweek],
     queryFn: ({ signal }) =>
       getManagerComparison(entryId as number, startGameweek, endGameweek, signal),
-    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
   });
@@ -82,7 +84,7 @@ const MyTrends: React.FC = () => {
     queryKey: ["team-impact", entryId, startGameweek, endGameweek],
     queryFn: ({ signal }) =>
       getTeamImpact(entryId as number, startGameweek, endGameweek, signal),
-    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
@@ -91,7 +93,7 @@ const MyTrends: React.FC = () => {
     queryKey: ["manager-transfers", entryId, startGameweek, endGameweek],
     queryFn: ({ signal }) =>
       getManagerTransfers(entryId as number, startGameweek, endGameweek, signal),
-    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
   });
@@ -100,7 +102,7 @@ const MyTrends: React.FC = () => {
     queryKey: ["captain-impact", entryId, startGameweek, endGameweek],
     queryFn: ({ signal }) =>
       getCaptainImpact(entryId as number, startGameweek, endGameweek, signal),
-    enabled: typeof entryId === "number" && startGameweek > 0 && endGameweek > 0,
+    enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
     retry: 1,
   });
@@ -109,6 +111,22 @@ const MyTrends: React.FC = () => {
     setEntryId(id);
     setSwitchOpen(false);
   };
+
+  if (isPreseason) {
+    return (
+      <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-4 text-center">
+        <h1 className="text-xl font-semibold text-text md:text-3xl">My Trends</h1>
+        <Card className="w-full border-secondary bg-primary p-5 shadow-lg">
+          <p className="text-sm font-semibold text-text">Returns after Gameweek 1</p>
+          <p className="mt-2 text-sm leading-6 text-text/65">
+            Preseason player analysis uses {analysisSeasonLabel ?? "previous-season"}{" "}
+            totals, but manager IDs and picks belong to the new season. My Trends will
+            activate once current gameweek data is available.
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   if (entryId === null) {
     return (

@@ -16,6 +16,9 @@ type Props = {
 
 const FootballerDetailsHistory = ({ footballer }: Props) => {
   const teams = useSelector((state: RootState) => state.teams.list);
+  const analysisSeasonLabel = useSelector(
+    (state: RootState) => state.gameweeks.analysisSeasonLabel,
+  );
   const ref = useRef<HTMLDivElement>(null);
 
   const getGameweekEvents = useCallback(
@@ -77,6 +80,15 @@ const FootballerDetailsHistory = ({ footballer }: Props) => {
       ref.current.scrollLeft = ref.current.scrollWidth;
     }
   }, []);
+
+  if (!footballer?.history.length) {
+    return (
+      <div className="rounded-md border border-accent4/60 bg-accent2/90 px-4 py-6 text-center text-xs leading-5 text-text/60 md:text-sm">
+        Gameweek-level history is not available for the preseason feed. The summary above
+        uses {analysisSeasonLabel ?? "previous-season"} totals.
+      </div>
+    );
+  }
 
   return (
     <div

@@ -36,7 +36,7 @@ const CompareTool = () => {
     removeFootballer,
     openFootballersProfile,
   } = useCompareTool();
-  const { status } = useAppInitContext();
+  const { status, isPreseason, analysisSeasonLabel } = useAppInitContext();
   const [selectedMetricKeys, setSelectedMetricKeys] = useState<CompareMetricKey[]>(
     DEFAULT_COMPARE_METRIC_KEYS,
   );
@@ -83,6 +83,12 @@ const CompareTool = () => {
       <h1 className="flex items-center gap-2">
         Comparison Tool <FaTools className="text-magenta" />
       </h1>
+      {isPreseason && (
+        <p className="mt-2 rounded-md border border-highlight/25 bg-highlight/10 px-3 py-2 text-xs text-text/70 md:text-sm">
+          Performance uses {analysisSeasonLabel ?? "previous-season"} totals. Prices,
+          clubs and upcoming fixtures are current.
+        </p>
+      )}
       <div className="-mx-2 mt-4 overflow-x-auto px-2 pb-2 lg:mx-0 lg:mt-8 lg:px-0">
         <div className="flex w-max min-w-full snap-x items-stretch justify-center gap-3 md:gap-4 lg:gap-5 xl:gap-6">
           {footballersComparisonArray.map((selectedFootballer, index) => (

@@ -1,21 +1,21 @@
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import { useMemo } from "react";
+import { useAppInitContext } from "../AppInitializer/app-initializer.context";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
 };
 
 const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
+  const { isPreseason, analysisSeasonLabel } = useAppInitContext();
   const seasonStats = useMemo(() => {
-    const historyLength = footballer?.history?.filter((h) => h.minutes > 0)?.length ?? 0;
-
     const baseInfo = [
-      { title: "Points", value: footballer?.total_points },
-      { title: "Goals", value: footballer?.goals_scored },
-      { title: "Assists", value: footballer?.assists },
+      { title: "Points", value: footballer?.totalPoints },
+      { title: "Goals", value: footballer?.totalGoals },
+      { title: "Assists", value: footballer?.totalAssists },
       {
         title: "Min/G",
-        value: ((footballer?.minutes ?? 1) / historyLength).toFixed(0) + "`",
+        value: `${(footballer?.minPerGame ?? 0).toFixed(0)}'`,
       },
     ];
 
@@ -26,7 +26,7 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
           return [{ title: "CS", value: footballer?.clean_sheets }];
         case 3:
         case 4:
-          return [{ title: "xG/G", value: footballer?.expected_goals_per_90.toFixed(2) }];
+          return [{ title: "xG/90", value: footballer?.xGSPer90 }];
         default:
           return [];
       }
@@ -38,7 +38,9 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
     <div className="rounded-md bg-accent4/25 p-2 ring-1 ring-inset ring-accent4/40">
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="text-[10px] font-semibold uppercase text-text/45 md:text-xs">
-          Season stats
+          {isPreseason && analysisSeasonLabel
+            ? `${analysisSeasonLabel} stats`
+            : "Season stats"}
         </h3>
         <span className="h-[1px] flex-1 bg-accent4/60" />
       </div>

@@ -34,6 +34,12 @@ A React 19 SPA with four views:
 
 A dual-thumb gameweek slider in the navbar (GW 1–38) controls the range; all stats are recomputed client-side from each player's `history` array on change.
 
+Before the new season has a completed gameweek, the SPA enters **preseason
+mode**. Prices, clubs, availability, ownership, and fixtures come from the new
+season, while performance is computed from the latest matching `history_past`
+season. Gameweek-only team charts and My Trends show explicit unavailable
+states until current match data exists.
+
 ---
 
 ## Stack
@@ -318,10 +324,10 @@ cd ~/fpl-trends-app && npm run deploy
 
 ## Start-of-season checklist
 
-When a new Premier League season starts (typically mid-August), the backend's [season manager](../fpl-trends-api/Readme.md#start-of-season-runbook) handles data wipe + repopulate automatically. On the frontend side:
+When a new Premier League season starts (typically mid-August), the backend's [season manager](../fpl-trends-api/Readme.md#start-of-season-runbook) archives the outgoing bulk data, then handles the live-table wipe and repopulate automatically. On the frontend side:
 
 1. **No code changes are usually required** — the SPA reads everything dynamically from the API.
-2. After the backend reset, hit the site and confirm the gameweek slider re-anchors (start = 1, end = current GW).
+2. After the backend reset and populate, confirm the preseason banner identifies the previous analytics season and the new price/fixture season.
 3. If pre-season copy / promotional content changed (e.g. "Coming soon — 2026/27 Premier League season"), update components and redeploy:
    ```bash
    git pull

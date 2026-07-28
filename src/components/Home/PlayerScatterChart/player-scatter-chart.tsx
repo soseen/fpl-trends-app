@@ -220,7 +220,7 @@ const PlayerScatterChartSkeleton = () => (
 const PlayerScatterChart = () => {
   const navigate = useNavigate();
   const { isSM, isMD } = useDimensions();
-  const { status } = useAppInitContext();
+  const { status, isPreseason, analysisSeasonLabel } = useAppInitContext();
   const { footballers } = useSelector(
     (state: RootState) => state.footballersGameweekStats,
   );
@@ -529,7 +529,9 @@ const PlayerScatterChart = () => {
         <div className="min-w-0">
           <h2 className="text-sm font-semibold md:text-lg">Player metric map</h2>
           <p className="mt-1 max-w-2xl text-xs text-text/55 md:text-sm">
-            Top 30 players on either selected axis for GW {startGameweek}-{endGameweek}.
+            {isPreseason
+              ? `Top 30 players on either selected axis using ${analysisSeasonLabel ?? "previous-season"} totals.`
+              : `Top 30 players on either selected axis for GW ${startGameweek}-${endGameweek}.`}{" "}
             Labelled names highlight the standout and selected dots.
           </p>
         </div>

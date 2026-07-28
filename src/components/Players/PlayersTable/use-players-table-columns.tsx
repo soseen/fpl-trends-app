@@ -5,9 +5,12 @@ import { useFootballerDetailsContext } from "src/components/FootballerDetails/fo
 import { Button } from "@/components/ui/button";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { removeAccents } from "src/utils/strings";
+import { useSelector } from "react-redux";
+import type { RootState } from "src/redux/store";
 
 export const usePlayersTableColumns = () => {
   const { setFootballer } = useFootballerDetailsContext();
+  const isPreseason = useSelector((state: RootState) => state.gameweeks.isPreseason);
   const columnHelper = createColumnHelper<FootballerWithGameweekStats>();
 
   const playersTableColumns = [
@@ -124,7 +127,7 @@ export const usePlayersTableColumns = () => {
       cell: (info) => <p>{info.getValue()}</p>,
     }),
     columnHelper.accessor("maxOwnership", {
-      header: "Max ownership",
+      header: isPreseason ? "Current ownership" : "Max ownership",
       cell: (info) => <p>{info.getValue().toFixed(2)}%</p>,
     }),
     columnHelper.accessor("teamName", {

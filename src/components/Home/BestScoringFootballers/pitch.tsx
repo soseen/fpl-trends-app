@@ -27,7 +27,7 @@ const Pitch = () => {
   } = useBestScoringFootballers({
     teamLimitationOn: true,
   });
-  const { status } = useAppInitContext();
+  const { status, isPreseason, analysisSeasonLabel } = useAppInitContext();
   const selectedPlayersCount =
     goalkeepers.length + defenders.length + midfielders.length + strikers.length;
 
@@ -37,7 +37,9 @@ const Pitch = () => {
   return (
     <div className="mt-4 flex w-full flex-col justify-center md:mt-6">
       <h2 className="mb-8 text-center text-sm text-text md:mb-12 md:text-xl">
-        {`Highest Scoring Team (gameweek ${startGameweek}-${endGameweek})`}
+        {isPreseason
+          ? `Highest Scoring XI · ${analysisSeasonLabel ?? "Previous season"} totals`
+          : `Highest Scoring Team (gameweek ${startGameweek}-${endGameweek})`}
       </h2>
       <div className="relative mt-2 min-h-[350px] w-full sm:min-h-[550px] md:mt-6 md:min-h-[620px] lg:min-h-[860px]">
         <img

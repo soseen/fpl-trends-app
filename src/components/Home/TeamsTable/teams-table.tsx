@@ -25,9 +25,25 @@ import { AsyncThunkStatus } from "src/redux/types";
 const TeamsTable = () => {
   const { teams, isDefensiveStats, onSelectValueChange } = useTeamsTable();
   const teamsStatus = useSelector((state: RootState) => state.teams.status);
+  const { isPreseason, analysisSeasonLabel } = useSelector(
+    (state: RootState) => state.gameweeks,
+  );
 
   if (teamsStatus === AsyncThunkStatus.loading || teamsStatus === AsyncThunkStatus.idle) {
     return <TeamsTableSkeleton />;
+  }
+
+  if (isPreseason) {
+    return (
+      <div className="flex min-h-[280px] w-full flex-col items-center justify-center rounded-md border border-accent4/70 bg-secondary px-5 text-center text-text shadow-xl">
+        <h2 className="text-sm font-semibold md:text-lg">Team Rankings</h2>
+        <p className="mt-2 max-w-sm text-xs leading-5 text-text/60 md:text-sm">
+          Player totals from {analysisSeasonLabel ?? "the previous season"} are available,
+          but team rankings need the archived gameweek feed. They will return with
+          current-season match data.
+        </p>
+      </div>
+    );
   }
 
   return (

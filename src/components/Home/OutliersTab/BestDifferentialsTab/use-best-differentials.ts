@@ -9,14 +9,12 @@ export const useBestDifferentials = () => {
   const { footballers } = useSelector(
     (state: RootState) => state.footballersGameweekStats,
   );
-  const { startGameweek, endGameweek } = useSelector(
-    (state: RootState) => state.gameweeks,
-  );
   const { events } = useSelector((state: RootState) => state.events);
+  const isPreseason = useSelector((state: RootState) => state.gameweeks.isPreseason);
   const { isMD } = useDimensions();
 
   const bestDifferentials: FootballerWithGameweekStats[] = useMemo(() => {
-    if (!footballers.length || !events.length) return [];
+    if (!footballers.length || (!isPreseason && !events.length)) return [];
 
     const differentials = footballers
       .filter(
@@ -28,7 +26,7 @@ export const useBestDifferentials = () => {
       .slice(0, isMD ? 4 : 5);
 
     return differentials;
-  }, [footballers, startGameweek, endGameweek, isMD, events]);
+  }, [footballers, isMD, events, isPreseason]);
 
   return { bestDifferentials };
 };

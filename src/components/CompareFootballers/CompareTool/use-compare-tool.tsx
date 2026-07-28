@@ -175,7 +175,7 @@ export const useCompareTool = () => {
 
       updatedStats["fixtureDifficultyRank"] = rankFixtures(
         validFootballers,
-        maxGameweek,
+        Math.max(1, maxGameweek),
       )(footballer);
 
       return {
@@ -276,15 +276,18 @@ export const useCompareTool = () => {
         : 0;
     };
 
+    const hasGameweekHistory = validFootballers.some(
+      (footballer) => footballer.history.length > 0,
+    );
     const maxHighScoringGames = Math.max(...validFootballers.map(calculateAvgGoals));
     const minLowScoringGames = Math.min(...validFootballers.map(calculateAvgGoals));
 
-    const highScoringGamesPlayers = validFootballers.filter(
-      (f) => calculateAvgGoals(f) === maxHighScoringGames,
-    );
-    const lowScoringGamesPlayers = validFootballers.filter(
-      (f) => calculateAvgGoals(f) === minLowScoringGames,
-    );
+    const highScoringGamesPlayers = hasGameweekHistory
+      ? validFootballers.filter((f) => calculateAvgGoals(f) === maxHighScoringGames)
+      : [];
+    const lowScoringGamesPlayers = hasGameweekHistory
+      ? validFootballers.filter((f) => calculateAvgGoals(f) === minLowScoringGames)
+      : [];
 
     // Find best attacking team — use the team's actual goals across the range,
     // not the player's per-game share (which depended on whether they featured).
