@@ -68,4 +68,16 @@ export default [
   {
     ignores: ["dist/", "node_modules/", "webpack.config.js"],
   },
+  {
+    files: ["tailwind.config.cjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      sourceType: "commonjs",
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];

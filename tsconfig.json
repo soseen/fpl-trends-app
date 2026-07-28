@@ -28,7 +28,6 @@
     "useDefineForClassFields": true,
 
     /* Paths */
-    "baseUrl": "./",
     "paths": {
       "@/*": ["./@/*"],
       "src/*": ["./src/*"]
