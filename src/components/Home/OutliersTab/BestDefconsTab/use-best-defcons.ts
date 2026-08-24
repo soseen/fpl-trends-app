@@ -22,21 +22,27 @@ export const useBestDefcons = () => {
   );
 
   const bestDefcons: FootballerWithGameweekStats[] = useMemo(() => {
+    const gameweeksInRange = Math.max(1, endGameweek - startGameweek + 1);
+    const minGamesRequired = isPreseason
+      ? MIN_GAMES_IN_RANGE
+      : Math.min(MIN_GAMES_IN_RANGE, gameweeksInRange);
+
     return [...footballers]
       .filter((f) => {
-        // only positions that earn defcons, with enough games to avoid small-sample noise
+        // only positions that earn defcons, with enough appearances to avoid small-sample noise
         if (getDefconThreshold(f.element_type) === null) return false;
         if (f.element_type === FootballerPosition.MGR) return false;
-        const gamesPlayed = isPreseason
+        const appearances = isPreseason
           ? (getHistoryPastForSeason(f, analysisSeasonLabel)?.starts ?? 0)
           : f.history.filter(
               (h) =>
                 h.round >= startGameweek &&
                 h.round <= endGameweek &&
                 h.team_a_score !== null &&
-                h.team_h_score !== null,
+                h.team_h_score !== null &&
+                h.minutes > 0,
             ).length;
-        return gamesPlayed >= MIN_GAMES_IN_RANGE;
+        return appearances >= minGamesRequired;
       })
       .sort((a, b) => parseFloat(b.defconsPerGame) - parseFloat(a.defconsPerGame))
       .slice(0, isMD ? 4 : 5);
