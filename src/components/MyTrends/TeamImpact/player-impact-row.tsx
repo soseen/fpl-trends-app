@@ -74,6 +74,13 @@ const formatDecimal = (raw: string | number | null | undefined): string => {
   return n.toFixed(1);
 };
 
+const appearanceLabel = (player: PlayerImpact): string => {
+  if (player.starts > 0) {
+    return `${player.starts} start${player.starts === 1 ? "" : "s"}`;
+  }
+  return `${player.played_count} bench app${player.played_count === 1 ? "" : "s"}`;
+};
+
 const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
   const enriched = useSelector(
     (state: RootState) => state.footballersGameweekStats.footballers,
@@ -166,7 +173,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
             </span>
           ) : (
             <span className="rounded-sm bg-magenta2/50 px-1.5 py-[1px] text-[10px] font-semibold text-text sm:text-xs md:text-sm">
-              {player.starts} start{player.starts === 1 ? "" : "s"}
+              {appearanceLabel(player)}
             </span>
           )}
           {player.captaincies > 0 && (
@@ -243,7 +250,7 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
                 <TooltipTrigger asChild>
                   <span className="mt-0.5 hidden text-[10px] text-text/60 sm:inline sm:text-xs">
                     {formatRankDelta(ranksPerAppearance)}
-                    {isRankKiller ? "/game" : "/start"}
+                    {isRankKiller ? "/game" : "/app"}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>Average rank impact per appearance</TooltipContent>
