@@ -36,6 +36,34 @@ const DEFAULT_SORTING = [{ desc: true, id: "totalPoints" }];
 const areFilterValuesEqual = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
+const getColumnGroupClasses = (columnIndex: number, isEvenRow?: boolean) => {
+  const startsStatGroup = columnIndex > 0;
+  const isFirstColumn = columnIndex === 0;
+  const isHighlightedColumn = !isFirstColumn && columnIndex % 2 === 1;
+
+  return {
+    groupDivider:
+      startsStatGroup &&
+      "border-l border-l-accent3/80 shadow-[-4px_0_8px_-10px_rgb(0_0_0_/_0.8)]",
+    headerTone: isFirstColumn
+      ? "bg-accent3"
+      : isHighlightedColumn
+        ? "bg-accent4"
+        : "bg-accent5",
+    cellTone: isFirstColumn
+      ? isEvenRow
+        ? "bg-accent2"
+        : "bg-primary"
+      : isHighlightedColumn
+        ? isEvenRow
+          ? "bg-accent4/65"
+          : "bg-accent4/45"
+        : isEvenRow
+          ? "bg-primary"
+          : "bg-accent5",
+  };
+};
+
 export const FILTERS_DEFAULT_STATE: ColumnFiltersState = [
   { id: "web_name", value: "" },
   { id: "maxOwnership", value: [0, 100] },
@@ -133,24 +161,31 @@ const PlayersTable = () => {
         playersTableColumns={playersTableColumns as any}
         table={table}
       />
-      <div className="mb-2 w-full overflow-x-auto rounded-md border-2 border-accent3 shadow-md md:mb-4">
-        <Table className="max-w-[100vw] overflow-scroll bg-accent2 text-xs text-text md:text-sm lg:text-base">
+      <div className="mb-2 w-full overflow-x-auto rounded-md border border-accent4 shadow-md md:mb-4">
+        <Table className="w-max min-w-full table-auto border-separate border-spacing-0 bg-accent2 text-xs text-text md:text-sm">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="p-2">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, columnIndex) => {
                   const isSorted = !!header.column.getIsSorted();
+                  const columnGroupClasses = getColumnGroupClasses(columnIndex);
+                  const isFirstColumn = columnIndex === 0;
+
                   return (
                     <TableHead
                       key={header.id}
                       className={clsx(
-                        "border-1 cursor-pointer rounded-md border-b-2 border-accent3 px-1 py-1 md:px-2",
-                        isSorted && "bg-magenta3",
+                        "sticky top-0 z-20 cursor-pointer whitespace-nowrap border-b-2 border-r border-b-accent border-r-accent3/80 px-2 py-2 text-text last:border-r-0 md:px-3",
+                        columnGroupClasses.headerTone,
+                        columnGroupClasses.groupDivider,
+                        isFirstColumn &&
+                          "left-0 z-30 min-w-40 max-w-48 border-r-2 border-r-accent md:min-w-44 md:max-w-52",
+                        isSorted && "bg-magenta3 text-white",
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                       style={{ width: `${header.getSize()}px` }}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 md:gap-2">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -178,18 +213,29 @@ const PlayersTable = () => {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, id) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={clsx(
-                        id % 2 === 0 ? "bg-primary" : "bg-accent2",
-                        "border-b-[1px] border-accent3 px-1 py-1 md:px-2",
-                        cell.column.getIsSorted() && "bg-magenta3",
-                      )}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell, columnIndex) => {
+                    const columnGroupClasses = getColumnGroupClasses(
+                      columnIndex,
+                      id % 2 === 0,
+                    );
+                    const isFirstColumn = columnIndex === 0;
+
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={clsx(
+                          "whitespace-nowrap border-b border-r border-b-accent3 border-r-accent3/80 px-2 py-2 last:border-r-0 md:px-3",
+                          columnGroupClasses.cellTone,
+                          columnGroupClasses.groupDivider,
+                          isFirstColumn &&
+                            "sticky left-0 z-10 min-w-40 max-w-48 border-r-2 border-r-accent md:min-w-44 md:max-w-52",
+                          cell.column.getIsSorted() && "bg-magenta3/90 text-white",
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

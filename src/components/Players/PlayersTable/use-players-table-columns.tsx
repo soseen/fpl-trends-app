@@ -36,7 +36,7 @@ export const usePlayersTableColumns = () => {
         );
       },
       enableSorting: false,
-      size: 250,
+      size: 180,
       filterFn: (row, columnId, filterValue) => {
         const normalizedName = removeAccents(
           (row.getValue(columnId) as string).toLowerCase(),
@@ -49,11 +49,13 @@ export const usePlayersTableColumns = () => {
     columnHelper.accessor("totalPoints", {
       header: "Points",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 72,
     }),
     columnHelper.accessor("now_cost", {
       header: "Price",
       cell: (info) => <p>£{(info.getValue() / 10).toFixed(1)}m</p>,
       enableMultiSort: true,
+      size: 78,
     }),
     columnHelper.accessor("element_type", {
       header: "Position",
@@ -68,30 +70,36 @@ export const usePlayersTableColumns = () => {
       ),
       filterFn: (row, columnId, filterValue) =>
         (filterValue as number[]).includes(row.getValue(columnId)),
+      size: 88,
     }),
     columnHelper.accessor("totalGoals", {
       header: "Goals",
       cell: (info) => <p>{info.getValue()}</p>,
       enableMultiSort: true,
+      size: 72,
     }),
     columnHelper.accessor("goalsPerGame", {
       header: "G/game",
       cell: (info) => <p>{info.getValue().toFixed(1)}</p>,
       enableMultiSort: true,
+      size: 82,
     }),
     columnHelper.accessor("totalAssists", {
       header: "Assists",
       cell: (info) => <p>{info.getValue()}</p>,
       enableMultiSort: true,
+      size: 76,
     }),
     columnHelper.accessor("assistsPerGame", {
       header: "A/game",
       cell: (info) => <p>{info.getValue().toFixed(1)}</p>,
       enableMultiSort: true,
+      size: 82,
     }),
     columnHelper.accessor("totalCleanSheets", {
       header: "Cleansheets",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 104,
     }),
     columnHelper.accessor("defconsPerGame", {
       header: "Defcons/g",
@@ -99,40 +107,49 @@ export const usePlayersTableColumns = () => {
       sortingFn: (a, b, columnId) =>
         parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
       enableMultiSort: true,
+      size: 94,
     }),
     columnHelper.accessor("totalDefcons", {
       header: "Defcons",
       cell: (info) => <p>{info.getValue()}</p>,
       enableMultiSort: true,
+      size: 84,
     }),
     columnHelper.accessor("totalXGI", {
       header: "xGI",
       cell: (info) => <p>{info.getValue().toFixed(2)}</p>,
       enableMultiSort: true,
+      size: 68,
     }),
     columnHelper.accessor("xGIPerGame", {
       header: "xGI/game",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 86,
     }),
     columnHelper.accessor("minPerGame", {
       header: "Min/game",
       cell: (info) => <p>{info.getValue().toFixed(0)}</p>,
+      size: 86,
     }),
     columnHelper.accessor("totalSaves", {
       header: "Saves",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 72,
     }),
     columnHelper.accessor("savesPerGame", {
       header: "Saves/game",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 96,
     }),
     columnHelper.accessor("maxOwnership", {
       header: isPreseason ? "Current ownership" : "Max ownership",
       cell: (info) => <p>{info.getValue().toFixed(2)}%</p>,
+      size: isPreseason ? 140 : 120,
     }),
     columnHelper.accessor("teamName", {
       header: "Team",
       cell: (info) => <p>{info.getValue()}</p>,
+      size: 110,
     }),
   ];
 
