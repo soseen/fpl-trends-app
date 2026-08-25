@@ -84,14 +84,6 @@ export const usePlayersTableColumns = () => {
       enableMultiSort: true,
       size: 82,
     }),
-    columnHelper.accessor("xGSPerGame", {
-      header: "xG/game",
-      cell: (info) => <p>{info.getValue()}</p>,
-      sortingFn: (a, b, columnId) =>
-        parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
-      enableMultiSort: true,
-      size: 86,
-    }),
     columnHelper.accessor("totalAssists", {
       header: "Assists",
       cell: (info) => <p>{info.getValue()}</p>,
@@ -103,14 +95,6 @@ export const usePlayersTableColumns = () => {
       cell: (info) => <p>{info.getValue().toFixed(1)}</p>,
       enableMultiSort: true,
       size: 82,
-    }),
-    columnHelper.accessor("xAPerGame", {
-      header: "xA/game",
-      cell: (info) => <p>{info.getValue()}</p>,
-      sortingFn: (a, b, columnId) =>
-        parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
-      enableMultiSort: true,
-      size: 86,
     }),
     columnHelper.accessor("totalCleanSheets", {
       header: "Cleansheets",
@@ -130,6 +114,22 @@ export const usePlayersTableColumns = () => {
       cell: (info) => <p>{info.getValue()}</p>,
       enableMultiSort: true,
       size: 84,
+    }),
+    columnHelper.accessor("xGSPerGame", {
+      header: "xG/game",
+      cell: (info) => <p>{info.getValue()}</p>,
+      sortingFn: (a, b, columnId) =>
+        parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
+      enableMultiSort: true,
+      size: 86,
+    }),
+    columnHelper.accessor("xAPerGame", {
+      header: "xA/game",
+      cell: (info) => <p>{info.getValue()}</p>,
+      sortingFn: (a, b, columnId) =>
+        parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
+      enableMultiSort: true,
+      size: 86,
     }),
     columnHelper.accessor("totalXGI", {
       header: "xGI",
