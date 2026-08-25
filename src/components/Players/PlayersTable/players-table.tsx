@@ -95,6 +95,7 @@ const PlayersTable = () => {
     totalXGI: false,
     totalDefcons: false,
     element_type: false,
+    maxOwnership: false,
   });
 
   const isClearState = useMemo(() => {
