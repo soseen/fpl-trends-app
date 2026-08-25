@@ -7,8 +7,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import type { RootState } from "src/redux/store";
 import {
   Table,
@@ -33,8 +34,29 @@ import { useTableFiltersFromParams } from "./use-table-filters-from-params";
 import PlayersTablePagination from "./players-table-pagination";
 
 const DEFAULT_SORTING = [{ desc: true, id: "totalPoints" }];
+const DEFAULT_COLUMN_VISIBILITY: Partial<
+  Record<keyof FootballerWithGameweekStats, boolean>
+> = {
+  points_per_game: false,
+  savesPerGame: false,
+  totalSaves: false,
+  teamName: false,
+  goalsPerGame: false,
+  assistsPerGame: false,
+  totalXGI: false,
+  totalDefcons: false,
+  element_type: false,
+  maxOwnership: false,
+};
 const areFilterValuesEqual = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
+const getHiddenColumnIds = (
+  visibility: Partial<Record<keyof FootballerWithGameweekStats, boolean>>,
+) =>
+  Object.entries(visibility)
+    .filter(([, isVisible]) => isVisible === false)
+    .map(([columnId]) => columnId)
+    .sort();
 
 const getColumnGroupClasses = (columnIndex: number, isEvenRow?: boolean) => {
   const startsStatGroup = columnIndex > 0;
@@ -78,25 +100,47 @@ const PlayersTable = () => {
   );
   const { status } = useAppInitContext();
   const { playersTableColumns } = usePlayersTableColumns();
-  const { defaultFilters, sortingFromParams } = useTableFiltersFromParams();
+  const [, setSearchParams] = useSearchParams();
+  const { defaultFilters, sortingFromParams, columnVisibilityFromParams } =
+    useTableFiltersFromParams();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultFilters);
   const [sorting, setSorting] = useState<ColumnSort[]>(
     sortingFromParams ?? DEFAULT_SORTING,
   );
   const [columnVisibility, setColumnVisibility] = useState<
     Partial<Record<keyof FootballerWithGameweekStats, boolean>>
-  >({
-    points_per_game: false,
-    savesPerGame: false,
-    totalSaves: false,
-    teamName: false,
-    goalsPerGame: false,
-    assistsPerGame: false,
-    totalXGI: false,
-    totalDefcons: false,
-    element_type: false,
-    maxOwnership: false,
-  });
+  >(columnVisibilityFromParams ?? DEFAULT_COLUMN_VISIBILITY);
+
+  useEffect(() => {
+    const defaultHiddenColumnIds = getHiddenColumnIds(DEFAULT_COLUMN_VISIBILITY);
+    const hiddenColumnIds = getHiddenColumnIds(columnVisibility);
+
+    setSearchParams(
+      (previousParams) => {
+        const nextParams = new URLSearchParams(previousParams);
+
+        if (areFilterValuesEqual(sorting, DEFAULT_SORTING)) {
+          nextParams.delete("sorting");
+        } else {
+          nextParams.set("sorting", JSON.stringify(sorting));
+        }
+
+        if (areFilterValuesEqual(hiddenColumnIds, defaultHiddenColumnIds)) {
+          nextParams.delete("hiddenColumns");
+        } else {
+          nextParams.set(
+            "hiddenColumns",
+            hiddenColumnIds.length ? hiddenColumnIds.join(",") : "none",
+          );
+        }
+
+        return nextParams.toString() === previousParams.toString()
+          ? previousParams
+          : nextParams;
+      },
+      { replace: true },
+    );
+  }, [columnVisibility, setSearchParams, sorting]);
 
   const isClearState = useMemo(() => {
     const isDefaultSorting =
