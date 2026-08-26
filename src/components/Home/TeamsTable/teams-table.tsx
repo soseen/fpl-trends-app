@@ -78,7 +78,7 @@ const TeamsTable = () => {
             <TableHead className="p-2">Team</TableHead>
             <TableHead className="p-2 text-right">GP</TableHead>
             <TableHead className="p-2 text-right">
-              {isDefensiveStats ? "Avg npxGA" : "Avg npxG"}
+              {isDefensiveStats ? "npxGA" : "npxG"}
             </TableHead>
             <TableHead className="p-2 text-right">
               {isDefensiveStats ? "Clean Sheets" : "Goals Scored"}
