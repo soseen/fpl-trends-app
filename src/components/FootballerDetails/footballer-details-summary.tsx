@@ -51,9 +51,11 @@ const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
             : "-",
       },
       {
-        label: "xGI",
+        label: "npxGI",
         value:
-          typeof footballer.totalXGI === "number" ? footballer.totalXGI.toFixed(2) : "-",
+          typeof footballer.totalNpxGI === "number"
+            ? footballer.totalNpxGI.toFixed(2)
+            : "-",
       },
       {
         label: "Min/g",

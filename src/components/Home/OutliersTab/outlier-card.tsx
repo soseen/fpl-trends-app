@@ -10,7 +10,7 @@ type Props = {
   footballer: FootballerWithGameweekStats;
   include: {
     returns?: boolean;
-    xGI?: boolean;
+    npxGI?: boolean;
     selectedBy?: boolean;
     defcons?: boolean;
     totalPoints?: boolean;
@@ -23,11 +23,11 @@ const getMetricChip = (
   footballer: FootballerWithGameweekStats,
   include: Props["include"],
 ): MetricChip | null => {
-  if (include.xGI)
+  if (include.npxGI)
     return {
-      value: `${footballer?.xGIPerGame}`,
-      suffix: "xGI",
-      label: "xGI per game",
+      value: `${footballer?.npxGIPerGame}`,
+      suffix: "npxGI",
+      label: "Non-penalty expected goal involvements per game",
     };
   if (include.defcons)
     return {

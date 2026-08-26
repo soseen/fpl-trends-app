@@ -78,7 +78,7 @@ const TeamsTable = () => {
             <TableHead className="p-2">Team</TableHead>
             <TableHead className="p-2 text-right">GP</TableHead>
             <TableHead className="p-2 text-right">
-              {isDefensiveStats ? "Avg xGC" : "Avg xGS"}
+              {isDefensiveStats ? "Avg npxGA" : "Avg npxG"}
             </TableHead>
             <TableHead className="p-2 text-right">
               {isDefensiveStats ? "Clean Sheets" : "Goals Scored"}
@@ -90,8 +90,8 @@ const TeamsTable = () => {
             const diff =
               (team?.avg ?? 0) -
               (isDefensiveStats
-                ? (team.avgXGCFullSeason ?? 0)
-                : (team.avgXGSFullSeason ?? 0));
+                ? (team.avgNPXGAFullSeason ?? 0)
+                : (team.avgNPXGFullSeason ?? 0));
             const rankingDiff = (team.fullSeasonRank ?? 0) - (index + 1);
 
             return (

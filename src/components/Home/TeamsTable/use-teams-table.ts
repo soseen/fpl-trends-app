@@ -19,11 +19,11 @@ export const useTeamsTable = () => {
 
     return [...list].map((team) => ({
       ...team,
-      avgXGCFullSeason:
-        team.team_history.reduce((sum, gw) => sum + gw.teamXGC, 0) /
+      avgNPXGAFullSeason:
+        team.team_history.reduce((sum, gw) => sum + gw.teamNPXGA, 0) /
           team.team_history.length || 0,
-      avgXGSFullSeason:
-        team.team_history.reduce((sum, gw) => sum + gw.teamXGS, 0) /
+      avgNPXGFullSeason:
+        team.team_history.reduce((sum, gw) => sum + gw.teamNPXG, 0) /
           team.team_history.length || 0,
       fullSeasonRank: 0,
     }));
@@ -34,8 +34,8 @@ export const useTeamsTable = () => {
       .filter(Boolean)
       .sort((a, b) =>
         isDefensiveStats
-          ? a!.avgXGCFullSeason - b!.avgXGCFullSeason
-          : b!.avgXGSFullSeason - a!.avgXGSFullSeason,
+          ? a!.avgNPXGAFullSeason - b!.avgNPXGAFullSeason
+          : b!.avgNPXGFullSeason - a!.avgNPXGFullSeason,
       );
 
     sortedByFullSeason.forEach((team, index) => {
@@ -53,7 +53,7 @@ export const useTeamsTable = () => {
         );
 
         const selectedStatTotal = selectedGameweeks.reduce(
-          (sum, gw) => sum + (isDefensiveStats ? gw.teamXGC : gw.teamXGS),
+          (sum, gw) => sum + (isDefensiveStats ? gw.teamNPXGA : gw.teamNPXG),
           0,
         );
         const avg = selectedStatTotal / selectedGameweeks.length || 0;

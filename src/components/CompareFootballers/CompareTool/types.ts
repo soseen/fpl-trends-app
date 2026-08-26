@@ -5,7 +5,7 @@ import {
 
 export type SelectedStatKey = keyof Pick<
   AdditionalStats,
-  | "xGIPer90"
+  | "npxGIPer90"
   | "pointsPer90"
   | "goalsPer90"
   | "assistsPer90"
@@ -40,7 +40,7 @@ export type BestAttributes = Record<
     totalDefcons: number;
     totalDefconBonuses: number;
     returns: number;
-    teamAvgXGC: number;
+    teamAvgNPXGA: number;
     teamGoalsInRange: number;
   }
 >;

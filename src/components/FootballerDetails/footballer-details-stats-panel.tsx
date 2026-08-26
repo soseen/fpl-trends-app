@@ -26,7 +26,7 @@ const FootballerDetailsStatsPanel = ({ footballer }: Props) => {
           return [{ title: "CS", value: footballer?.clean_sheets }];
         case 3:
         case 4:
-          return [{ title: "xG/90", value: footballer?.xGSPer90 }];
+          return [{ title: "npxG/90", value: footballer?.npxGPer90 }];
         default:
           return [];
       }

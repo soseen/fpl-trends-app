@@ -62,6 +62,12 @@ export type Element = {
   expected_assists: string;
   expected_goal_involvements: string;
   expected_goals_conceded: string;
+  penalties_scored: number;
+  non_penalty_goals_scored: number;
+  non_penalty_expected_goals: number;
+  non_penalty_expected_goal_involvements: number;
+  non_penalty_expected_goals_per_90: number;
+  non_penalty_expected_goal_involvements_per_90: number;
   influence_rank: number;
   influence_rank_type: number;
   creativity_rank: number;
@@ -139,6 +145,10 @@ export type History = {
   own_goals: number;
   penalties_saved: number;
   penalties_missed: number;
+  penalties_scored: number;
+  non_penalty_goals_scored: number;
+  non_penalty_expected_goals: number;
+  non_penalty_expected_goal_involvements: number;
   yellow_cards: number;
   red_cards: number;
   saves: number;
@@ -159,6 +169,7 @@ export type History = {
   transfers_in: number;
   transfers_out: number;
   defensive_contribution: number | null;
+  fixture_code: number;
 };
 
 export type HistoryPast = {
@@ -175,6 +186,12 @@ export type HistoryPast = {
   own_goals: number;
   penalties_saved: number;
   penalties_missed: number;
+  penalties_scored: number;
+  non_penalty_goals_scored: number;
+  non_penalty_expected_goals: number;
+  non_penalty_expected_goal_involvements: number;
+  non_penalty_expected_goals_per_90: number;
+  non_penalty_expected_goal_involvements_per_90: number;
   yellow_cards: number;
   red_cards: number;
   saves: number;
@@ -269,6 +286,8 @@ export type TeamHistory = {
   round: number;
   teamXGC: number;
   teamXGS: number;
+  teamNPXG: number;
+  teamNPXGA: number;
   goals: number;
   goals_conceded: number;
 };

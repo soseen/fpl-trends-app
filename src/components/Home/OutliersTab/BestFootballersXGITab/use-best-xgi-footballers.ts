@@ -16,7 +16,7 @@ export const useBestXGIFootballers = () => {
   const bestXGIFootballers: FootballerWithGameweekStats[] = useMemo(
     () =>
       [...footballers]
-        .sort((a, b) => parseFloat(b.xGIPerGame) - parseFloat(a.xGIPerGame))
+        .sort((a, b) => parseFloat(b.npxGIPerGame) - parseFloat(a.npxGIPerGame))
         .slice(0, isMD ? 4 : 5),
     [footballers, startGameweek, endGameweek, isMD],
   );

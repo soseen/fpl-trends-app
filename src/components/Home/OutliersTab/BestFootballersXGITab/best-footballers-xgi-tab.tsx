@@ -8,10 +8,10 @@ const BestFootballersXGITab = () => {
   return (
     <div>
       <OutliersHeader
-        title="Players with the Highest xGI / game"
+        title="Players with the Highest npxGI / game"
         search={new URLSearchParams({
           sorting: JSON.stringify([
-            { id: "xGIPerGame", desc: true },
+            { id: "npxGIPerGame", desc: true },
             { id: "totalGoals", desc: true },
           ]),
         }).toString()}
@@ -21,7 +21,7 @@ const BestFootballersXGITab = () => {
           <OutlierCard
             key={footballer.id}
             footballer={footballer}
-            include={{ xGI: true, returns: true }}
+            include={{ npxGI: true, returns: true }}
           />
         ))}
       </div>

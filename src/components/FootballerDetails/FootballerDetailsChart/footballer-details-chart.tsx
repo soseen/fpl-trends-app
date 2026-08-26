@@ -39,7 +39,7 @@ import { useDimensions } from "src/hooks/use-dimensions";
 const MOBILE_BAR_WIDTH = 36;
 
 enum SelectedChartStat {
-  xGI = "xGI",
+  npxGI = "npxGI",
   xGC = "xGC",
   minutes = "minutes",
   points = "points",
@@ -49,13 +49,13 @@ enum SelectedChartStat {
 
 const CHART_STAT_COPY: Record<SelectedChartStat, { label: string; description: string }> =
   {
-    [SelectedChartStat.xGI]: {
-      label: "Expected involvement",
-      description: "xG + xA by gameweek",
+    [SelectedChartStat.npxGI]: {
+      label: "Non-penalty expected involvement",
+      description: "npxG + xA by gameweek",
     },
     [SelectedChartStat.xGC]: {
       label: "Expected conceded",
-      description: "Defensive exposure by gameweek",
+      description: "Defensive exposure by gameweek, including penalties",
     },
     [SelectedChartStat.minutes]: {
       label: "Minutes",
@@ -81,7 +81,7 @@ type Props = {
 
 export type ChartData = {
   gw: number;
-  xGI: number;
+  npxGI: number;
   xGC: number;
   minutes: number;
   points: number;
@@ -103,11 +103,11 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       footballer?.element_type ?? 1,
     )
       ? SelectedChartStat.xGC
-      : SelectedChartStat.xGI,
+      : SelectedChartStat.npxGI,
   );
 
   const chartConfig: ChartConfig = {
-    xGI: { color: "var(--chart-1)", label: "xGI" },
+    npxGI: { color: "var(--chart-1)", label: "npxGI" },
   };
 
   // Per-stat colour palette. Cyan/magenta tones tie back to the brand
@@ -119,7 +119,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
     SelectedChartStat,
     { stroke: string; gradientFrom: string; gradientTo: string; activeFill: string }
   > = {
-    [SelectedChartStat.xGI]: {
+    [SelectedChartStat.npxGI]: {
       stroke: "#27dfff",
       gradientFrom: "#27dfff",
       gradientTo: "rgba(39, 223, 255, 0.15)",
@@ -181,7 +181,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       if (existing) {
         gameweekMap.set(round, {
           ...existing,
-          xGI: existing.xGI + parseFloat(h.expected_goal_involvements),
+          npxGI: existing.npxGI + h.non_penalty_expected_goal_involvements,
           xGC: existing.xGC + parseFloat(h.expected_goals_conceded),
           minutes: existing.minutes + h.minutes,
           points: existing.points + h.total_points,
@@ -194,7 +194,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       } else {
         gameweekMap.set(round, {
           gw: round,
-          xGI: parseFloat(h.expected_goal_involvements),
+          npxGI: h.non_penalty_expected_goal_involvements,
           xGC: parseFloat(h.expected_goals_conceded),
           minutes: h.minutes,
           points: h.total_points,
@@ -213,7 +213,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
       return (
         gameweekMap.get(round) ?? {
           gw: round,
-          xGI: 0,
+          npxGI: 0,
           xGC: 0,
           minutes: 0,
           points: 0,
@@ -427,11 +427,11 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                   axisLine={false}
                   width={32}
                   tickCount={5}
-                  // xGI / xGC are floats; ownership is a percentage; the rest
+                  // npxGI / xGC are floats; ownership is a percentage; the rest
                   // are integer counts. Drop trailing `.0` on whole-number
                   // ownership ticks (e.g. show "5%" not "5.0%").
                   tickFormatter={(v: number) =>
-                    [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
+                    [SelectedChartStat.npxGI, SelectedChartStat.xGC].includes(
                       displayedChartStat,
                     )
                       ? v.toFixed(1)
@@ -529,7 +529,7 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                           >
                             {value === 0
                               ? ""
-                              : [SelectedChartStat.xGI, SelectedChartStat.xGC].includes(
+                              : [SelectedChartStat.npxGI, SelectedChartStat.xGC].includes(
                                     displayedChartStat,
                                   )
                                 ? (value as number).toFixed(2)

@@ -39,7 +39,7 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
             totalDefcons,
             totalDefconBonuses,
             returns,
-            teamAvgXGC,
+            teamAvgNPXGA,
             teamGoalsInRange,
           } = bestAttributes[footballer.id] || {};
 
@@ -87,16 +87,17 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                   </span>
                 )}
-                {isBestFinisher && !!footballer?.totalGoals && (
+                {isBestFinisher && !!footballer?.totalNonPenaltyGoals && (
                   <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
                     <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1">
                       🎯 Best Finisher{" "}
                     </p>
                     <p className="">
-                      Scored <b className="text-magenta">{footballer?.totalGoals}</b>{" "}
-                      goals from{" "}
-                      <b className="text-magenta">{footballer?.totalXGS.toFixed(2)}</b>{" "}
-                      expected goals scored
+                      Scored{" "}
+                      <b className="text-magenta">{footballer?.totalNonPenaltyGoals}</b>{" "}
+                      non-penalty goals from{" "}
+                      <b className="text-magenta">{footballer?.totalNpxG.toFixed(2)}</b>{" "}
+                      npxG
                     </p>
                   </span>
                 )}
@@ -158,11 +159,11 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                 {isBestAttacker && (
                   <span className="flex w-fit flex-col gap-1 text-sm md:flex-row md:items-center md:gap-2 md:text-base">
                     <p className="w-fit whitespace-nowrap rounded-r-md bg-magenta2 p-1 pr-4">
-                      🔥 Highest goal threat{" "}
+                      🔥 Highest non-penalty goal threat{" "}
                     </p>
                     <p className="">
-                      Accumulated <b className="text-magenta">{footballer?.xGSPer90}</b>{" "}
-                      expected goals scored per 90
+                      Accumulated <b className="text-magenta">{footballer?.npxGPer90}</b>{" "}
+                      npxG per 90
                     </p>
                   </span>
                 )}
@@ -174,8 +175,8 @@ const CompareToolRankings = ({ bestAttributes, selectedFootballers }: Props) => 
                     </p>
                     <p className="">
                       Plays for a defense that accumulated{" "}
-                      <b className="text-magenta">{teamAvgXGC?.toFixed(2)}</b> expected
-                      goals conceded per game
+                      <b className="text-magenta">{teamAvgNPXGA?.toFixed(2)}</b> npxGA per
+                      game
                     </p>
                   </span>
                 )}

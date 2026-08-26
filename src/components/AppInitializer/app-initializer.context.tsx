@@ -123,19 +123,22 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             const per90Count = (acc.totalMinutes + val.minutes) / 90;
             const totalPoints = acc.totalPoints + val.total_points;
             const totalGoals = acc.totalGoals + val.goals_scored;
+            const totalNonPenaltyGoals =
+              acc.totalNonPenaltyGoals + val.non_penalty_goals_scored;
             const totalAssists = acc.totalAssists + val.assists;
             const totalSaves = acc.totalSaves + val.saves;
-            const totalXGI = acc.totalXGI + parseStat(val.expected_goal_involvements);
+            const totalNpxGI =
+              acc.totalNpxGI + val.non_penalty_expected_goal_involvements;
             const expectedAssists =
               val.expected_assists === undefined || val.expected_assists === null
                 ? Math.max(
                     0,
-                    parseStat(val.expected_goal_involvements) -
-                      parseStat(val.expected_goals),
+                    val.non_penalty_expected_goal_involvements -
+                      val.non_penalty_expected_goals,
                   )
                 : parseStat(val.expected_assists);
             const totalXA = acc.totalXA + expectedAssists;
-            const totalXGS = acc.totalXGS + parseStat(val.expected_goals);
+            const totalNpxG = acc.totalNpxG + val.non_penalty_expected_goals;
             const totalXGC = acc.totalXGC + parseStat(val.expected_goals_conceded);
             const accumulatedMinutes = acc.totalMinutes + val.minutes;
 
@@ -144,6 +147,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
               pointsPerGame: safeDivide(totalPoints, appearancesCount),
               pointsPer90: safeDivide(totalPoints, per90Count),
               totalGoals,
+              totalNonPenaltyGoals,
               goalsPerGame: safeDivide(totalGoals, appearancesCount),
               goalsPer90: safeDivide(totalGoals, per90Count),
               totalAssists,
@@ -152,15 +156,15 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
               totalCleanSheets: acc.totalCleanSheets + val.clean_sheets,
               totalSaves,
               savesPerGame: safeDivide(totalSaves, appearancesCount),
-              totalXGI,
-              xGIPerGame: formatRate(safeDivide(totalXGI, appearancesCount)),
-              xGIPer90: formatRate(safeDivide(totalXGI, per90Count)),
+              totalNpxGI,
+              npxGIPerGame: formatRate(safeDivide(totalNpxGI, appearancesCount)),
+              npxGIPer90: formatRate(safeDivide(totalNpxGI, per90Count)),
               totalXA,
               xAPerGame: formatRate(safeDivide(totalXA, appearancesCount)),
               xAPer90: formatRate(safeDivide(totalXA, per90Count)),
-              totalXGS,
-              xGSPerGame: formatRate(safeDivide(totalXGS, appearancesCount)),
-              xGSPer90: formatRate(safeDivide(totalXGS, per90Count)),
+              totalNpxG,
+              npxGPerGame: formatRate(safeDivide(totalNpxG, appearancesCount)),
+              npxGPer90: formatRate(safeDivide(totalNpxG, per90Count)),
               totalXGC,
               xGCPerGame: formatRate(safeDivide(totalXGC, appearancesCount)),
               xGCPer90: formatRate(safeDivide(totalXGC, per90Count)),
@@ -177,6 +181,7 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             pointsPerGame: 0,
             pointsPer90: 0,
             totalGoals: 0,
+            totalNonPenaltyGoals: 0,
             goalsPerGame: 0,
             goalsPer90: 0,
             totalAssists: 0,
@@ -185,15 +190,15 @@ export const AppInitializerProvider = ({ children }: AppInitializerProviderProps
             totalCleanSheets: 0,
             totalSaves: 0,
             savesPerGame: 0,
-            totalXGI: 0,
-            xGIPerGame: "0.00",
-            xGIPer90: "0.00",
+            totalNpxGI: 0,
+            npxGIPerGame: "0.00",
+            npxGIPer90: "0.00",
             totalXA: 0,
             xAPerGame: "0.00",
             xAPer90: "0.00",
-            totalXGS: 0,
-            xGSPerGame: "0.00",
-            xGSPer90: "0.00",
+            totalNpxG: 0,
+            npxGPerGame: "0.00",
+            npxGPer90: "0.00",
             totalXGC: 0,
             xGCPerGame: "0.00",
             xGCPer90: "0.00",

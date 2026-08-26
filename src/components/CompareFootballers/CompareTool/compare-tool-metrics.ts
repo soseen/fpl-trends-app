@@ -6,8 +6,8 @@ export type CompareMetricKey =
   | "pointsPer90"
   | "goalsPer90"
   | "assistsPer90"
-  | "xGIPer90"
-  | "xGSPer90"
+  | "npxGIPer90"
+  | "npxGPer90"
   | "xAPer90"
   | "xGCPer90"
   | "minPerGame"
@@ -108,24 +108,24 @@ export const COMPARE_METRICS: CompareMetric[] = [
     getValue: (footballer) => footballer.assistsPer90,
   },
   {
-    key: "xGIPer90",
-    label: "xGI / 90",
-    shortLabel: "xGI/90",
+    key: "npxGIPer90",
+    label: "npxGI / 90",
+    shortLabel: "npxGI/90",
     group: "Attack",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.xGIPer90),
+    getValue: (footballer) => numberOrZero(footballer.npxGIPer90),
   },
   {
-    key: "xGSPer90",
-    label: "xG / 90",
-    shortLabel: "xG/90",
+    key: "npxGPer90",
+    label: "npxG / 90",
+    shortLabel: "npxG/90",
     group: "Attack",
     better: "higher",
     defaultSelected: true,
     format: formatTwo,
-    getValue: (footballer) => numberOrZero(footballer.xGSPer90),
+    getValue: (footballer) => numberOrZero(footballer.npxGPer90),
   },
   {
     key: "xAPer90",

@@ -43,7 +43,7 @@ const DEFAULT_COLUMN_VISIBILITY: Partial<
   teamName: false,
   goalsPerGame: false,
   assistsPerGame: false,
-  totalXGI: false,
+  totalNpxGI: false,
   totalDefcons: false,
   element_type: false,
   maxOwnership: false,

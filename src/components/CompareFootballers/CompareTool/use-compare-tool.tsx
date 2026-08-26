@@ -19,7 +19,7 @@ export const COMPARE_TOOL_STAT_KEYS: Array<{ key: SelectedStatKey; label: string
   { key: "pointsPer90", label: "Pts/90" },
   { key: "goalsPer90", label: "Goals/90" },
   { key: "assistsPer90", label: "Assists/90" },
-  { key: "xGIPer90", label: "xGI/90" },
+  { key: "npxGIPer90", label: "npxGI/90" },
   { key: "xGCPer90", label: "xGC/90" },
   { key: "defconsPer90", label: "Def/90" },
   { key: "minPerGame", label: "Min/GW" },
@@ -45,7 +45,7 @@ export const useCompareTool = () => {
   const teamStatsById = useMemo(() => {
     const result: Record<
       number,
-      { avgXGC: number; goalsInRange: number; gamesPlayed: number }
+      { avgNPXGA: number; goalsInRange: number; gamesPlayed: number }
     > = {};
     teams.forEach((team) => {
       const inRange = team.team_history.filter(
@@ -53,7 +53,7 @@ export const useCompareTool = () => {
       );
       const games = inRange.length;
       result[team.id] = {
-        avgXGC: games ? inRange.reduce((sum, gw) => sum + gw.teamXGC, 0) / games : 0,
+        avgNPXGA: games ? inRange.reduce((sum, gw) => sum + gw.teamNPXGA, 0) / games : 0,
         goalsInRange: inRange.reduce((sum, gw) => sum + gw.goals, 0),
         gamesPlayed: games,
       };
@@ -208,11 +208,11 @@ export const useCompareTool = () => {
     const footballersWithTeamGames = validFootballers.filter(
       (f) => (teamStatsById[f.team]?.gamesPlayed ?? 0) > 0,
     );
-    const bestTeamDefenseXGC = footballersWithTeamGames.length
-      ? Math.min(...footballersWithTeamGames.map((f) => teamStatsById[f.team]!.avgXGC))
+    const bestTeamDefenseNPXGA = footballersWithTeamGames.length
+      ? Math.min(...footballersWithTeamGames.map((f) => teamStatsById[f.team]!.avgNPXGA))
       : Infinity;
     const bestAttackerValue = Math.max(
-      ...validFootballers.map((f) => parseFloat(f?.xGSPer90 as string) ?? 0),
+      ...validFootballers.map((f) => parseFloat(f?.npxGPer90 as string) ?? 0),
     );
     const mostDifferentialValue = Math.min(
       ...validFootballers.map((f) => parseFloat(f?.selected_by_percent ?? "0")),
@@ -234,12 +234,12 @@ export const useCompareTool = () => {
       (f) => (f?.fixtureDifficultyRank?.rank ?? 99) === bestFixtures,
     );
     const bestDefendersPlayers = footballersWithTeamGames.filter(
-      (f) => teamStatsById[f.team]!.avgXGC === bestTeamDefenseXGC,
+      (f) => teamStatsById[f.team]!.avgNPXGA === bestTeamDefenseNPXGA,
     );
     const bestAttackersPlayers = validFootballers.filter((f) => {
-      const xGSPer90Value = parseFloat(f?.xGSPer90 as string) || 0;
+      const npxGPer90Value = parseFloat(f?.npxGPer90 as string) || 0;
 
-      return xGSPer90Value === bestAttackerValue;
+      return npxGPer90Value === bestAttackerValue;
     });
     const mostDifferentialPlayers = validFootballers.filter(
       (f) => parseFloat(f?.selected_by_percent ?? "0") === mostDifferentialValue,
@@ -346,7 +346,7 @@ export const useCompareTool = () => {
         totalDefcons: footballer.totalDefcons,
         totalDefconBonuses: footballer.totalDefconBonuses,
         returns,
-        teamAvgXGC: teamStatsById[footballer.team]?.avgXGC ?? 0,
+        teamAvgNPXGA: teamStatsById[footballer.team]?.avgNPXGA ?? 0,
         teamGoalsInRange: teamStatsById[footballer.team]?.goalsInRange ?? 0,
       };
     });

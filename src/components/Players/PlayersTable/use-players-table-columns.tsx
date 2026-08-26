@@ -115,8 +115,8 @@ export const usePlayersTableColumns = () => {
       enableMultiSort: true,
       size: 84,
     }),
-    columnHelper.accessor("xGSPerGame", {
-      header: "xG/game",
+    columnHelper.accessor("npxGPerGame", {
+      header: "npxG/game",
       cell: (info) => <p>{info.getValue()}</p>,
       sortingFn: (a, b, columnId) =>
         parseFloat(a.getValue(columnId)) - parseFloat(b.getValue(columnId)),
@@ -131,14 +131,14 @@ export const usePlayersTableColumns = () => {
       enableMultiSort: true,
       size: 86,
     }),
-    columnHelper.accessor("totalXGI", {
-      header: "xGI",
+    columnHelper.accessor("totalNpxGI", {
+      header: "npxGI",
       cell: (info) => <p>{info.getValue().toFixed(2)}</p>,
       enableMultiSort: true,
       size: 68,
     }),
-    columnHelper.accessor("xGIPerGame", {
-      header: "xGI/game",
+    columnHelper.accessor("npxGIPerGame", {
+      header: "npxGI/game",
       cell: (info) => <p>{info.getValue()}</p>,
       size: 86,
     }),

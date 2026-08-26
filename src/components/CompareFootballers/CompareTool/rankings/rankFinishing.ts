@@ -1,11 +1,14 @@
 import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 
+const finishing = (player: FootballerWithGameweekStats): number =>
+  Number(((player.totalNonPenaltyGoals || 0) - (player.totalNpxG || 0)).toFixed(2));
+
 export const rankFinishing = (footballers: FootballerWithGameweekStats[]) => {
   const sortedByFinishing = [...footballers]
-    .filter((f) => f.totalGoals > 0)
+    .filter((f) => f.totalNonPenaltyGoals > 0)
     ?.sort((a, b) => {
-      const aFinishing = (a.totalGoals || 0) - (a.totalXGS || 0);
-      const bFinishing = (b.totalGoals || 0) - (b.totalXGS || 0);
+      const aFinishing = finishing(a);
+      const bFinishing = finishing(b);
 
       return bFinishing - aFinishing; // Bigger positive difference is better
     });
@@ -14,23 +17,21 @@ export const rankFinishing = (footballers: FootballerWithGameweekStats[]) => {
   let rank = 1;
 
   sortedByFinishing.forEach((player, index) => {
-    const playerFinishing = (player.totalGoals || 0) - (player.totalXGS || 0);
+    const playerFinishing = finishing(player);
 
     if (!rankMap.has(playerFinishing)) rankMap.set(playerFinishing, rank);
 
     if (index < sortedByFinishing.length - 1) {
       const nextPlayer = sortedByFinishing[index + 1];
-      const nextFinishing = nextPlayer
-        ? (nextPlayer.totalGoals || 0) - (nextPlayer.totalXGS || 0)
-        : playerFinishing;
+      const nextFinishing = nextPlayer ? finishing(nextPlayer) : playerFinishing;
 
       if (playerFinishing !== nextFinishing) rank++;
     }
   });
 
   return (player: FootballerWithGameweekStats) => ({
-    value: (player.totalGoals || 0) - (player.totalXGS || 0),
-    rank: rankMap.get((player.totalGoals || 0) - (player.totalXGS || 0)) ?? rank,
+    value: finishing(player),
+    rank: rankMap.get(finishing(player)) ?? rank,
     label: "Finishing Ability",
   });
 };

@@ -165,8 +165,8 @@ const CompareToolFootballerCard = ({
           return gamesPer90 > 0 ? footballer?.goals_scored / gamesPer90 : 0;
         case "assistsPer90":
           return gamesPer90 > 0 ? footballer?.assists / gamesPer90 : 0;
-        case "xGIPer90":
-          return footballer?.expected_goal_involvements_per_90;
+        case "npxGIPer90":
+          return footballer?.non_penalty_expected_goal_involvements_per_90;
         case "xGCPer90":
           return footballer?.expected_goals_conceded_per_90;
         case "defconsPer90": {

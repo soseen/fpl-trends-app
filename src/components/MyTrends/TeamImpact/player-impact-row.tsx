@@ -206,15 +206,15 @@ const PlayerImpactRow: React.FC<Props> = ({ player, showRankImpact }) => {
               tooltip="Defensive-contribution +2 bonuses in range (threshold met)"
             />
             <StatChip
-              label="xGI"
-              value={formatDecimal(stats.totalXGI)}
-              tooltip="Expected goal involvements (xG + xA)"
+              label="npxGI"
+              value={formatDecimal(stats.totalNpxGI)}
+              tooltip="Non-penalty expected goal involvements (npxG + xA)"
             />
             {isKeeperOrDef && (
               <StatChip
                 label="xGC"
                 value={formatDecimal(stats.totalXGC)}
-                tooltip="Expected goals conceded"
+                tooltip="Expected goals conceded, including penalties"
               />
             )}
             {stats.totalSaves > 0 && (

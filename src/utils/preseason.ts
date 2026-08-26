@@ -68,11 +68,12 @@ export const getPreseasonFootballerStats = (
       : 0;
   const appearances = Math.max(starts, inferredAppearances);
   const totalGoals = previous.goals_scored ?? 0;
+  const totalNonPenaltyGoals = previous.non_penalty_goals_scored;
   const totalAssists = previous.assists ?? 0;
   const totalSaves = previous.saves ?? 0;
-  const totalXGI = parseStat(previous.expected_goal_involvements);
+  const totalNpxGI = previous.non_penalty_expected_goal_involvements;
   const totalXA = parseStat(previous.expected_assists);
-  const totalXGS = parseStat(previous.expected_goals);
+  const totalNpxG = previous.non_penalty_expected_goals;
   const totalXGC = parseStat(previous.expected_goals_conceded);
   const totalDefcons = previous.defensive_contribution ?? 0;
   const currentOwnership = parseStat(footballer.selected_by_percent);
@@ -82,6 +83,10 @@ export const getPreseasonFootballerStats = (
       total_points: totalPoints,
       minutes,
       goals_scored: totalGoals,
+      penalties_scored: previous.penalties_scored,
+      non_penalty_goals_scored: totalNonPenaltyGoals,
+      non_penalty_expected_goals: totalNpxG,
+      non_penalty_expected_goal_involvements: totalNpxGI,
       assists: totalAssists,
       clean_sheets: previous.clean_sheets ?? 0,
       goals_conceded: previous.goals_conceded ?? 0,
@@ -101,9 +106,9 @@ export const getPreseasonFootballerStats = (
       expected_assists: previous.expected_assists,
       expected_goal_involvements: previous.expected_goal_involvements,
       expected_goals_conceded: previous.expected_goals_conceded,
-      expected_goals_per_90: safeDivide(totalXGS, minutesPer90),
+      non_penalty_expected_goals_per_90: safeDivide(totalNpxG, minutesPer90),
       expected_assists_per_90: safeDivide(totalXA, minutesPer90),
-      expected_goal_involvements_per_90: safeDivide(totalXGI, minutesPer90),
+      non_penalty_expected_goal_involvements_per_90: safeDivide(totalNpxGI, minutesPer90),
       expected_goals_conceded_per_90: safeDivide(totalXGC, minutesPer90),
       defensive_contribution: totalDefcons,
       defensive_contribution_per_90: safeDivide(totalDefcons, minutesPer90),
@@ -114,6 +119,7 @@ export const getPreseasonFootballerStats = (
       pointsPerGame: safeDivide(totalPoints, appearances),
       pointsPer90: safeDivide(totalPoints, minutesPer90),
       totalGoals,
+      totalNonPenaltyGoals,
       goalsPerGame: safeDivide(totalGoals, appearances),
       goalsPer90: safeDivide(totalGoals, minutesPer90),
       totalAssists,
@@ -122,15 +128,15 @@ export const getPreseasonFootballerStats = (
       totalCleanSheets: previous.clean_sheets ?? 0,
       totalSaves,
       savesPerGame: safeDivide(totalSaves, appearances),
-      totalXGI,
-      xGIPerGame: formatRate(safeDivide(totalXGI, appearances)),
-      xGIPer90: formatRate(safeDivide(totalXGI, minutesPer90)),
+      totalNpxGI,
+      npxGIPerGame: formatRate(safeDivide(totalNpxGI, appearances)),
+      npxGIPer90: formatRate(safeDivide(totalNpxGI, minutesPer90)),
       totalXA,
       xAPerGame: formatRate(safeDivide(totalXA, appearances)),
       xAPer90: formatRate(safeDivide(totalXA, minutesPer90)),
-      totalXGS,
-      xGSPerGame: formatRate(safeDivide(totalXGS, appearances)),
-      xGSPer90: formatRate(safeDivide(totalXGS, minutesPer90)),
+      totalNpxG,
+      npxGPerGame: formatRate(safeDivide(totalNpxG, appearances)),
+      npxGPer90: formatRate(safeDivide(totalNpxG, minutesPer90)),
       totalXGC,
       xGCPerGame: formatRate(safeDivide(totalXGC, appearances)),
       xGCPer90: formatRate(safeDivide(totalXGC, minutesPer90)),
