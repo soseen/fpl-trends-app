@@ -32,6 +32,24 @@ type Props = {
   showRankImpact: boolean;
 };
 
+const HeaderTooltip: React.FC<{ label: string; explanation: string }> = ({
+  label,
+  explanation,
+}) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button
+        type="button"
+        className="cursor-help underline decoration-dotted underline-offset-4"
+        aria-label={`${label}: ${explanation}`}
+      >
+        {label}
+      </button>
+    </TooltipTrigger>
+    <TooltipContent className="max-w-64 text-center">{explanation}</TooltipContent>
+  </Tooltip>
+);
+
 // FPL defcon thresholds (per GW): outfield = 10 / 12 / 12 (DEF / MID / FWD)
 // for the +2 bonus. GKs have clean-sheet/saves rules instead — defcon
 // scoring isn't applied to them, so the chip is hidden for keepers.
@@ -327,10 +345,16 @@ const PlayerImpactDetail: React.FC<Props> = ({ player, showRankImpact }) => {
               Own%
             </TableHead>
             <TableHead className="h-7 px-1.5 text-right text-text/70 sm:px-2">
-              EO
+              <HeaderTooltip
+                label="EO"
+                explanation="Effective ownership in your comparison group. Starters count once, captains twice and triple captains three times."
+              />
             </TableHead>
             <TableHead className="h-7 px-1.5 text-right text-text/70 sm:px-2">
-              Excess
+              <HeaderTooltip
+                label="Excess"
+                explanation="Points you gained or lost versus your comparison group from playing, benching or captaining this player."
+              />
             </TableHead>
             {showRankImpact && (
               <TableHead className="h-7 px-1.5 text-right text-text/70 sm:px-2">
