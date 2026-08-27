@@ -11,6 +11,7 @@ export type ManagerRangeRank = {
   // startGw=1 queries (FPL doesn't store partial-range answers).
   // Useful as a ground-truth comparison alongside `range_rank`.
   range_rank_official: number | null;
+  ranked_count_at_end: number | null;
   range_total: number;
   overall_rank_before: number | null;
   overall_rank_after: number | null;

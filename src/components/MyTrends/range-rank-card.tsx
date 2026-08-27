@@ -14,6 +14,14 @@ type Props = {
 const formatRank = (rank: number | null | undefined): string =>
   typeof rank === "number" && rank > 0 ? rank.toLocaleString("en-GB") : "—";
 
+const formatTopPercentage = (
+  rank: number | null | undefined,
+  population: number,
+): string => {
+  if (typeof rank !== "number" || rank <= 0 || population <= 0) return "—";
+  return `${Math.ceil((rank / population) * 10000) / 100}%`;
+};
+
 const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
   const { totalPlayers } = useSelector((state: RootState) => state.totalPlayers);
   const overall = data.overall_rank;
@@ -33,12 +41,11 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
     else if (after > before) colorClass = "text-rose-400";
   }
 
-  const percentageOverall =
-    totalPlayers > 0 ? Math.ceil(((overall ?? 0) / totalPlayers) * 10000) / 100 : 0;
-  const percentageRange =
-    totalPlayers > 0
-      ? Math.ceil(((displayedRange ?? 0) / totalPlayers) * 10000) / 100
-      : 0;
+  const percentageOverall = formatTopPercentage(overall, totalPlayers);
+  const percentageRange = formatTopPercentage(
+    displayedRange,
+    data.ranked_count_at_end ?? totalPlayers,
+  );
 
   const prefix = usingOfficial || data.confidence === "exact" ? "" : "≈ ";
   const rangeLabel = startGw === endGw ? `GW ${startGw}` : `GWs ${startGw}–${endGw}`;
@@ -53,7 +60,7 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
           <p className="text-base font-semibold md:mb-2 md:text-5xl">
             {formatRank(overall)}
           </p>
-          <p className="text-xs text-text/60 md:text-sm">Top {percentageOverall}%</p>
+          <p className="text-xs text-text/60 md:text-sm">Top {percentageOverall}</p>
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
           {(data.total_points ?? 0)?.toLocaleString("en-GB")} pts
@@ -71,7 +78,7 @@ const RangeRankCard: React.FC<Props> = ({ data, startGw, endGw }) => {
             {prefix}
             {formatRank(displayedRange)}
           </p>
-          <p className="text-xs text-text/60 md:text-sm">Top {percentageRange}%</p>
+          <p className="text-xs text-text/60 md:text-sm">Top {percentageRange}</p>
         </div>
         <div className="w-fit self-center justify-self-center rounded-b-md bg-magenta px-2 text-center text-sm text-text md:px-8 md:pb-1 md:text-sm lg:px-12 lg:text-base">
           {data.range_total?.toLocaleString("en-GB")} pts

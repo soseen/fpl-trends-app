@@ -254,7 +254,7 @@ const EventChips: React.FC<{
           icon={<FaStar />}
           value={row.bonus}
           tone={TONE.bonus}
-          title="Bonus points (BPS top 3)"
+          title="Bonus points"
         />
       )}
       {/* Suppress unused-var lints for branches we don't currently render. */}

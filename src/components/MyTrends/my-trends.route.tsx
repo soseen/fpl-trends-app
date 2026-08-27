@@ -187,12 +187,14 @@ const MyTrends: React.FC = () => {
         <MyTrendsSection
           title="My rank"
           headerRight={
-            <AccuracyMeter
-              stratum={rangeRankQuery.data?.stratum_used ?? null}
-              sampleSize={rangeRankQuery.data?.sample_size ?? 0}
-              sampleStatus={rangeRankQuery.data?.sample_status}
-              isLoading={rangeRankQuery.isPending || trajectoryQuery.isPending}
-            />
+            startGameweek > 1 && rangeRankQuery.data?.range_rank_official == null ? (
+              <AccuracyMeter
+                stratum={rangeRankQuery.data?.stratum_used ?? null}
+                sampleSize={rangeRankQuery.data?.sample_size ?? 0}
+                sampleStatus={rangeRankQuery.data?.sample_status}
+                isLoading={rangeRankQuery.isPending || trajectoryQuery.isPending}
+              />
+            ) : undefined
           }
         >
           {rangeRankQuery.data ? (

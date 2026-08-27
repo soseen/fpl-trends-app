@@ -64,7 +64,7 @@ const FplIdInput: React.FC<Props> = ({
         Don&apos;t have an FPL ID?{" "}
         <button
           type="button"
-          onClick={() => onSubmit(22646)}
+          onClick={() => onSubmit(18885)}
           className="text-magenta hover:underline"
         >
           Use admin&apos;s team
