@@ -46,6 +46,7 @@ export type ManagerComparison = {
   wildcards: ChipUsageStat;
   free_hits: ChipUsageStat;
   bench_boosts: ChipUsageStat;
+  triple_captains: ChipUsageStat;
   hits: ComparisonStat;
   bench_points: ComparisonStat;
   captain_bonus: ComparisonStat;

@@ -113,6 +113,7 @@ const buildRows = (data: ManagerComparison): Row[] => [
   { kind: "chip", label: "Wildcards", stat: data.wildcards },
   { kind: "chip", label: "Free hits", stat: data.free_hits },
   { kind: "chip", label: "Bench boosts", stat: data.bench_boosts },
+  { kind: "chip", label: "Triple captains", stat: data.triple_captains },
   {
     kind: "numeric",
     label: "Hits taken",

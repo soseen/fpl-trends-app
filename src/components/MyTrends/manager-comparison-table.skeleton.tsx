@@ -3,9 +3,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Mirrors `manager-comparison-table.tsx`:
 //   - 5-column table: Stat | You | Avg | T100k | T10k
-//   - 10 data rows (Total points, Avg GW score, Captain bonus, Most
+//   - 11 data rows (Total points, Avg GW score, Captain bonus, Most
 //     captained, Transfers made, Wildcards, Free hits, Bench boosts,
-//     Hits taken, Points benched).
+//     Triple captains, Hits taken, Points benched).
 //
 // The label column is wider; the four numeric columns are narrower and
 // right-aligned in the real table, so we use a `grid-cols-12` layout
@@ -33,7 +33,7 @@ const DataRow: React.FC = () => (
 const ManagerComparisonTableSkeleton: React.FC = () => (
   <div className="flex flex-col">
     <HeaderRow />
-    {Array.from({ length: 10 }).map((_, i) => (
+    {Array.from({ length: 11 }).map((_, i) => (
       <DataRow key={i} />
     ))}
   </div>
