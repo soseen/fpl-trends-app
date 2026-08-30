@@ -39,6 +39,21 @@ const gameweeksSlice = createSlice({
       state.isPreseason = false;
       state.analysisSeasonLabel = null;
     },
+    advanceGameweekRange: (state, action: PayloadAction<number>) => {
+      const maxGameweek = action.payload;
+      if (maxGameweek < 1 || maxGameweek <= state.maxGameweek) return;
+
+      const wasPinnedToLatest =
+        state.maxGameweek === 0 || state.endGameweek === state.maxGameweek;
+
+      state.maxGameweek = maxGameweek;
+      if (wasPinnedToLatest) {
+        state.endGameweek = maxGameweek;
+        state.startGameweek = defaultStartGameweek(maxGameweek);
+      }
+      state.isPreseason = false;
+      state.analysisSeasonLabel = null;
+    },
     initializePreseasonRange: (state, action: PayloadAction<{ seasonLabel: string }>) => {
       state.startGameweek = 1;
       state.endGameweek = 38;
@@ -49,8 +64,12 @@ const gameweeksSlice = createSlice({
   },
 });
 
-export const { setGameweekRange, initializeGameweekRange, initializePreseasonRange } =
-  gameweeksSlice.actions;
+export const {
+  setGameweekRange,
+  initializeGameweekRange,
+  advanceGameweekRange,
+  initializePreseasonRange,
+} = gameweeksSlice.actions;
 export default gameweeksSlice.reducer;
 
 export const selectGameweekRange = (state: RootState) => state.gameweeks;

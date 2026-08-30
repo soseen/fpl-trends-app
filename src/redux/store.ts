@@ -4,6 +4,7 @@ import teamsSlice from "./slices/teamsSlice";
 import totalPlayersSlice from "./slices/totalPlayersSlice";
 import eventsSlice from "./slices/eventsSlice";
 import gameweeksSlice, {
+  advanceGameweekRange,
   initializeGameweekRange,
   initializePreseasonRange,
 } from "./slices/gameweeksSlice";
@@ -22,14 +23,9 @@ export const store = configureStore({
   },
 });
 
-const latestIngestedEvent = () => {
+const latestCheckedEventGameweek = () => {
   const events = store.getState().events.events;
   if (events.length === 0) return 0;
-
-  const current = events.find(
-    (event) => event.is_current && event.finished && event.data_checked,
-  );
-  if (current) return current.id;
 
   return Math.max(
     0,
@@ -37,6 +33,20 @@ const latestIngestedEvent = () => {
       .filter((event) => event.finished && event.data_checked)
       .map((event) => event.id),
   );
+};
+
+const latestHistoryGameweek = () => {
+  const footballers = store.getState().footballers.list;
+  let latestRound = 0;
+
+  for (const footballer of footballers) {
+    for (const history of footballer.history ?? []) {
+      if (history.team_a_score === null || history.team_h_score === null) continue;
+      latestRound = Math.max(latestRound, history.round);
+    }
+  }
+
+  return latestRound;
 };
 
 const latestCompletedFixtureGameweek = () => {
@@ -55,14 +65,23 @@ const latestCompletedFixtureGameweek = () => {
   return Math.max(0, nextGameweek - 1);
 };
 
+const latestAvailableGameweek = () =>
+  Math.max(
+    latestCheckedEventGameweek(),
+    latestHistoryGameweek(),
+    latestCompletedFixtureGameweek(),
+  );
+
 const initializeGameweeks = () => {
   const state = store.getState();
   const eventsStatus = state.events.status;
-  const eventMax = latestIngestedEvent();
-  if (eventMax > 0) {
-    store.dispatch(initializeGameweekRange(eventMax));
+  const availableMax = latestAvailableGameweek();
+  if (availableMax > state.gameweeks.maxGameweek) {
+    store.dispatch(advanceGameweekRange(availableMax));
     return;
   }
+
+  if (state.gameweeks.maxGameweek > 0) return;
 
   if (
     [AsyncThunkStatus.success, AsyncThunkStatus.failed].includes(eventsStatus) &&
@@ -91,7 +110,7 @@ const initializeGameweeks = () => {
 
 store.subscribe(() => {
   const { maxGameweek, isPreseason } = store.getState().gameweeks;
-  if (maxGameweek === 0 && !isPreseason) {
+  if (maxGameweek === 0 || !isPreseason) {
     initializeGameweeks();
   }
 });
