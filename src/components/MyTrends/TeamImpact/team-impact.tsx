@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import type { TeamImpact } from "src/queries/getTeamImpact";
 import TeamImpactPitch from "./team-impact-pitch";
 import PlayerImpactAccordion from "./player-impact-accordion";
+import TeamImpactNotes from "./team-impact-notes";
 import TeamImpactSkeleton from "./team-impact.skeleton";
 
 const INITIAL_VISIBLE = 8;
@@ -65,6 +66,8 @@ const TeamImpactView: FC<Props> = ({ query }) => {
         </Card>
       )}
 
+      <TeamImpactNotes notes={data.notes} />
+
       <div className="rounded-md border border-accent4 bg-primary p-2 sm:p-3">
         <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
           <h3 className="text-sm font-semibold text-text sm:text-base">
@@ -93,23 +96,6 @@ const TeamImpactView: FC<Props> = ({ query }) => {
               )}
             </Button>
           </div>
-        )}
-        {data.notes.fallback_used && (
-          <p className="mt-2 px-2 text-[11px] text-text/60 sm:text-xs">
-            We don&apos;t have you ranked yet, so rank impact isn&apos;t shown — points
-            are still attributed.
-          </p>
-        )}
-        {data.notes.incomplete_picks && (
-          <p className="mt-1 px-2 text-[11px] text-text/60 sm:text-xs">
-            Some gameweeks couldn&apos;t be loaded from FPL — totals may be partial.
-          </p>
-        )}
-        {data.notes.small_sample_gws.length > 0 && (
-          <p className="mt-1 px-2 text-[11px] text-text/60 sm:text-xs">
-            EO sample is light for some GWs, so those rows use captain data to infer
-            minimum cohort ownership.
-          </p>
         )}
       </div>
     </div>

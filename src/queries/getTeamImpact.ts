@@ -103,6 +103,19 @@ export type TeamImpact = {
     incomplete_picks: boolean;
     fallback_used: boolean;
     small_sample_gws: number[];
+    rank_curve_source:
+      | "standings_snapshot"
+      | "recent_manager_sample"
+      | "final_manager_sample"
+      | null;
+    rank_curve_status:
+      | "live"
+      | "refreshing"
+      | "final"
+      | "provisional"
+      | "stale"
+      | "unavailable";
+    rank_curve_captured_at: string | null;
   };
 };
 

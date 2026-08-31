@@ -5,6 +5,7 @@ import TabSwitch from "../tab-switch";
 import TeamImpactView from "./team-impact";
 import TeamImpactPitch from "./team-impact-pitch";
 import PlayerImpactAccordion from "./player-impact-accordion";
+import TeamImpactNotes from "./team-impact-notes";
 
 type Props = {
   query: UseQueryResult<TeamImpact>;
@@ -69,13 +70,15 @@ const TeamAndRankKillersView: FC<Props> = ({ query }) => {
             showRankImpact
           />
 
+          <TeamImpactNotes notes={data!.notes} />
+
           <div className="rounded-md border border-accent4 bg-primary p-2 sm:p-3">
             <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
               <h3 className="text-sm font-semibold text-text sm:text-base">
                 Top rank killers
               </h3>
               <p className="text-[11px] text-text/60 sm:text-xs">
-                Highly-owned players you didn&apos;t have that scored big
+                Net cost from highly-owned players you didn&apos;t have
               </p>
             </div>
             <PlayerImpactAccordion players={killers} showRankImpact />
