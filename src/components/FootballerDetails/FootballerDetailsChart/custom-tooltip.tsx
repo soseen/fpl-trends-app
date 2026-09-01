@@ -80,65 +80,61 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   const matchInfo = data?.matchInfo as History[];
 
   return (
-    // Recharts positions its wrapper at the cursor (we set offset=0 in the
-    // chart). Translate the card so its bottom-right sits ~12px above-left
-    // of the cursor — gives a stable top-left placement that won't extend
-    // below the modal and trigger overflow-y scroll.
-    <div style={{ transform: "translate(calc(-100% - 12px), calc(-100% - 12px))" }}>
-      <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
-        <p className="text-center text-xs font-bold">Gameweek {label}</p>
-        {matchInfo.map((history, index) => {
-          const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
-          const homeTeamBadge = getTeamsBadge(
-            history.was_home ? data?.team_code : opponentTeamCode,
-          );
-          const awayTeamBadge = getTeamsBadge(
-            history.was_home ? opponentTeamCode : data?.team_code,
-          );
-          const gameweekEvents = getGameweekEvents(history);
+    // The chart leaves positioning to Recharts so its measured card width
+    // can determine whether the tooltip fits to the right or should flip left.
+    <Card className="rounded-md bg-background p-2 text-xs text-text shadow-md lg:text-sm">
+      <p className="text-center text-xs font-bold">Gameweek {label}</p>
+      {matchInfo.map((history, index) => {
+        const opponentTeamCode = getTeamById(history.opponent_team as number)?.code;
+        const homeTeamBadge = getTeamsBadge(
+          history.was_home ? data?.team_code : opponentTeamCode,
+        );
+        const awayTeamBadge = getTeamsBadge(
+          history.was_home ? opponentTeamCode : data?.team_code,
+        );
+        const gameweekEvents = getGameweekEvents(history);
 
-          return (
-            <div key={index} className="mb-2 w-full">
-              <div className="m-auto my-1 mb-2 flex w-fit items-center justify-center gap-1 text-text">
-                <img
-                  src={homeTeamBadge}
-                  className="h-4 w-4 object-contain md:h-5 md:w-5"
-                  alt="Home Team Badge"
-                />
-                <span className="m-auto mx-1">
-                  {history.team_h_score}:{history.team_a_score}
-                </span>
-                <img
-                  src={awayTeamBadge}
-                  className="h-4 w-4 object-contain md:h-5 md:w-5"
-                  alt="Away Team Badge"
-                />
-              </div>
-              {!!gameweekEvents.length && (
-                <div className="flex w-full flex-col items-start gap-[2px] rounded-md bg-secondary p-1 py-[4px] text-xs md:gap-1">
-                  {gameweekEvents.map((event, index) => (
-                    <div
-                      key={index}
-                      className="flex w-full flex-grow items-center justify-between gap-1"
-                    >
-                      <span className="flex items-center gap-1 text-[10px] text-chart3 md:gap-2 md:text-xs">
-                        {event.key} {event.icon}
-                      </span>
-                      <p>{event.value}</p>
-                    </div>
-                  ))}
-
-                  <span className="w-fit self-end justify-self-end rounded-sm bg-magenta p-[2px] py-[1px] shadow-sm">
-                    {history.total_points} pts
-                  </span>
-                </div>
-              )}
-              <div className="flex justify-items-end" />
+        return (
+          <div key={index} className="mb-2 w-full">
+            <div className="m-auto my-1 mb-2 flex w-fit items-center justify-center gap-1 text-text">
+              <img
+                src={homeTeamBadge}
+                className="h-4 w-4 object-contain md:h-5 md:w-5"
+                alt="Home Team Badge"
+              />
+              <span className="m-auto mx-1">
+                {history.team_h_score}:{history.team_a_score}
+              </span>
+              <img
+                src={awayTeamBadge}
+                className="h-4 w-4 object-contain md:h-5 md:w-5"
+                alt="Away Team Badge"
+              />
             </div>
-          );
-        })}
-      </Card>
-    </div>
+            {!!gameweekEvents.length && (
+              <div className="flex w-full flex-col items-start gap-[2px] rounded-md bg-secondary p-1 py-[4px] text-xs md:gap-1">
+                {gameweekEvents.map((event, index) => (
+                  <div
+                    key={index}
+                    className="flex w-full flex-grow items-center justify-between gap-1"
+                  >
+                    <span className="flex items-center gap-1 text-[10px] text-chart3 md:gap-2 md:text-xs">
+                      {event.key} {event.icon}
+                    </span>
+                    <p>{event.value}</p>
+                  </div>
+                ))}
+
+                <span className="w-fit self-end justify-self-end rounded-sm bg-magenta p-[2px] py-[1px] shadow-sm">
+                  {history.total_points} pts
+                </span>
+              </div>
+            )}
+            <div className="flex justify-items-end" />
+          </div>
+        );
+      })}
+    </Card>
   );
 };
 

@@ -443,14 +443,11 @@ const FootballerDetailsChart = ({ footballer }: Props) => {
                 <Tooltip
                   content={<CustomTooltip />}
                   cursor={{ fill: palette.stroke, fillOpacity: 0.08 }}
-                  // Pin the wrapper exactly at the cursor and let it leave
-                  // the chart viewBox; CustomTooltip itself translates the
-                  // visible card to top-left of the cursor (see its render).
-                  // Without this, Recharts auto-flips placement near edges
-                  // and can push the tooltip below the viewport, scrolling
-                  // the modal as a side-effect.
-                  offset={0}
-                  allowEscapeViewBox={{ x: true, y: true }}
+                  // Recharts measures the card and uses the side with enough
+                  // room: right normally, then left near the final gameweeks.
+                  // Keeping both axes in the view box prevents card clipping.
+                  offset={12}
+                  allowEscapeViewBox={{ x: false, y: false }}
                 />
                 {displayedChartStat === SelectedChartStat.ownership ? (
                   <Line
