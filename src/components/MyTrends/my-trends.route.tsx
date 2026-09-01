@@ -247,7 +247,7 @@ const MyTrends: React.FC = () => {
       )}
 
       <Dialog open={switchOpen} onOpenChange={setSwitchOpen}>
-        <DialogContent className="border-secondary bg-primary text-text">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md border-secondary bg-primary p-4 text-text sm:p-6">
           <DialogHeader>
             <DialogTitle>Switch FPL ID</DialogTitle>
           </DialogHeader>

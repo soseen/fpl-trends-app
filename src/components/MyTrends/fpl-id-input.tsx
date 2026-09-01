@@ -36,8 +36,11 @@ const FplIdInput: React.FC<Props> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full flex-col items-center gap-2">
-      <div className="flex w-fit items-center gap-2">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-1"
+    >
+      <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
         <Input
           type="text"
           inputMode="numeric"
@@ -46,9 +49,12 @@ const FplIdInput: React.FC<Props> = ({
           placeholder="Your FPL ID"
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          className="h-9 w-full bg-white px-2 text-accent2 focus:outline-none md:w-auto md:min-w-[420px]"
+          className="h-9 min-w-0 bg-white px-2 text-accent2 focus:outline-none"
         />
-        <Button type="submit" className="h-9 bg-magenta text-white hover:bg-magenta/90">
+        <Button
+          type="submit"
+          className="h-9 bg-magenta px-4 text-white hover:bg-magenta/90"
+        >
           {submitLabel}
         </Button>
       </div>

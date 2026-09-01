@@ -171,14 +171,23 @@ const FootballerDetailsSummary = ({ footballer, compact }: Props) => {
 
           <FootballerDetailsStatsPanel footballer={footballer} />
 
-          <div className="min-w-0 overflow-x-auto rounded-md bg-accent4/25 p-2 ring-1 ring-inset ring-accent4/40">
+          <div className="min-w-0 rounded-md bg-accent4/25 p-2 ring-1 ring-inset ring-accent4/40">
             <div className="mb-2 flex items-center justify-between gap-2">
               <h3 className="text-[10px] font-semibold uppercase text-text/45 md:text-xs">
-                Fixtures
+                Upcoming fixtures
               </h3>
               <span className="h-[1px] flex-1 bg-accent4/60" />
+              <span className="text-[9px] text-text/45 md:text-[10px]">
+                Scroll to see all
+              </span>
             </div>
-            <FootballerUpcomingFixtures footballer={footballer} max={compact ? 5 : 7} />
+            <div
+              className="overflow-x-auto pb-1"
+              tabIndex={0}
+              aria-label="All upcoming fixtures"
+            >
+              <FootballerUpcomingFixtures footballer={footballer} />
+            </div>
           </div>
         </div>
       </div>

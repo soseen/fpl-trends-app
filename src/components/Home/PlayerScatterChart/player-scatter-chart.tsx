@@ -25,6 +25,7 @@ import {
   type CompareMetric,
   type CompareMetricKey,
 } from "src/components/CompareFootballers/CompareTool/compare-tool-metrics";
+import { useFootballerDetailsContext } from "src/components/FootballerDetails/footballer-details.context";
 import { useDimensions } from "src/hooks/use-dimensions";
 import type { FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
 import type { RootState } from "src/redux/store";
@@ -219,6 +220,7 @@ const PlayerScatterChartSkeleton = () => (
 
 const PlayerScatterChart = () => {
   const navigate = useNavigate();
+  const { setFootballer } = useFootballerDetailsContext();
   const { isSM, isMD } = useDimensions();
   const { status, isPreseason, analysisSeasonLabel } = useAppInitContext();
   const { footballers } = useSelector(
@@ -704,21 +706,30 @@ const PlayerScatterChart = () => {
                 <MdClose className="h-3.5 w-3.5" />
               </button>
 
-              <div className="flex items-start gap-2 pr-5">
+              <button
+                type="button"
+                aria-label={`Open ${activePoint.point.name} profile`}
+                className="group -m-1 flex w-[calc(100%+0.25rem)] items-start gap-2 rounded-md p-1 pr-6 text-left transition-colors hover:bg-accent3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-magenta"
+                onClick={() => {
+                  const { footballer } = activePoint.point;
+                  hideActivePoint();
+                  setFootballer(footballer);
+                }}
+              >
                 <img
                   src={getTeamsBadge(activePoint.point.teamCode)}
                   alt={activePoint.point.teamShortName}
                   className="h-8 w-8 shrink-0 object-contain"
                 />
                 <div className="min-w-0">
-                  <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold">
+                  <p className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-semibold group-hover:text-magenta">
                     {activePoint.point.name}
                   </p>
                   <p className="text-[11px] text-text/55">
                     {activePoint.point.teamShortName} - {activePoint.point.position}
                   </p>
                 </div>
-              </div>
+              </button>
 
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <div className="rounded-md bg-accent3/70 px-2 py-1.5">

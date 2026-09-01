@@ -1,11 +1,11 @@
-import { useCallback, useMemo } from "react";
-import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
-import { useSelector } from "react-redux";
-import { type RootState } from "src/redux/store";
-import { getTeamsBadge } from "src/utils/images";
 import clsx from "clsx";
+import { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { type Fixture } from "src/queries/types";
+import { type FootballerWithGameweekStats } from "src/redux/slices/footballersGameweekStatsSlice";
+import { type RootState } from "src/redux/store";
 import { TOTAL_GAMEWEEKS_COUNT } from "src/utils/constants";
+import { getTeamsBadge } from "src/utils/images";
 
 type Props = {
   footballer: FootballerWithGameweekStats | null;
@@ -22,22 +22,27 @@ const FootballerUpcomingFixtures = ({
 }: Props) => {
   const { list: teams } = useSelector((state: RootState) => state.teams);
 
-  const upcomingFixtures: Record<number, Fixture | undefined> = useMemo(() => {
+  const upcomingFixtures = useMemo(() => {
     const start = footballer?.footballer_fixtures[0]?.event;
 
     if (!start) {
-      return {};
+      return [];
     }
 
-    const end = Math.min(start + (max ? max - 1 : 7), TOTAL_GAMEWEEKS_COUNT);
+    const end = max
+      ? Math.min(start + max - 1, TOTAL_GAMEWEEKS_COUNT)
+      : TOTAL_GAMEWEEKS_COUNT;
 
-    const footballerFixturesObject: Record<number, Fixture | undefined> = {};
-    Array.from({ length: end - start + 1 }).forEach((_, i) => {
-      const fix = footballer?.footballer_fixtures.find((f) => f.event === start + i);
-      footballerFixturesObject[start + i] = fix;
+    return Array.from({ length: end - start + 1 }).flatMap((_, index) => {
+      const event = start + index;
+      const fixtures =
+        footballer?.footballer_fixtures.filter((fixture) => fixture.event === event) ??
+        [];
+
+      return fixtures.length > 0
+        ? fixtures.map((fixture) => ({ event, fixture }))
+        : [{ event, fixture: undefined as Fixture | undefined }];
     });
-
-    return footballerFixturesObject as Record<number, Fixture | undefined>;
   }, [footballer, max]);
 
   const findTeamById = useCallback(
@@ -62,23 +67,26 @@ const FootballerUpcomingFixtures = ({
     }
   }, []);
 
-  if (!Object.keys(upcomingFixtures).length) {
+  if (!upcomingFixtures.length) {
     return null;
   }
 
   return (
-    <div className="flex w-full items-center gap-4">
+    <div className="flex w-max min-w-full items-center">
       <div className="flex items-end gap-[6px]">
-        {Object.keys(upcomingFixtures).map((key) => {
-          const fix = upcomingFixtures[parseInt(key)];
+        {upcomingFixtures.map(({ event, fixture: fix }, index) => {
           const team = findTeamById(
             [fix?.team_a, fix?.team_h].find((t) => t !== footballer?.teams.id),
           );
           return (
-            <div key={key} className="flex flex-col items-center">
+            <div
+              key={fix?.id ?? `blank-${event}-${index}`}
+              className="flex shrink-0 flex-col items-center"
+            >
               {team?.code && !ignoreBadge && (
                 <img
                   src={getTeamsBadge(team?.code)}
+                  alt=""
                   className="mb-1 h-auto w-4 object-cover lg:w-6"
                 />
               )}
@@ -93,7 +101,7 @@ const FootballerUpcomingFixtures = ({
               </div>
               {!ignoreGWCount && (
                 <p className="rounded-b-sm bg-gray-800 px-[2px] text-[6px] leading-[1.8] text-text md:text-xs lg:px-2">
-                  {key}
+                  {event}
                 </p>
               )}
             </div>
