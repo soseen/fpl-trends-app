@@ -65,7 +65,7 @@ const PlayerCardShell = ({
 
       <div
         className={clsx(
-          "relative flex w-full items-end justify-center overflow-hidden bg-accent5",
+          "relative flex w-full items-end justify-center overflow-hidden bg-accent5 [&>img]:origin-bottom [&>img]:scale-110 md:[&>img]:scale-[1.15]",
           imageAreaClassName ?? "min-h-0 flex-1 pt-2",
         )}
       >
