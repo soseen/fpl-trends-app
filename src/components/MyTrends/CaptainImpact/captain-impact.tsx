@@ -46,26 +46,23 @@ const CaptainImpactView: FC<Props> = ({ query }) => {
         totalTemplate={data.total_template_captain_pts}
         totalDiffVsTop10k={data.total_diff_vs_top10k}
         totalDiffVsTemplate={data.total_diff_vs_template}
-        totalRankImpact={data.total_rank_impact ?? null}
+        rankImpactVsTemplate={data.total_rank_impact_vs_template ?? null}
+        rankImpactVsTop10k={data.total_rank_impact_vs_top10k ?? null}
         matchedTop10kCount={data.matched_top10k_count}
         matchedTemplateCount={data.matched_template_count}
         totalGws={data.total_with_captain}
       />
 
-      {data.notes?.partial_rank_impact && (
+      {data.events.some((event) => !event.template_captain || !event.top10k_captain) && (
         <p className="text-center text-[10px] text-text/60 sm:text-xs">
-          Some captain sample data is missing — rank impact is based on available GWs.
+          Some reference captains are missing — rank comparisons use available GWs.
         </p>
       )}
 
       {data.events.length > 0 && (
         <div className="flex flex-col gap-3">
           {visibleEvents.map((event) => (
-            <CaptainEventCard
-              key={event.gw}
-              event={event}
-              rankPerPoint={data.notes.rank_per_point}
-            />
+            <CaptainEventCard key={event.gw} event={event} />
           ))}
         </div>
       )}

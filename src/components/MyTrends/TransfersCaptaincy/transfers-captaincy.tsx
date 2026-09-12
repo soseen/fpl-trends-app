@@ -123,14 +123,17 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
                 totalTemplate={captain.total_template_captain_pts}
                 totalDiffVsTop10k={captain.total_diff_vs_top10k}
                 totalDiffVsTemplate={captain.total_diff_vs_template}
-                totalRankImpact={captain.total_rank_impact ?? null}
+                rankImpactVsTemplate={captain.total_rank_impact_vs_template ?? null}
+                rankImpactVsTop10k={captain.total_rank_impact_vs_top10k ?? null}
                 matchedTop10kCount={captain.matched_top10k_count}
                 matchedTemplateCount={captain.matched_template_count}
                 totalGws={captain.total_with_captain}
               />
-              {captain.notes?.partial_rank_impact && (
+              {captain.events.some(
+                (event) => !event.template_captain || !event.top10k_captain,
+              ) && (
                 <p className="text-center text-[10px] text-text/60 sm:text-xs">
-                  Some captain sample data is missing — rank impact is based on available
+                  Some reference captains are missing — rank comparisons use available
                   GWs.
                 </p>
               )}
@@ -138,13 +141,7 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
                 {visibleGws.map((gw) => {
                   const ev = captainByGw.get(gw);
                   if (!ev) return null;
-                  return (
-                    <CaptainEventCard
-                      key={`cev-${gw}`}
-                      event={ev}
-                      rankPerPoint={captain.notes.rank_per_point}
-                    />
-                  );
+                  return <CaptainEventCard key={`cev-${gw}`} event={ev} />;
                 })}
               </div>
             </>

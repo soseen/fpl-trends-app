@@ -1,6 +1,6 @@
 import type React from "react";
 import clsx from "clsx";
-import { formatRankDelta, rankImpactColorClass } from "../TeamImpact/format";
+import { formatRankDelta } from "../TeamImpact/format";
 
 type Props = {
   totalUser: number;
@@ -8,7 +8,8 @@ type Props = {
   totalTemplate: number;
   totalDiffVsTop10k: number;
   totalDiffVsTemplate: number;
-  totalRankImpact: number | null;
+  rankImpactVsTemplate: number | null;
+  rankImpactVsTop10k: number | null;
   matchedTop10kCount: number;
   matchedTemplateCount: number;
   totalGws: number;
@@ -28,18 +29,14 @@ const totalToneClass = (n: number): string => {
   return "text-text/60";
 };
 
-// Big diff-vs-top-10k headline (mirrors Transfer Impact's headline
-// total) followed by a clean three-column comparison: YOU / AVERAGE
-// / TOP 10K. The columns disambiguate the headline — each carries
-// its own absolute total, diff vs you, and match rate — so we can
-// drop any explanatory subtitle and let the number sit on its own.
 const CaptainImpactSummary: React.FC<Props> = ({
   totalUser,
   totalTop10k,
   totalTemplate,
   totalDiffVsTop10k,
   totalDiffVsTemplate,
-  totalRankImpact,
+  rankImpactVsTemplate,
+  rankImpactVsTop10k,
   matchedTop10kCount,
   matchedTemplateCount,
   totalGws,
@@ -52,43 +49,15 @@ const CaptainImpactSummary: React.FC<Props> = ({
     );
   }
 
-  const hasRankImpact = totalRankImpact != null;
-  const showVsPopular = matchedTemplateCount < totalGws;
-  const showVsTop10k = matchedTop10kCount < totalGws;
-  const diffSegments: string[] = [];
-  if (showVsPopular) {
-    diffSegments.push(`${formatSigned(totalDiffVsTemplate)} vs popular`);
-  }
-  if (showVsTop10k) {
-    diffSegments.push(`${formatSigned(totalDiffVsTop10k)} vs Top 10k`);
-  }
-  const subtitle = hasRankImpact
-    ? ["captaincy rank impact", ...diffSegments].join(" · ")
-    : diffSegments.length > 0
-      ? `points: ${diffSegments.join(" · ")}`
-      : "matched the popular and top 10k captains every GW";
-
   return (
     <div className="flex flex-col items-center gap-3 py-2">
-      <span
-        className={clsx(
-          "text-3xl font-semibold leading-none md:text-5xl lg:text-6xl",
-          hasRankImpact
-            ? rankImpactColorClass(totalRankImpact)
-            : totalToneClass(totalDiffVsTop10k),
-        )}
-      >
-        {hasRankImpact
-          ? formatRankDelta(totalRankImpact)
-          : formatSigned(totalDiffVsTop10k)}
-      </span>
-      <span className="text-xs text-text/70 md:text-sm">{subtitle}</span>
       <div className="grid w-full max-w-md grid-cols-3 gap-2 sm:gap-4">
         <Column label="You" value={totalUser} />
         <Column
           label="Average"
           value={totalTemplate}
           diff={totalDiffVsTemplate}
+          rankImpact={rankImpactVsTemplate}
           matched={matchedTemplateCount}
           totalGws={totalGws}
         />
@@ -96,6 +65,7 @@ const CaptainImpactSummary: React.FC<Props> = ({
           label="Top 10k"
           value={totalTop10k}
           diff={totalDiffVsTop10k}
+          rankImpact={rankImpactVsTop10k}
           matched={matchedTop10kCount}
           totalGws={totalGws}
         />
@@ -107,14 +77,20 @@ const CaptainImpactSummary: React.FC<Props> = ({
 type ColumnProps = {
   label: string;
   value: number;
-  // Diff and matched are only meaningful for the reference columns
-  // (Average / Top 10k) — for the You column they're omitted.
   diff?: number;
+  rankImpact?: number | null;
   matched?: number;
   totalGws?: number;
 };
 
-const Column: React.FC<ColumnProps> = ({ label, value, diff, matched, totalGws }) => (
+const Column: React.FC<ColumnProps> = ({
+  label,
+  value,
+  diff,
+  rankImpact,
+  matched,
+  totalGws,
+}) => (
   <div className="flex flex-col items-center gap-0.5 text-center">
     <span className="text-[10px] font-semibold uppercase tracking-wide text-text/60 sm:text-xs">
       {label}
@@ -125,6 +101,25 @@ const Column: React.FC<ColumnProps> = ({ label, value, diff, matched, totalGws }
     {typeof diff === "number" && (
       <span className={clsx("text-[10px] sm:text-xs", totalToneClass(diff))}>
         {formatSigned(diff)}
+      </span>
+    )}
+    {rankImpact !== undefined && (
+      <span
+        title="Estimated rank movement from the weighted captain points difference over the selected range"
+        className={clsx(
+          "text-[9px] sm:text-[10px]",
+          rankImpact == null ? "text-text/50" : totalToneClass(Math.round(rankImpact)),
+        )}
+      >
+        {rankImpact == null
+          ? "Rank unavailable"
+          : Math.round(Math.abs(rankImpact)) === 0
+            ? "No rank change"
+            : `Est. ${
+                Math.abs(rankImpact) < 50
+                  ? Math.round(Math.abs(rankImpact))
+                  : formatRankDelta(Math.abs(rankImpact)).replace(/^\+/, "")
+              } ranks ${rankImpact > 0 ? "gained" : "lost"}`}
       </span>
     )}
     {typeof matched === "number" && typeof totalGws === "number" && (

@@ -11,12 +11,10 @@ import { TbLockFilled } from "react-icons/tb";
 import { HelpCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { CaptainEvent, CaptainPlayer } from "src/queries/getCaptainImpact";
-import ImpactPill from "../shared/impact-pill";
 import CaptainTile from "./captain-tile";
 
 type Props = {
   event: CaptainEvent;
-  rankPerPoint: number | null;
 };
 
 const formatNet = (n: number): string => {
@@ -26,9 +24,6 @@ const formatNet = (n: number): string => {
 };
 
 const formatLinePoints = (n: number): string => `${n > 0 ? "+" : ""}${n}`;
-
-const captainBonusExposure = (player: CaptainPlayer): number =>
-  (player.captain_rate ?? 0) + 2 * (player.triple_captain_rate ?? 0);
 
 // FPL points lookup tables by element_type (1=GK, 2=DEF, 3=MID, 4=FWD).
 const GOAL_PTS: Record<number, number> = { 1: 6, 2: 6, 3: 5, 4: 4 };
@@ -150,17 +145,23 @@ const SLOT_BODY_CLASS =
 
 const SlotFrame: React.FC<{
   label: string;
-  matched?: boolean;
+  diff?: number;
   children: React.ReactNode;
-}> = ({ label, matched, children }) => (
+}> = ({ label, diff, children }) => (
   <div className="flex flex-col items-center gap-1">
     <span className="text-center text-[9px] uppercase tracking-wide text-text/60 sm:text-[10px]">
       {label}
     </span>
     {children}
-    <span className="text-[9px] text-text/40 sm:text-[10px]">
-      {matched ? "= your pick" : " "}
-    </span>
+    {typeof diff === "number" && (
+      <span
+        className={`text-[10px] font-semibold tabular-nums sm:text-xs ${
+          diff > 0 ? "text-emerald-400" : diff < 0 ? "text-rose-400" : "text-text/60"
+        }`}
+      >
+        {formatNet(diff)}
+      </span>
+    )}
   </div>
 );
 
@@ -177,37 +178,12 @@ const renderReferenceSlot = (player: CaptainPlayer | null): React.ReactNode => {
   return <CaptainTile player={player} variant="reference" />;
 };
 
-const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
-  const { gw, differential_vs_top10k, differential_vs_template } = event;
-  const primaryDiff = event.template_captain
-    ? { label: "vs popular", value: differential_vs_template }
-    : event.top10k_captain
-      ? { label: "vs top 10k", value: differential_vs_top10k }
-      : null;
-  const secondaryDiff =
-    event.template_captain && event.top10k_captain
-      ? { label: "vs top 10k", value: differential_vs_top10k }
-      : null;
-  const rankImpact =
-    event.rank_impact ??
-    (event.captaincy_excess != null && rankPerPoint != null
-      ? event.captaincy_excess * rankPerPoint
-      : null);
+const CaptainEventCard: React.FC<Props> = ({ event }) => {
+  const { gw } = event;
   const isTripleCaptain = event.user_captain.multiplier === 3;
-  const templateCaptain = event.template_captain;
-  const userCaptainExposure = Math.max((event.user_captain.multiplier ?? 0) - 1, 0);
-  const userCaptainFieldExposure = captainBonusExposure(event.user_captain);
-  const templateCaptainFieldExposure = templateCaptain
-    ? captainBonusExposure(templateCaptain)
-    : null;
-  const rankTitle =
-    event.captaincy_excess != null
-      ? `Captaincy excess ${formatNet(event.captaincy_excess)}. Your armband exposure ${(userCaptainExposure * 100).toFixed(0)}%; ${event.user_captain.web_name} captain EO ${(userCaptainFieldExposure * 100).toFixed(1)}%${
-          templateCaptain && templateCaptainFieldExposure != null
-            ? `; ${templateCaptain.web_name} captain EO ${(templateCaptainFieldExposure * 100).toFixed(1)}%`
-            : ""
-        }`
-      : "Rank impact unavailable for this GW";
+  const userPoints = event.user_captain.raw_points * event.user_captain.multiplier;
+  const diffVsCaptain = (player: CaptainPlayer | null): number | undefined =>
+    player ? userPoints - player.raw_points * player.multiplier : undefined;
 
   const userPlayer = event.user_captain;
   const breakdown = captainPointsBreakdown(userPlayer);
@@ -229,37 +205,16 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
             </span>
           )}
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {primaryDiff && (
-            <ImpactPill
-              points={primaryDiff.value}
-              pointsLabel={primaryDiff.label}
-              pointsSubtitle={
-                secondaryDiff
-                  ? `${formatNet(secondaryDiff.value)} ${secondaryDiff.label}`
-                  : undefined
-              }
-              pointsTitle={
-                `${formatNet(differential_vs_template)} vs popular captain` +
-                (event.top10k_captain
-                  ? ` · ${formatNet(differential_vs_top10k)} vs top 10k captain`
-                  : "")
-              }
-              rankImpact={rankImpact}
-              rankTitle={rankTitle}
-            />
-          )}
-        </div>
       </div>
 
       <div className="flex items-start justify-center gap-2 px-3 py-3 sm:gap-3 sm:py-4 md:gap-4">
-        <SlotFrame label="Your pick">
+        <SlotFrame label="My captain">
           <CaptainTile player={userPlayer} variant="user" />
         </SlotFrame>
-        <SlotFrame label="Average" matched={event.matched_template}>
+        <SlotFrame label="Average captain" diff={diffVsCaptain(event.template_captain)}>
           {renderReferenceSlot(event.template_captain)}
         </SlotFrame>
-        <SlotFrame label="Top 10k" matched={event.matched_top10k}>
+        <SlotFrame label="Top 10k captain" diff={diffVsCaptain(event.top10k_captain)}>
           {renderReferenceSlot(event.top10k_captain)}
         </SlotFrame>
       </div>
@@ -308,7 +263,7 @@ const CaptainEventCard: React.FC<Props> = ({ event, rankPerPoint }) => {
             {showMultiplier && (
               <>
                 <span className="px-1 text-text/50">×{multiplier}</span>
-                <span>= {userPlayer.effective_points}</span>
+                <span>= {userPoints}</span>
               </>
             )}
           </span>

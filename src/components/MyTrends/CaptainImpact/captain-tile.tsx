@@ -18,23 +18,10 @@ type Props = {
 // across the app. Variant-only opacity differentiation: user picks at
 // full strength, reference picks faded — no chip overlay needed since
 // the section's labels above each tile carry the meaning.
-// Effective ownership: ownership weighted by armband multipliers. Mirrors the
-// backend formula in fpl-trends-api/src/managers/getTeamImpact.ts (line 865):
-//   eo = ownership_pct + captain_rate + 2 * triple_captain_rate
-const computeEO = (player: CaptainPlayer): number =>
-  (player.ownership_pct ?? 0) +
-  (player.captain_rate ?? 0) +
-  2 * (player.triple_captain_rate ?? 0);
-
 const CaptainTile: React.FC<Props> = ({ player, variant }) => {
   const openDetails = useOpenPlayerDetails();
   const isReference = variant === "reference";
-  const pointsLabel = Number.isInteger(player.effective_points)
-    ? `${player.effective_points}`
-    : player.effective_points.toFixed(1);
-  const eo = computeEO(player);
-  const eoPct = eo * 100;
-  const eoLabel = eoPct >= 10 ? eoPct.toFixed(0) : eoPct.toFixed(1);
+  const points = player.raw_points * player.multiplier;
 
   return (
     <div className={clsx("flex", isReference && "opacity-60 grayscale-[40%]")}>
@@ -51,17 +38,6 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
             />
           </span>
         }
-        topRight={
-          eo > 0 ? (
-            <span
-              title={`Effective ownership: ${eoPct.toFixed(1)}%`}
-              className="rounded-l-md bg-accent3/95 px-1 py-[2px] text-[8px] font-semibold leading-none text-text shadow-md ring-1 ring-inset ring-accent4/60 sm:text-[9px] md:px-1.5 md:text-[10px]"
-            >
-              EO {eoLabel}%
-            </span>
-          ) : undefined
-        }
-        topRightClassName="bottom-1 top-auto gap-0.5 md:bottom-2"
         image={
           <FootballerImage
             code={player.code}
@@ -70,7 +46,7 @@ const CaptainTile: React.FC<Props> = ({ player, variant }) => {
           />
         }
         name={player.web_name}
-        points={`${pointsLabel} pts`}
+        points={`${points} pts`}
       />
     </div>
   );

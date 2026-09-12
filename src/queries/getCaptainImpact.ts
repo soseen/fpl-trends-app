@@ -55,6 +55,8 @@ export type CaptainImpact = {
   total_expected_captain_bonus: number | null;
   total_captaincy_excess: number | null;
   total_rank_impact: number | null;
+  total_rank_impact_vs_template: number | null;
+  total_rank_impact_vs_top10k: number | null;
   matched_template_count: number;
   matched_top10k_count: number;
   total_with_captain: number;
