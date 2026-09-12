@@ -1,4 +1,4 @@
-import type React from "react";
+import type { FC } from "react";
 import clsx from "clsx";
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -43,7 +43,7 @@ const CHIP_BADGE_CLASS: Record<NonNullable<ActiveChip>, string> = {
   manager: "bg-text/15 text-text/80",
 };
 
-const ChipBadge: React.FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
+const ChipBadge: FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
   <span
     className={clsx(
       "rounded-sm px-1.5 py-[1px] text-[10px] font-semibold uppercase tracking-wide sm:text-xs",
@@ -57,7 +57,7 @@ const ChipBadge: React.FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
 const formatTransferCount = (count: number): string =>
   `${count} transfer${count === 1 ? "" : "s"}`;
 
-const TransferCountBadge: React.FC<{ count: number }> = ({ count }) => (
+const TransferCountBadge: FC<{ count: number }> = ({ count }) => (
   <span className="text-[10px] font-normal text-text/60 sm:text-xs">
     {formatTransferCount(count)}
   </span>
@@ -99,7 +99,56 @@ const groupPairsByPosition = (pairs: TransferImpactPair[]): PositionGroup[] => {
   });
 };
 
-const TransferEventCard: React.FC<Props> = ({ event }) => {
+const TransferPlayers: FC<{ pairs: TransferImpactPair[] }> = ({ pairs }) => {
+  // Split larger position groups evenly: four becomes 2 + 2, five becomes 3 + 2.
+  const splitAt = Math.ceil(pairs.length / 2);
+  const rows =
+    pairs.length > 3 ? [pairs.slice(0, splitAt), pairs.slice(splitAt)] : [pairs];
+
+  return (
+    <div className="grid w-full min-w-0 grid-cols-1 items-center gap-2 xs:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-3">
+      <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
+        {rows.map((row, index) => (
+          <div
+            key={index}
+            className="flex flex-wrap justify-center gap-1.5 xs:justify-end sm:gap-2"
+          >
+            {row.map((pair) => (
+              <TransferPlayerTile
+                key={pair.player_out.player_id}
+                player={pair.player_out}
+                side="out"
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <ArrowRight
+        className="h-5 w-5 rotate-90 justify-self-center text-text/70 xs:rotate-0 sm:h-6 sm:w-6"
+        aria-hidden
+      />
+      <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
+        {rows.map((row, index) => (
+          <div
+            key={index}
+            className="flex flex-wrap justify-center gap-1.5 xs:justify-start sm:gap-2"
+          >
+            {row.map((pair) => (
+              <TransferPlayerTile
+                key={pair.player_in.player_id}
+                player={pair.player_in}
+                side="in"
+                soldGw={pair.in_sold_gw}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TransferEventCard: FC<Props> = ({ event }) => {
   const {
     gw,
     pairs,
@@ -164,39 +213,15 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
             ({ position, pairs: groupPairs, groupNet }) => (
               <div
                 key={position}
-                className="flex flex-col gap-2 border-t border-accent4/40 pt-2 first:border-t-0 first:pt-0 xs:flex-row xs:items-center"
+                className="grid grid-cols-1 items-center gap-2 border-t border-accent4/40 pt-2 first:border-t-0 first:pt-0 xs:grid-cols-[4rem_minmax(0,1fr)_4rem] sm:gap-3"
               >
                 <span className="w-10 shrink-0 text-[10px] font-semibold uppercase tracking-wide text-text/70 sm:text-xs">
                   {POSITION_LABEL[position]}
                 </span>
-                <div className="flex flex-1 flex-col items-center gap-2 xs:flex-row xs:justify-center sm:gap-3">
-                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                    {groupPairs.map((pair) => (
-                      <TransferPlayerTile
-                        key={`out-${pair.player_out.player_id}-${gw}-${position}`}
-                        player={pair.player_out}
-                        side="out"
-                      />
-                    ))}
-                  </div>
-                  <ArrowRight
-                    className="h-5 w-5 shrink-0 rotate-90 text-text/70 xs:rotate-0 sm:h-6 sm:w-6"
-                    aria-hidden
-                  />
-                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                    {groupPairs.map((pair) => (
-                      <TransferPlayerTile
-                        key={`in-${pair.player_in.player_id}-${gw}-${position}`}
-                        player={pair.player_in}
-                        side="in"
-                        soldGw={pair.in_sold_gw}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <TransferPlayers pairs={groupPairs} />
                 <span
                   className={clsx(
-                    "shrink-0 self-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold sm:text-xs",
+                    "justify-self-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-semibold xs:justify-self-end sm:text-xs",
                     netPillClass(groupNet),
                   )}
                 >
@@ -207,32 +232,8 @@ const TransferEventCard: React.FC<Props> = ({ event }) => {
           )}
         </div>
       ) : !isBenchBoostOnly ? (
-        <div className="flex flex-col items-center gap-2 px-3 py-3 xs:flex-row xs:justify-center sm:gap-3 sm:py-4">
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-            {pairs.map((pair) => (
-              <TransferPlayerTile
-                key={`out-${pair.player_out.player_id}-${gw}`}
-                player={pair.player_out}
-                side="out"
-              />
-            ))}
-          </div>
-
-          <ArrowRight
-            className="h-5 w-5 shrink-0 rotate-90 text-text/70 xs:rotate-0 sm:h-6 sm:w-6"
-            aria-hidden
-          />
-
-          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-            {pairs.map((pair) => (
-              <TransferPlayerTile
-                key={`in-${pair.player_in.player_id}-${gw}`}
-                player={pair.player_in}
-                side="in"
-                soldGw={pair.in_sold_gw}
-              />
-            ))}
-          </div>
+        <div className="px-3 py-3 sm:py-4">
+          <TransferPlayers pairs={pairs} />
         </div>
       ) : null}
 

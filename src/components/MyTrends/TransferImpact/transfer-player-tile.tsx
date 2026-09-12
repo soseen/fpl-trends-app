@@ -31,7 +31,9 @@ const TransferPlayerTile: React.FC<Props> = ({ player, side, soldGw }) => {
   const showSoldBadge = !isOut && typeof soldGw === "number";
 
   return (
-    <div className={clsx("relative flex", isOut && "opacity-60 grayscale-[40%]")}>
+    <div
+      className={clsx("relative flex shrink-0", isOut && "opacity-60 grayscale-[40%]")}
+    >
       <PlayerCardShell
         onClick={() => openDetails(player.player_id)}
         ariaLabel={`Open ${player.web_name} details`}
