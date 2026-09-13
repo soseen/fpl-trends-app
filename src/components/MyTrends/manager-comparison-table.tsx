@@ -1,6 +1,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -248,6 +249,11 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
 
   return (
     <Table className="text-[11px] sm:text-xs md:text-sm">
+      {data.captain_bonus.average === null && (
+        <TableCaption className="text-xs text-text/60">
+          Captain averages are awaiting enough data for the selected range.
+        </TableCaption>
+      )}
       <TableHeader>
         <TableRow className="border-b border-accent4 hover:bg-transparent">
           <TableHead className="h-8 px-1.5 text-text/70 sm:px-2">Stat</TableHead>

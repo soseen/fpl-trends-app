@@ -58,6 +58,7 @@ export type ManagerComparison = {
   avg_gw_score: ComparisonStat;
   most_captained: CaptainSummary;
   notes: {
+    provisional: boolean;
     hits_average_partial: boolean;
     bench_average_partial: boolean;
     captain_average_partial: boolean;

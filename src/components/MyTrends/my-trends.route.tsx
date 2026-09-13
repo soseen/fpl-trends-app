@@ -1,3 +1,4 @@
+import type { RootState } from "src/redux/store";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
@@ -43,6 +44,13 @@ const MyTrends: React.FC = () => {
   const [entryId, setEntryId] = useLocalStorage<number>(FPL_ID_STORAGE_KEY);
   const { startGameweek, endGameweek, isPreseason, analysisSeasonLabel } =
     useSelector(selectGameweekRange);
+  const hasProvisionalGameweek = useSelector((state: RootState) =>
+    state.events.events.some(
+      (event) =>
+        event.id >= startGameweek && event.id <= endGameweek && !event.data_checked,
+    ),
+  );
+  const refetchInterval = hasProvisionalGameweek ? 60 * 1000 : false;
   const [switchOpen, setSwitchOpen] = useState(false);
   const canLoadManager = !isPreseason && typeof entryId === "number";
 
@@ -51,6 +59,7 @@ const MyTrends: React.FC = () => {
     queryFn: () => getManagerSummary(entryId as number),
     enabled: canLoadManager,
     staleTime: 5 * 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -60,6 +69,7 @@ const MyTrends: React.FC = () => {
       getManagerRangeRank(entryId as number, startGameweek, endGameweek, signal),
     enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -68,6 +78,7 @@ const MyTrends: React.FC = () => {
     queryFn: () => getManagerTrajectory(entryId as number),
     enabled: canLoadManager,
     staleTime: 5 * 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -77,6 +88,7 @@ const MyTrends: React.FC = () => {
       getManagerComparison(entryId as number, startGameweek, endGameweek, signal),
     enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -86,6 +98,7 @@ const MyTrends: React.FC = () => {
       getTeamImpact(entryId as number, startGameweek, endGameweek, signal),
     enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 5 * 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -95,6 +108,7 @@ const MyTrends: React.FC = () => {
       getManagerTransfers(entryId as number, startGameweek, endGameweek, signal),
     enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -104,6 +118,7 @@ const MyTrends: React.FC = () => {
       getCaptainImpact(entryId as number, startGameweek, endGameweek, signal),
     enabled: canLoadManager && startGameweek > 0 && endGameweek > 0,
     staleTime: 60 * 1000,
+    refetchInterval,
     retry: 1,
   });
 
@@ -116,6 +131,12 @@ const MyTrends: React.FC = () => {
     return (
       <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-4 text-center">
         <h1 className="text-xl font-semibold text-text md:text-3xl">My Trends</h1>
+        {hasProvisionalGameweek && (
+          <p className="text-xs text-text/70">
+            Live gameweek: points, ownership and rank estimates are provisional. This page
+            refreshes automatically as data arrives.
+          </p>
+        )}
         <Card className="w-full border-secondary bg-primary p-5 shadow-lg">
           <p className="text-sm font-semibold text-text">Returns after Gameweek 1</p>
           <p className="mt-2 text-sm leading-6 text-text/65">
