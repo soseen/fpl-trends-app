@@ -133,8 +133,8 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
                 (event) => !event.template_captain || !event.top10k_captain,
               ) && (
                 <p className="text-center text-[10px] text-text/60 sm:text-xs">
-                  Some reference captains are missing — rank comparisons use available
-                  GWs.
+                  Some reference captains are missing — comparison totals may be
+                  incomplete.
                 </p>
               )}
               <div className="flex flex-col gap-3">
