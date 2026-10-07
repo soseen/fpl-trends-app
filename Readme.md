@@ -184,7 +184,7 @@ A four-pane personal dashboard at `/my-trends` combining range-rank estimation, 
 
 ### How the rank is computed
 
-The frontend is a thin wrapper around the API endpoints. The actual rank estimation, captain-bonus aggregation, and top-10k SQL all run server-side — see [`fpl-trends-api` Readme: Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends) and [Manager comparison](../fpl-trends-api/Readme.md#manager-comparison-sample-averages--top-10k).
+The frontend is a thin wrapper around the API endpoints. The actual rank estimation, captain-bonus aggregation, and cohort weighting all run server-side — see [`fpl-trends-api` Readme: Manager rank estimation](../fpl-trends-api/Readme.md#manager-rank-estimation-my-trends), [Manager comparison](../fpl-trends-api/Readme.md#manager-comparison-sample-averages--elite-cohorts), and the [comparison performance incident](../fpl-trends-api/docs/my-trends-comparison-performance.md).
 
 The range-rank card respects the `confidence` field returned by the API:
 
