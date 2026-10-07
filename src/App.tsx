@@ -15,6 +15,9 @@ const CompareFootballers = lazy(
   () => import("./components/CompareFootballers/compare-footballers.route"),
 );
 const MyTrends = lazy(() => import("./components/MyTrends/my-trends.route"));
+const ManagerSamplingCaseStudy = lazy(
+  () => import("./components/CaseStudies/manager-sampling.route"),
+);
 
 const RouteFallback = () => <div className="min-h-[280px]" />;
 
@@ -50,6 +53,14 @@ const App: React.FC = () => {
                       element={
                         <Suspense fallback={<RouteFallback />}>
                           <MyTrends />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="case-studies/manager-sampling"
+                      element={
+                        <Suspense fallback={<RouteFallback />}>
+                          <ManagerSamplingCaseStudy />
                         </Suspense>
                       }
                     />

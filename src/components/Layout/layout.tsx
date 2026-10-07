@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./navbar";
 import Footer from "./footer";
 import {
@@ -19,10 +19,13 @@ const ErrorScreen = () => (
 
 const Layout = () => {
   const { status } = useAppInitContext();
+  const { pathname } = useLocation();
+  const isStaticCaseStudy = pathname.startsWith("/case-studies/");
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
-      {status === AppInitStatus.error ? (
+      {status === AppInitStatus.error && !isStaticCaseStudy ? (
         <ErrorScreen />
       ) : (
         <main className="container mx-auto flex-grow px-2 py-1 md:px-4 md:py-4">

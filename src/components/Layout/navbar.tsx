@@ -9,7 +9,7 @@ import {
 } from "../AppInitializer/app-initializer.context";
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
 import logo from "../../assets/logo.png";
-import { ChartLine, House, User, Wrench } from "lucide-react";
+import { BookOpen, ChartLine, House, User, Wrench } from "lucide-react";
 import type { RootState } from "src/redux/store";
 import { getSeasonStart } from "src/utils/season";
 import PreseasonNotice from "./preseason-notice";
@@ -27,6 +27,11 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/my-trends", label: "My Trends", icon: <ChartLine /> },
   { to: "/players", label: "Players", icon: <User /> },
   { to: "/compare", label: "Compare", icon: <Wrench /> },
+  {
+    to: "/case-studies/manager-sampling",
+    label: "Case studies",
+    icon: <BookOpen />,
+  },
 ];
 
 // Mobile shows icons only — labels were wrapping/clumping at 375px.
