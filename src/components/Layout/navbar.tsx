@@ -28,7 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/players", label: "Players", icon: <User /> },
   { to: "/compare", label: "Compare", icon: <Wrench /> },
   {
-    to: "/case-studies/manager-sampling",
+    to: "/case-studies",
     label: "Case studies",
     icon: <BookOpen />,
   },

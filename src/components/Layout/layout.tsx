@@ -20,7 +20,8 @@ const ErrorScreen = () => (
 const Layout = () => {
   const { status } = useAppInitContext();
   const { pathname } = useLocation();
-  const isStaticCaseStudy = pathname.startsWith("/case-studies/");
+  const isStaticCaseStudy =
+    pathname === "/case-studies" || pathname.startsWith("/case-studies/");
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

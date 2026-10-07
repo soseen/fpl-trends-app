@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 type TocItem = {
@@ -109,9 +110,17 @@ const ManagerSamplingCaseStudy: React.FC = () => {
 
   return (
     <article className="mx-auto w-full max-w-[1120px] pb-12 text-text">
-      <h1 className="py-5 text-2xl font-semibold text-text md:py-7 md:text-3xl">
-        Case study - Sampling managers on My Trends route
-      </h1>
+      <div className="pt-5 md:pt-7">
+        <Link
+          to="/case-studies"
+          className="text-sm text-text/60 transition-colors hover:text-text"
+        >
+          Back to case studies
+        </Link>
+        <h1 className="mt-4 text-2xl font-semibold text-text md:text-3xl">
+          Case study - Sampling managers on My Trends route
+        </h1>
+      </div>
 
       <div className="grid gap-8 lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-12">
         <aside className="border-y border-accent4 py-4 lg:sticky lg:top-32 lg:max-h-[calc(100vh-9rem)] lg:self-start lg:overflow-y-auto lg:border-y-0 lg:border-r lg:py-0 lg:pr-5">
@@ -701,6 +710,15 @@ const ManagerSamplingCaseStudy: React.FC = () => {
             </ul>
           </Section>
         </div>
+      </div>
+
+      <div className="mt-12 border-t border-accent4 pt-6 md:mt-16">
+        <Link
+          to="/case-studies"
+          className="text-sm text-text/60 transition-colors hover:text-text"
+        >
+          Back to case studies
+        </Link>
       </div>
     </article>
   );

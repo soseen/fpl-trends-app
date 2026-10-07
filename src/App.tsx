@@ -15,8 +15,12 @@ const CompareFootballers = lazy(
   () => import("./components/CompareFootballers/compare-footballers.route"),
 );
 const MyTrends = lazy(() => import("./components/MyTrends/my-trends.route"));
+const CaseStudies = lazy(() => import("./components/CaseStudies/case-studies.route"));
 const ManagerSamplingCaseStudy = lazy(
   () => import("./components/CaseStudies/manager-sampling.route"),
+);
+const RankGainLossCaseStudy = lazy(
+  () => import("./components/CaseStudies/rank-gain-loss.route"),
 );
 
 const RouteFallback = () => <div className="min-h-[280px]" />;
@@ -57,10 +61,26 @@ const App: React.FC = () => {
                       }
                     />
                     <Route
+                      path="case-studies"
+                      element={
+                        <Suspense fallback={<RouteFallback />}>
+                          <CaseStudies />
+                        </Suspense>
+                      }
+                    />
+                    <Route
                       path="case-studies/manager-sampling"
                       element={
                         <Suspense fallback={<RouteFallback />}>
                           <ManagerSamplingCaseStudy />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="case-studies/rank-gain-loss"
+                      element={
+                        <Suspense fallback={<RouteFallback />}>
+                          <RankGainLossCaseStudy />
                         </Suspense>
                       }
                     />
