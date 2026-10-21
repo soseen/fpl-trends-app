@@ -445,8 +445,8 @@ const ManagerSamplingCaseStudy: React.FC = () => {
                 cleared and rebuilt from finalized FPL data.
               </li>
               <li>
-                After ingestion, the latest range-score buckets and comparison aggregates
-                are rebuilt.
+                After ingestion, the latest range-score buckets, captain aggregates, and
+                player exposure aggregates are rebuilt.
               </li>
               <li>
                 The sample is marked final only after the walks for A, B, and C have all
@@ -654,8 +654,9 @@ const ManagerSamplingCaseStudy: React.FC = () => {
 
             <p>
               The server cache is process-local and is lost on restart. PostgreSQL read
-              models are durable precomputation rather than cache entries, so the API
-              still has a fast data source after a restart.
+              models are durable precomputation rather than cache entries. Range-rank
+              estimates can read stored score buckets after a restart, while comparison
+              and captain analytics can still require expensive cold queries.
             </p>
           </Section>
 
@@ -687,8 +688,9 @@ const ManagerSamplingCaseStudy: React.FC = () => {
             <p>
               Correct calculations were still a product problem when several My Trends
               panels triggered large cold queries at once. Cumulative rows, score buckets,
-              precomputed comparison aggregates, and single-flight caching moved that work
-              away from the request path.
+              and single-flight caching reduce repeated work. Comparison precomputation is
+              still awaiting a historical backfill and production rollout; cold comparison
+              and captain queries remain a performance limitation.
             </p>
 
             <Subheading>Current limitations</Subheading>
