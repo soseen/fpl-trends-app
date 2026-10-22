@@ -15,6 +15,13 @@ const CASE_STUDIES = [
       "How player points become relative rank impact using nearby managers, effective ownership, and a score-to-rank curve.",
     to: "/case-studies/rank-gain-loss",
   },
+  {
+    number: 3,
+    title: "Rebuilding My Trends for speed and reliability",
+    description:
+      "How background calculations, published results, bounded samples and score checks replaced slow request-time analytics.",
+    to: "/case-studies/published-analytics",
+  },
 ] as const;
 
 const CaseStudies: React.FC = () => (

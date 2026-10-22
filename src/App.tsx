@@ -23,6 +23,9 @@ const ManagerSamplingCaseStudy = lazy(
 const RankGainLossCaseStudy = lazy(
   () => import("./components/CaseStudies/rank-gain-loss.route"),
 );
+const PublishedAnalyticsCaseStudy = lazy(
+  () => import("./components/CaseStudies/published-analytics.route"),
+);
 
 const RouteFallback = () => <div className="min-h-[280px]" />;
 
@@ -84,6 +87,14 @@ const App: React.FC = () => {
                       element={
                         <Suspense fallback={<RouteFallback />}>
                           <RankGainLossCaseStudy />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="case-studies/published-analytics"
+                      element={
+                        <Suspense fallback={<RouteFallback />}>
+                          <PublishedAnalyticsCaseStudy />
                         </Suspense>
                       }
                     />

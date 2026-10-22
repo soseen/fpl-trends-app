@@ -109,6 +109,7 @@ Routes are nested under `<Layout />`:
 - `/players`: full players table
 - `/compare`: footballer comparison tool
 - `/my-trends`: personalized FPL manager analytics
+- `/case-studies`: engineering articles, including `/case-studies/published-analytics`
 
 The navbar includes the gameweek slider. That range is global state and
 drives most analytics.
@@ -207,7 +208,7 @@ scannable, and work-focused.
 ## Known Risks
 
 - My Trends has a render error boundary; other routes still need coverage
-- Bundle is not route-split and is large
+- Routes are lazy-loaded, but the main/shared bundles remain large
 - Large 404 GIF is bundled
 - API base URL is build-time only
 - Some older docs still describe React Query as unused; current My Trends
