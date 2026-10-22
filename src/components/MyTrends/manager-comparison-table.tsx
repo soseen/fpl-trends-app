@@ -261,6 +261,8 @@ const ManagerComparisonTable: React.FC<Props> = ({ data }) => {
         through the range end, excluding Wildcard and Free Hit transfers, lineups,
         captaincy and hit costs. Captain benchmarks use each gameweek&apos;s sample.
         {data.captain_bonus.average === null && " Captain averages await more data."}
+        {data.total_points.top10k_average === null &&
+          " The historical Top 10k cohort is too small for some estimates; unavailable values are shown as a dash."}
       </TableCaption>
       <TableHeader>
         <TableRow className="border-b border-accent4 hover:bg-transparent">
