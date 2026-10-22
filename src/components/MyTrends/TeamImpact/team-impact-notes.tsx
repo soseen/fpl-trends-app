@@ -56,12 +56,13 @@ const RankCurveNote: FC<Props> = ({ notes }) => {
 
 const TeamImpactNotes: FC<Props> = ({ notes }) => {
   const eoGws = notes.small_sample_gws.join(", ");
-  const hasNotes =
-    notes.rank_curve_status !== "final" || notes.fallback_used || notes.incomplete_picks;
-  if (!hasNotes) return null;
 
   return (
     <div className="rounded-md border border-accent4 bg-primary px-3 py-2 text-[11px] text-text/60 sm:text-xs">
+      <p>
+        EO includes scoring multipliers, autosubs and Bench Boost. Gameweek rank figures
+        are contributions to the selected range&apos;s ending-rank estimate.
+      </p>
       <RankCurveNote notes={notes} />
       {notes.fallback_used && (
         <p>

@@ -150,12 +150,11 @@ Bulk data:
 
 My Trends:
 
-- `GET /manager/:id/summary`
-- `GET /manager/:id/trajectory`
-- `GET /manager/:id/range-rank?start=N&end=M`
-- `GET /manager/:id/comparison?start=N&end=M`
-- `GET /manager/:id/team-impact?start=N&end=M`
-- `GET /manager/:id/transfers?start=N&end=M`
+- GET /manager/:id/analysis?start=N&end=M
+- One generated Zod contract validates all seven prepared sections.
+- 202 polls preparation; saved results survive refresh/section failures.
+- API and frontend deploy together; old individual manager routes are retired.
+- Regenerate contracts from the sibling API repo using npm run contracts:generate.
 
 Keep query keys aligned with `entryId`, `startGameweek`, and
 `endGameweek` so range changes invalidate correctly.
@@ -207,7 +206,7 @@ scannable, and work-focused.
 
 ## Known Risks
 
-- No React error boundaries, so render errors can blank the app
+- My Trends has a render error boundary; other routes still need coverage
 - Bundle is not route-split and is large
 - Large 404 GIF is bundled
 - API base URL is build-time only

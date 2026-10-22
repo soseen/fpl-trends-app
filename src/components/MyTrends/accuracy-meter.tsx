@@ -12,8 +12,8 @@ type Props = {
 // level. They are not probabilities and should never be shown as percentages.
 const TARGET_SAMPLE: Record<1 | 2 | 3, number> = {
   1: 10_000,
-  2: 50_000,
-  3: 50_000,
+  2: 10_000,
+  3: 20_000,
 };
 
 const bucketFor = (stratum: 1 | 2 | 3 | null, sampleSize: number): 1 | 2 | 3 => {
@@ -55,12 +55,12 @@ const AccuracyMeter: React.FC<Props> = ({
     ? "Updating"
     : isRefreshing
       ? "Refreshing"
-      : `${confidence} confidence`;
+      : `${confidence} sample coverage`;
   const tooltip = isStale
     ? "The latest finished gameweek sample is being reset before ranks are shown."
     : stratum === null
       ? "No rank data yet for this manager."
-      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} nearby-rank samples. The target sample is ${target.toLocaleString("en-GB")}, refreshed after each gameweek finalizes.`;
+      : `Estimate based on ${sampleSize.toLocaleString("en-GB")} samples in this source rank stratum. Sample size does not measure estimator error. The target sample is ${target.toLocaleString("en-GB")}, refreshed after each gameweek finalizes.`;
 
   return (
     <Tooltip>

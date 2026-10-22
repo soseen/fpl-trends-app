@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import type { PlayerImpact, TeamImpact, TeamImpactTile } from "src/queries/getTeamImpact";
 import TabSwitch from "../tab-switch";
 import TeamImpactView from "./team-impact";
@@ -8,7 +8,7 @@ import PlayerImpactAccordion from "./player-impact-accordion";
 import TeamImpactNotes from "./team-impact-notes";
 
 type Props = {
-  query: UseQueryResult<TeamImpact>;
+  query: SectionQuery<TeamImpact>;
 };
 
 const TABS = [

@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { CaptainImpact } from "src/queries/getCaptainImpact";
@@ -8,7 +8,7 @@ import CaptainEventCard from "./captain-event-card";
 import CaptainImpactSkeleton from "./captain-impact.skeleton";
 
 type Props = {
-  query: UseQueryResult<CaptainImpact>;
+  query: SectionQuery<CaptainImpact>;
 };
 
 // Same default-visible count as TransferImpact for consistency.

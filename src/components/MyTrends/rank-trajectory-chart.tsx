@@ -24,7 +24,7 @@ type Props = {
   endGw: number;
 };
 
-const formatRank = (n: number): string => n.toLocaleString("en-GB");
+const formatRank = (n: number | null): string => n?.toLocaleString("en-GB") ?? "—";
 
 const compactRank = (n: number): string =>
   n >= 1_000_000
@@ -89,8 +89,8 @@ type TooltipPayload = {
   value: number;
   payload: {
     gw: number;
-    overall_rank: number;
-    gw_rank: number;
+    overall_rank: number | null;
+    gw_rank: number | null;
     points: number;
     event_transfers: number;
     event_transfers_cost: number;
@@ -175,7 +175,15 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
 
   // Build the rank axis from the manager's real range, with modest log-space
   // padding, so mobile does not waste the top of the chart on unreachable ranks.
-  const rankValues = points.flatMap((p) => [p.gw_rank, p.overall_rank]);
+  const rankValues = points
+    .flatMap((p) => [p.gw_rank, p.overall_rank])
+    .filter((rank): rank is number => rank !== null && rank > 0);
+  if (rankValues.length === 0)
+    return (
+      <p className="text-sm text-text/65">
+        Rank history is not available for these gameweeks yet.
+      </p>
+    );
   const minRank = Math.max(1, Math.min(...rankValues));
   const maxRank = Math.max(...rankValues);
   const fieldSize = Math.max(totalPlayers > 0 ? totalPlayers : 0, maxRank);

@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import TeamImpactSkeleton from "./team-impact.skeleton";
 const INITIAL_VISIBLE = 8;
 
 type Props = {
-  query: UseQueryResult<TeamImpact>;
+  query: SectionQuery<TeamImpact>;
 };
 
 const TeamImpactView: FC<Props> = ({ query }) => {

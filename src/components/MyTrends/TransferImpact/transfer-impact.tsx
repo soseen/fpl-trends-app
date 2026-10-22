@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type {
@@ -12,7 +12,7 @@ import RolledTransferCard from "./rolled-transfer-card";
 import TransferImpactSkeleton from "./transfer-impact.skeleton";
 
 type Props = {
-  query: UseQueryResult<ManagerTransfers>;
+  query: SectionQuery<ManagerTransfers>;
 };
 
 // Initially-visible item count (events + rolled placeholders combined).

@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppInitializerProvider } from "./components/AppInitializer/app-initializer.context";
 import { AppContextProvider } from "./components/AppContext/app-context";
 import { FootballerDetailsProvider } from "./components/FootballerDetails/footballer-details.context";
+import AnalysisErrorBoundary from "./components/MyTrends/analysis-error-boundary";
 
 const Players = lazy(() => import("./components/Players/players.route"));
 const CompareFootballers = lazy(
@@ -56,7 +57,9 @@ const App: React.FC = () => {
                       path="my-trends"
                       element={
                         <Suspense fallback={<RouteFallback />}>
-                          <MyTrends />
+                          <AnalysisErrorBoundary>
+                            <MyTrends />
+                          </AnalysisErrorBoundary>
                         </Suspense>
                       }
                     />

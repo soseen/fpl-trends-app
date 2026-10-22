@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import type { UseQueryResult } from "@tanstack/react-query";
+import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { ManagerTransfers } from "src/queries/getManagerTransfers";
@@ -19,8 +19,8 @@ const TABS = [
 ] as const;
 
 type Props = {
-  transfersQuery: UseQueryResult<ManagerTransfers>;
-  captainQuery: UseQueryResult<CaptainImpact>;
+  transfersQuery: SectionQuery<ManagerTransfers>;
+  captainQuery: SectionQuery<CaptainImpact>;
 };
 
 // Initial visible per-GW item count when expanded.
