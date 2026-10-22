@@ -7,7 +7,9 @@ export const rankFixtures = (
   const playerFixtures = footballers.map((player) => {
     const upcomingFixtures = player.footballer_fixtures.filter(
       (fixture) =>
-        fixture.event >= currentGameweek && fixture.event < currentGameweek + 4,
+        fixture.event !== null &&
+        fixture.event >= currentGameweek &&
+        fixture.event < currentGameweek + 4,
     );
 
     const missingFixtures = Math.max(0, 4 - upcomingFixtures.length);

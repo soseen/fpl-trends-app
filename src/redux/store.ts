@@ -58,7 +58,9 @@ const latestCompletedFixtureGameweek = () => {
   const firstPlayer = footballers[0];
   if (!firstPlayer) return 0;
 
-  const fixtureEvents = firstPlayer.footballer_fixtures.map((fixture) => fixture.event);
+  const fixtureEvents = firstPlayer.footballer_fixtures
+    .map((fixture) => fixture.event)
+    .filter((event): event is number => event !== null && event >= 1 && event <= 38);
   if (fixtureEvents.length === 0) return 0;
 
   const nextGameweek = Math.min(...fixtureEvents);

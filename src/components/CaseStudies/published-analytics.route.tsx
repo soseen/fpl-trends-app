@@ -297,7 +297,7 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
             <ResultsTable
               headings={["Validation", "Release evidence"]}
               rows={[
-                ["Automated checks", "82 tests passed; no skips"],
+                ["Automated checks", "84 tests passed; no skips"],
                 ["GW6 source repair", "40,000 histories and squads refreshed"],
                 ["GW6 score mismatches after repair", "0"],
                 ["Reproducibility", "All seven published GWs replayed"],
@@ -331,6 +331,13 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
               four-connection read pool. Worker memory limits and a disk-headroom check
               contain expensive preparation. Structured request and job logs, readiness
               probes and log rotation make failures inspectable.
+            </p>
+            <p>
+              Bulk refreshes are serialized across HTTP and cron callers. Fixture
+              snapshots use atomic batches keyed by player and fixture, preserving stable
+              row IDs and null dates for postponed matches. A failure in a later batch
+              rolls back earlier writes, instead of leaving a partial snapshot or
+              thousands of requests waiting for a connection.
             </p>
             <p>
               Working facts can be pruned only after finalized replay archives exist for

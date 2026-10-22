@@ -15,7 +15,7 @@ const findFirstUpcomingFixture = (footballers: Footballer[]): Fixture | null => 
 
   footballers.forEach((footballer) => {
     footballer.footballer_fixtures.forEach((fixture) => {
-      if (fixture.finished) return;
+      if (fixture.finished || !fixture.kickoff_time) return;
 
       const kickoff = Date.parse(fixture.kickoff_time);
       if (!Number.isFinite(kickoff) || kickoff >= firstKickoff) return;
@@ -36,7 +36,7 @@ const getSeasonLabel = (kickoff: Date) => {
 
 export const getSeasonStart = (footballers: Footballer[]): SeasonStart | null => {
   const firstFixture = findFirstUpcomingFixture(footballers);
-  if (!firstFixture) return null;
+  if (!firstFixture?.kickoff_time) return null;
 
   const kickoff = new Date(firstFixture.kickoff_time);
   if (!Number.isFinite(kickoff.getTime())) return null;
