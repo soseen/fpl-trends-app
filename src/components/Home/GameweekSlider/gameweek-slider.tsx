@@ -125,15 +125,26 @@ const GameweekSlider = () => {
 
   if (status === AppInitStatus.loading)
     return (
-      <div className="flex h-2 w-full items-center px-2 pb-2 md:px-4 md:pb-3">
-        <Skeleton className="h-2 w-full md:h-3" />
+      <div className="px-2 pb-1.5 pt-1.5 md:px-4 md:pb-2.5 md:pt-2">
+        <div className="flex w-full items-center gap-2 md:gap-4">
+          <div className="flex h-7 w-[70px] shrink-0 items-baseline gap-1.5 md:h-9 md:w-[142px] md:gap-2">
+            <Skeleton className="h-3 w-4 md:h-4 md:w-[72px]" />
+            <Skeleton className="h-3 w-[42px] md:h-4 md:w-[58px]" />
+          </div>
+          <Skeleton className="h-2 min-w-0 flex-1 md:h-3" />
+          <div className="flex shrink-0 items-center gap-1 md:gap-1.5">
+            <Skeleton className="h-5 w-6 md:h-6 md:w-[42px]" />
+            <Skeleton className="h-5 w-6 md:h-6 md:w-[48px]" />
+            <Skeleton className="h-5 w-6 md:h-6 md:w-8" />
+          </div>
+        </div>
       </div>
     );
 
   const max = maxGameweek || TOTAL_GAMEWEEKS_COUNT;
 
   return (
-    <div className="px-2 pb-1.5 md:px-4 md:pb-2.5">
+    <div className="px-2 pb-1.5 pt-1.5 md:px-4 md:pb-2.5 md:pt-2">
       <div className="flex w-full items-center gap-2 md:gap-4">
         {/* Fixed-width heading so the slider doesn't shift as digit count
             changes. tabular-nums + min-width on the value reserves enough
