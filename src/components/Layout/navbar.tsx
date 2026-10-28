@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
             <img
               src={logo}
               alt="logo"
-              className="box-content h-5 w-auto bg-transparent p-1 md:h-7 lg:h-9"
+              className="box-content h-5 w-auto bg-transparent p-1 md:h-12 lg:h-16"
             />
           </NavLink>
           <div className="flex items-center gap-1 md:gap-2">
