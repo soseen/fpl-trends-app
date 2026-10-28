@@ -20,7 +20,7 @@ const Section = ({ index, children }: { index: number; children: ReactNode }) =>
   return (
     <section
       id={section.id}
-      className="scroll-mt-36 border-t border-accent4 pt-8 first:border-t-0 first:pt-0 last:min-h-[calc(100dvh-9rem)]"
+      className="scroll-mt-36 border-t border-accent4 pt-8 first:border-t-0 first:pt-0"
     >
       <h2 className="text-xl font-semibold text-highlight md:text-2xl">
         {index + 1}. {section.title}
@@ -44,31 +44,41 @@ const ResultsTable = ({
   rows,
   caption,
 }: {
-  headings: readonly [string, string];
-  rows: ReadonlyArray<readonly [string, string]>;
+  headings: readonly [string, string, string];
+  rows: ReadonlyArray<readonly [string, string, string]>;
   caption: string;
 }) => (
   <div className="overflow-x-auto">
-    <table className="w-full border-collapse text-left text-sm">
+    <table className="w-full min-w-[530px] border-collapse text-left text-sm">
       <caption className="pb-3 text-left text-xs leading-6 text-text/55">
         {caption}
       </caption>
       <thead>
         <tr className="border-y border-accent4 text-text">
-          {headings.map((heading) => (
-            <th key={heading} scope="col" className="px-3 py-3 font-semibold">
+          {headings.map((heading, index) => (
+            <th
+              key={heading}
+              scope="col"
+              className={cn(
+                "px-4 py-3 font-semibold",
+                index === 2 && "bg-highlight/5 text-highlight",
+              )}
+            >
               {heading}
             </th>
           ))}
         </tr>
       </thead>
       <tbody>
-        {rows.map(([label, value]) => (
+        {rows.map(([label, before, after]) => (
           <tr key={label} className="border-b border-accent4/60">
-            <th scope="row" className="px-3 py-3 font-normal text-text/75">
+            <th scope="row" className="px-4 py-3 font-medium text-text/75">
               {label}
             </th>
-            <td className="px-3 py-3 font-mono text-highlight">{value}</td>
+            <td className="px-4 py-3 text-text/55">{before}</td>
+            <td className="bg-highlight/5 px-4 py-3 font-medium text-highlight">
+              {after}
+            </td>
           </tr>
         ))}
       </tbody>
@@ -77,7 +87,7 @@ const ResultsTable = ({
 );
 
 const PublishedAnalyticsCaseStudy: React.FC = () => {
-  const activeSection = useActiveSection(SECTIONS);
+  const { activeSection, onSectionClick } = useActiveSection(SECTIONS);
 
   return (
     <article className="mx-auto w-full max-w-[1120px] pb-12 text-text">
@@ -97,7 +107,7 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
       </div>
 
       <div className="mt-7 grid gap-8 lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-12">
-        <aside className="border-y border-accent4 py-4 lg:sticky lg:top-32 lg:max-h-[calc(100vh-9rem)] lg:self-start lg:overflow-y-auto lg:border-y-0 lg:border-r lg:py-0 lg:pr-5">
+        <aside className="border-y border-accent4 py-4 lg:sticky lg:top-36 lg:max-h-[calc(100vh-10rem)] lg:self-start lg:overflow-y-auto lg:border-y-0 lg:border-r lg:py-0 lg:pr-5">
           <nav aria-label="Case study table of contents">
             <p className="mb-3 text-sm font-semibold text-text">Table of contents</p>
             <ol className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-1">
@@ -105,6 +115,7 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
+                    onClick={onSectionClick}
                     aria-current={activeSection === section.id ? "location" : undefined}
                     className={cn(
                       "block border-l-2 px-3 py-1.5 text-sm transition-colors",
@@ -165,6 +176,19 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
           </Section>
 
           <Section index={2}>
+            <div className="grid gap-4 border-y border-accent4 bg-primary px-4 py-4 sm:grid-cols-3">
+              {[
+                ["01", "Collect & validate", "Bounded source inputs"],
+                ["02", "Calculate & publish", "Shared versioned benchmarks"],
+                ["03", "Prepare & read", "Saved manager-range results"],
+              ].map(([step, title, detail]) => (
+                <div key={step}>
+                  <p className="font-mono text-xs text-magenta">{step}</p>
+                  <p className="mt-1 font-semibold text-text">{title}</p>
+                  <p className="mt-1 text-xs text-text/55">{detail}</p>
+                </div>
+              ))}
+            </div>
             <ol className="space-y-4 border-l border-accent4 pl-5">
               {[
                 [
@@ -323,14 +347,31 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
 
           <Section index={6}>
             <ResultsTable
-              headings={["Area", "Observed improvement"]}
+              headings={["Area", "Before", "After"]}
               rows={[
-                ["Prepared API responses", "Sub-second reads"],
-                ["Database storage", "About 15% reclaimed"],
-                ["Request-time work", "Bounded lookups of saved results"],
-                ["Failed refreshes", "Previous successful results retained"],
+                [
+                  "API response time",
+                  "About 16–36 s per analytics request",
+                  "About 0.3 s median for the prepared bundle",
+                ],
+                ["Prepared response p95", "Not recorded", "About 0.4 s"],
+                [
+                  "Database footprint",
+                  "Original storage baseline",
+                  "About 15% reclaimed",
+                ],
+                [
+                  "Request-time work",
+                  "Population calculations",
+                  "Bounded reads of saved results",
+                ],
+                [
+                  "Failed refreshes",
+                  "Panels could lose their result",
+                  "Last successful sections retained",
+                ],
               ]}
-              caption="Results from production validation. Response timings cover prepared analyses over public HTTPS; storage savings came from removing retired aggregate data."
+              caption="Rounded production observations. Before: separate comparison and impact requests. After: one prepared seven-section bundle over public HTTPS under concurrent requests. These checks are not a controlled speedup ratio; first-time preparation has separate costs."
             />
             <p>
               Requests that previously performed expensive calculations now read one

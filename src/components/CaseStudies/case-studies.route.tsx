@@ -5,14 +5,14 @@ const CASE_STUDIES = [
     number: 1,
     title: "Sampling managers",
     description:
-      "How My Trends builds a representative manager sample, estimates range rank, and keeps the population current.",
+      "How bounded standings samples, population weights and published benchmarks produce range-rank estimates.",
     to: "/case-studies/manager-sampling",
   },
   {
     number: 2,
     title: "Estimating rank gain and loss",
     description:
-      "How player points become relative rank impact using nearby managers, effective ownership, and a score-to-rank curve.",
+      "How published ownership benchmarks and a nonlinear score-to-rank curve turn player points into estimated rank impact.",
     to: "/case-studies/rank-gain-loss",
   },
   {
