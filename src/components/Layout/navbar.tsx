@@ -8,7 +8,7 @@ import {
   useAppInitContext,
 } from "../AppInitializer/app-initializer.context";
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo-transparent.png";
 import { BookOpen, ChartLine, House, User, Wrench } from "lucide-react";
 import type { RootState } from "src/redux/store";
 import { getSeasonStart } from "src/utils/season";
