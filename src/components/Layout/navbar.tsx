@@ -8,7 +8,7 @@ import {
   useAppInitContext,
 } from "../AppInitializer/app-initializer.context";
 import GameweekSlider from "../Home/GameweekSlider/gameweek-slider";
-import logo from "../../assets/logo-transparent.png";
+import logo from "../../assets/logo.png";
 import { BookOpen, ChartLine, House, User, Wrench } from "lucide-react";
 import type { RootState } from "src/redux/store";
 import { getSeasonStart } from "src/utils/season";
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
             <img
               src={logo}
               alt="logo"
-              className="box-content h-5 w-auto bg-transparent p-1 md:h-12 lg:h-16"
+              className="block h-6 w-auto bg-transparent md:h-7 lg:h-8"
             />
           </NavLink>
           <div className="flex items-center gap-1 md:gap-2">
