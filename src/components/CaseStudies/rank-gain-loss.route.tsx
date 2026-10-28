@@ -1,6 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useActiveSection } from "./use-active-section";
 
 type TocItem = {
   id: string;
@@ -50,33 +51,6 @@ const TechnicalNote = ({ title, children }: { title: string; children: ReactNode
   </div>
 );
 
-const useActiveSection = (): string => {
-  const [activeSection, setActiveSection] = useState(TOC_ITEMS[0]?.id ?? "question");
-
-  useEffect(() => {
-    const sections = TOC_ITEMS.map(({ id }) => document.getElementById(id)).filter(
-      (section): section is HTMLElement => section !== null,
-    );
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        const firstVisible = visible[0]?.target;
-        if (firstVisible?.id) setActiveSection(firstVisible.id);
-      },
-      { rootMargin: "-22% 0px -68% 0px", threshold: 0 },
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, []);
-
-  return activeSection;
-};
-
 const TableOfContents = ({ activeSection }: { activeSection: string }) => (
   <nav aria-label="Case study table of contents">
     <p className="mb-3 text-sm font-semibold text-text">Table of contents</p>
@@ -105,7 +79,7 @@ const TableOfContents = ({ activeSection }: { activeSection: string }) => (
 );
 
 const RankGainLossCaseStudy: React.FC = () => {
-  const activeSection = useActiveSection();
+  const activeSection = useActiveSection(TOC_ITEMS);
 
   return (
     <article className="mx-auto w-full max-w-[1120px] pb-12 text-text">

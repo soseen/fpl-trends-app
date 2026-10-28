@@ -1,6 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useActiveSection } from "./use-active-section";
 
 const SECTIONS = [
   { id: "problem", title: "The Problem" },
@@ -76,23 +77,7 @@ const ResultsTable = ({
 );
 
 const PublishedAnalyticsCaseStudy: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<string>(SECTIONS[0].id);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (first) setActiveSection(first.target.id);
-      },
-      { rootMargin: "-22% 0px -68% 0px", threshold: 0 },
-    );
-    SECTIONS.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-    return () => observer.disconnect();
-  }, []);
+  const activeSection = useActiveSection(SECTIONS);
 
   return (
     <article className="mx-auto w-full max-w-[1120px] pb-12 text-text">
@@ -107,7 +92,7 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
           Case study - Rebuilding My Trends around published analytics
         </h1>
         <p className="mt-3 text-xs text-text/50">
-          Engineering notes · Production rollout on 22 October 2026
+          Engineering notes · Scalable analytics, reliable calculations and recovery
         </p>
       </div>
 
@@ -139,39 +124,32 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
         <div className="min-w-0 max-w-4xl space-y-12 md:space-y-16">
           <Section index={0}>
             <p>
-              My Trends was asking the backend to do too much while a manager waited.
-              Opening a gameweek range triggered several calculations against a large
-              manager dataset. Small responses could take more than half a minute.
+              An analytics page can return very little data while asking its database to
+              do an enormous amount of work. In My Trends, opening a gameweek range
+              triggered population-wide calculations for comparisons, team impact and
+              captain impact. Requests could take tens of seconds, and the work grew as
+              the season progressed.
             </p>
-            <ResultsTable
-              headings={["Original request", "Response time"]}
-              rows={[
-                ["Manager comparison", "15.86 s"],
-                ["Team impact", "36.08 s"],
-                ["Captain impact", "35.93 s"],
-              ]}
-              caption="The browser network trace that prompted the redesign, for GW3–7. These are individual endpoint timings."
-            />
             <p>
-              We rebuilt the page around published results. Shared population calculations
-              now run in a background worker, and the API reads one saved analysis for a
-              manager and gameweek range. A prepared response contains all seven sections
-              the page needs.
+              The architectural problem went beyond a slow query. Repeating shared
+              calculations on every request tied response times to dataset growth and made
+              ordinary browsing compete with data collection. Caching individual endpoints
+              could only postpone that pressure.
             </p>
-            <Note title="The measured change">
-              After deployment, prepared bundles returned in about 360 ms at the 95th
-              percentile in a public HTTPS check with 20 concurrent requests. That is a
-              prepared-data measurement; a new manager still needs background preparation
-              before their first result is available.
+            <Note title="The design goal">
+              Calculate shared analytics in the background, validate and publish them,
+              then serve a saved analysis for each manager and gameweek range. Prepared
+              results should be quick to read, while preparation has its own progress,
+              resource limits and failure handling.
             </Note>
           </Section>
 
           <Section index={1}>
             <p>
-              The production export contained 5.21 million manager records, and the
-              database occupied about 20 GB after only seven gameweeks. Much of the work
-              involved repeatedly reading or rebuilding large collections of history,
-              picks, transfers and cumulative totals.
+              Storage and computation were growing together. Manager history, picks and
+              transfers accumulated every gameweek, while overlapping aggregate tables
+              stored information that could be derived from the same inputs. Range queries
+              repeatedly read or rebuilt those large collections.
             </p>
             <p>
               The API and ingestion jobs shared the same database and disk. Expensive
@@ -191,7 +169,7 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
               {[
                 [
                   "Collect a bounded sample",
-                  "A seeded draw selects standings pages: up to 10,000 managers from the Top 10k, 10,000 from the next 90k, and 20,000 from the remaining population.",
+                  "A seeded draw selects standings pages across rank bands, with explicit limits on collection size. Population weights preserve each band's contribution to the overall estimate.",
                 ],
                 [
                   "Build shared gameweek benchmarks",
@@ -222,8 +200,9 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
             <p>
               The keys matter: season, manager ID and both range endpoints identify a
               saved analysis. Its revision includes the calculation version, the selected
-              benchmark generations and the bulk-data refresh version. A result for GW3–7
-              cannot accidentally become the answer for GW1–7.
+              benchmark generations and the bulk-data refresh version. Changing either
+              range endpoint selects a different analysis; changing an input version
+              triggers preparation against the updated data.
             </p>
             <Note title="A replacement sample does not erase a usable result">
               Recollecting a finished gameweek happens incrementally. Its previous
@@ -282,28 +261,18 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
 
           <Section index={4}>
             <p>
-              The rollout uncovered a real historical defect: 12,743 of the 40,000
-              selected GW6 records had scores that disagreed with their stored squads.
-              Replaying a calculation would have reproduced that defect, so replay alone
-              was not enough.
+              Reproducibility and correctness need separate checks. Replaying stored
+              inputs can reliably reproduce a wrong answer if manager history and squad
+              data disagree. We therefore reconcile complete sampled squads with official
+              manager scores before treating a finalized benchmark as publishable.
             </p>
             <p>
-              We refreshed official history and squads for the entire selected GW6 roster,
-              rebuilt the benchmark, and audited the published inputs again. All 40,000
-              GW6 squads then reconciled, as did every selected squad in the other six
-              gameweeks. A finalized gameweek now rejects publication when a complete
-              sampled squad has a known score mismatch with manager history.
+              Historical inconsistencies require refreshing the affected source data and
+              rebuilding the benchmark. A finalized gameweek rejects publication when a
+              complete sampled squad has a known score mismatch with manager history.
+              Keeping the previous valid generation available lets that repair happen
+              without publishing a partial replacement.
             </p>
-            <ResultsTable
-              headings={["Validation", "Release evidence"]}
-              rows={[
-                ["Automated checks", "84 tests passed; no skips"],
-                ["GW6 source repair", "40,000 histories and squads refreshed"],
-                ["GW6 score mismatches after repair", "0"],
-                ["Reproducibility", "All seven published GWs replayed"],
-              ]}
-              caption="Checks performed during the production release. Replay verifies reproducibility; official score reconciliation and independent reference examples check different failure modes."
-            />
             <p>
               Tests cover manually expanded weighted populations, transfer windows, chip
               and vice-captain cases, late entrants, missing data and nonlinear rank
@@ -327,17 +296,16 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
               earlier successful data with its original timestamp.
             </p>
             <p>
-              Serving queries have two-second statement deadlines and a separate
-              four-connection read pool. Worker memory limits and a disk-headroom check
-              contain expensive preparation. Structured request and job logs, readiness
-              probes and log rotation make failures inspectable.
+              Serving queries have short statement deadlines and a separate, bounded read
+              pool. Worker memory limits and a disk-headroom check contain expensive
+              preparation. Structured request and job logs, readiness probes and log
+              rotation make failures inspectable.
             </p>
             <p>
-              Bulk refreshes are serialized across HTTP and cron callers. Fixture
-              snapshots use atomic batches keyed by player and fixture, preserving stable
-              row IDs and null dates for postponed matches. A failure in a later batch
-              rolls back earlier writes, instead of leaving a partial snapshot or
-              thousands of requests waiting for a connection.
+              Bulk refreshes are serialized across HTTP and scheduled callers. Updates
+              publish atomically using stable source keys, so a failed refresh leaves a
+              complete previous snapshot available. Nullable source fields, such as dates
+              for postponed fixtures, remain valid throughout that process.
             </p>
             <p>
               Working facts can be pruned only after finalized replay archives exist for
@@ -346,36 +314,36 @@ const PublishedAnalyticsCaseStudy: React.FC = () => {
               no longer rebuilt by recurring ingestion.
             </p>
             <Note title="Replay input is not an independent backup">
-              It lives in PostgreSQL too. The release used a separate compressed export
-              and restored it into a new database before cleanup. Recurring off-server
-              backups and external alert delivery still require configured services; local
-              readiness monitoring is active.
+              It lives in PostgreSQL too. A separate database export was successfully
+              restored before removing redundant storage. Recurring off-server backups and
+              external alert delivery still require configured services; local readiness
+              monitoring is active.
             </Note>
           </Section>
 
           <Section index={6}>
             <ResultsTable
-              headings={["Production check", "Observed result"]}
+              headings={["Area", "Observed improvement"]}
               rows={[
-                ["Prepared bundle, median", "270 ms"],
-                ["Prepared bundle, 95th percentile", "360 ms"],
-                ["Prepared bundle, maximum", "367 ms"],
-                ["Public HTTPS requests / concurrency", "40 / 20"],
-                ["Free production disk space", "About 5.7 GB → 8.8 GB"],
+                ["Prepared API responses", "Sub-second reads"],
+                ["Database storage", "About 15% reclaimed"],
+                ["Request-time work", "Bounded lookups of saved results"],
+                ["Failed refreshes", "Previous successful results retained"],
               ]}
-              caption="Measured on 22 October 2026. Two waves of 20 concurrent requests from a developer workstation to the public HTTPS API, with fresh prepared GW3–7 bundles and all seven sections validated. Timings include reading and decoding the response."
+              caption="Results from production validation. Response timings cover prepared analyses over public HTTPS; storage savings came from removing retired aggregate data."
             />
             <p>
-              The original trace measured separate endpoints; this check measured a
-              combined prepared response. It is evidence of the new serving path, not a
-              controlled speedup ratio or a page-render benchmark. Cold preparation,
-              upstream availability and browser rendering remain separate measurements.
+              Requests that previously performed expensive calculations now read one
+              prepared response containing all seven sections. Production checks observed
+              sub-second responses under concurrent requests, compared with the earlier
+              waits of tens of seconds. These observations cover the API serving path;
+              first-time preparation and browser rendering have separate costs.
             </p>
             <p>
-              The public page also passed a browser check with its comparison table
-              rendered, no runtime exceptions and no failed network responses. Checks
-              against real managers covered a late entrant and histories containing all
-              four chips, alongside full-season official-rank comparisons.
+              Removing redundant aggregates also reduced storage without discarding the
+              published benchmarks needed by the page. Browser checks and real-manager
+              audits cover the comparison table, late entrants, chip histories and
+              full-season official-rank comparisons alongside the automated tests.
             </p>
           </Section>
 
