@@ -20,7 +20,7 @@ const Section = ({ index, children }: { index: number; children: ReactNode }) =>
   return (
     <section
       id={section.id}
-      className="scroll-mt-36 border-t border-accent4 pt-8 first:border-t-0 first:pt-0"
+      className="scroll-mt-36 border-t border-accent4 pt-8 first:border-t-0 first:pt-0 last:min-h-[calc(100dvh-9rem)]"
     >
       <h2 className="text-xl font-semibold text-highlight md:text-2xl">
         {index + 1}. {section.title}

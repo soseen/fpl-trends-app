@@ -8,25 +8,16 @@ export const useActiveSection = (items: readonly { id: string }[]): string => {
       .map(({ id }) => document.getElementById(id))
       .filter((section): section is HTMLElement => section !== null);
     const firstSection = sections[0];
-    const lastSection = sections.at(-1);
-    if (!firstSection || !lastSection) return;
+    if (!firstSection) return;
 
     let frame: number | undefined;
 
     const updateActiveSection = () => {
       frame = undefined;
-      const { scrollTop, scrollHeight, clientHeight } =
-        document.scrollingElement ?? document.documentElement;
-
-      // Short final sections may never reach the normal activation line.
-      if (scrollTop > 0 && scrollTop + clientHeight >= scrollHeight - 2) {
-        setActiveSection(lastSection.id);
-        return;
-      }
-
       const scrollMargin =
         Number.parseFloat(window.getComputedStyle(firstSection).scrollMarginTop) || 0;
-      const activationLine = Math.max(window.innerHeight * 0.22, scrollMargin) + 1;
+      // Match native anchor positioning, independent of the viewport height.
+      const activationLine = scrollMargin + 1;
       let currentSection = firstSection;
       for (const section of sections) {
         if (section.getBoundingClientRect().top > activationLine) break;
