@@ -86,10 +86,14 @@ const TransferImpactView: FC<Props> = ({ query }) => {
       {items.length > 0 && (
         <div className="flex flex-col gap-3">
           {visibleItems.map((item) =>
-            item.kind === "event" ? (
+            item.kind === "event" && item.event.pairs.length > 0 ? (
               <TransferEventCard key={`ev-${item.gw}`} event={item.event} />
             ) : (
-              <RolledTransferCard key={`rolled-${item.gw}`} gw={item.gw} />
+              <RolledTransferCard
+                key={`rolled-${item.gw}`}
+                gw={item.gw}
+                noTransfers={item.kind === "event"}
+              />
             ),
           )}
         </div>

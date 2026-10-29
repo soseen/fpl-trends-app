@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type {
-  ActiveChip,
   TransferImpactEvent,
   TransferImpactPair,
 } from "src/queries/getManagerTransfers";
@@ -24,35 +23,6 @@ const netPillClass = (n: number): string => {
   if (n < 0) return "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40";
   return "bg-accent4/40 text-text/70 ring-1 ring-text/15";
 };
-
-const CHIP_LABEL: Record<NonNullable<ActiveChip>, string> = {
-  wildcard: "Wildcard",
-  freehit: "Free Hit",
-  bboost: "Bench Boost",
-  "3xc": "Triple Captain",
-  manager: "Assistant Manager",
-};
-
-// Each chip gets its own tint so they're visually distinct from the
-// neutral GW header strip.
-const CHIP_BADGE_CLASS: Record<NonNullable<ActiveChip>, string> = {
-  wildcard: "bg-cyan-500/25 text-cyan-200",
-  freehit: "bg-amber-500/25 text-amber-200",
-  bboost: "bg-emerald-500/25 text-emerald-200",
-  "3xc": "bg-magenta/30 text-magenta",
-  manager: "bg-text/15 text-text/80",
-};
-
-const ChipBadge: FC<{ chip: NonNullable<ActiveChip> }> = ({ chip }) => (
-  <span
-    className={clsx(
-      "rounded-sm px-1.5 py-[1px] text-[10px] font-semibold uppercase tracking-wide sm:text-xs",
-      CHIP_BADGE_CLASS[chip],
-    )}
-  >
-    {CHIP_LABEL[chip]}
-  </span>
-);
 
 const formatTransferCount = (count: number): string =>
   `${count} transfer${count === 1 ? "" : "s"}`;
@@ -152,19 +122,13 @@ const TransferEventCard: FC<Props> = ({ event }) => {
   const {
     gw,
     pairs,
-    chip,
     gross_net_points,
     hits_cost,
     combined_net_points,
     combined_rank_impact,
-    bench_boost_points,
   } = event;
 
   const useGrouped = pairs.length > POSITION_GROUP_THRESHOLD;
-  const isBenchBoost = chip === "bboost";
-  const isBenchBoostOnly = pairs.length === 0 && isBenchBoost;
-  const showBenchFooter =
-    isBenchBoost && !isBenchBoostOnly && bench_boost_points !== null;
   const showRank = combined_rank_impact !== null;
 
   return (
@@ -174,40 +138,22 @@ const TransferEventCard: FC<Props> = ({ event }) => {
           <span className="text-xs font-semibold text-text sm:text-sm md:text-base">
             GW {gw}
           </span>
-          {chip && <ChipBadge chip={chip} />}
           {pairs.length > 0 && <TransferCountBadge count={pairs.length} />}
         </div>
         <div className="flex items-center gap-2">
-          {!isBenchBoostOnly && (
-            <ImpactPill
-              points={combined_net_points}
-              pointsSubtitle={
-                hits_cost > 0
-                  ? `${formatNet(gross_net_points)} - ${hits_cost}`
-                  : undefined
-              }
-              rankImpact={showRank ? combined_rank_impact : null}
-              rankTitle="Estimated rank swing from base transfer points. Captaincy is shown separately."
-              title="Estimated transfer impact in base points and rank"
-            />
-          )}
-          {isBenchBoostOnly && (
-            <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/40 sm:text-sm md:text-base">
-              +{bench_boost_points ?? 0} bench pts
-            </span>
-          )}
+          <ImpactPill
+            points={combined_net_points}
+            pointsSubtitle={
+              hits_cost > 0 ? `${formatNet(gross_net_points)} - ${hits_cost}` : undefined
+            }
+            rankImpact={showRank ? combined_rank_impact : null}
+            rankTitle="Estimated rank swing from base transfer points. Captaincy is shown separately."
+            title="Estimated transfer impact in base points and rank"
+          />
         </div>
       </div>
 
-      {isBenchBoostOnly && (
-        <div className="flex items-center justify-center gap-2 px-3 py-3 text-center text-[11px] text-text/60 sm:text-xs">
-          <span>
-            Bench scored {bench_boost_points ?? 0} pts. Not counted toward transfer total.
-          </span>
-        </div>
-      )}
-
-      {!isBenchBoostOnly && useGrouped ? (
+      {useGrouped ? (
         <div className="flex flex-col gap-2 px-3 py-3 sm:gap-3 sm:py-4">
           {groupPairsByPosition(pairs).map(
             ({ position, pairs: groupPairs, groupNet }) => (
@@ -231,15 +177,9 @@ const TransferEventCard: FC<Props> = ({ event }) => {
             ),
           )}
         </div>
-      ) : !isBenchBoostOnly ? (
+      ) : (
         <div className="px-3 py-3 sm:py-4">
           <TransferPlayers pairs={pairs} />
-        </div>
-      ) : null}
-
-      {showBenchFooter && (
-        <div className="border-t border-accent4/40 px-3 py-2 text-center text-[10px] text-emerald-300/80 sm:text-xs">
-          Bench Boost added +{bench_boost_points} pts (not counted toward transfer total)
         </div>
       )}
     </Card>

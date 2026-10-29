@@ -2,6 +2,7 @@ import type React from "react";
 import clsx from "clsx";
 import FootballerImage from "src/components/FootballerImage/footballer-image";
 import { getTeamsBadge } from "src/utils/images";
+import { captainComparisonPoints } from "./captain-comparison";
 import type { CaptainPlayer } from "src/queries/getCaptainImpact";
 import { useOpenPlayerDetails } from "../TeamImpact/use-open-player-details";
 import PlayerCardShell from "src/components/PlayerCard/player-card-shell";
@@ -21,7 +22,7 @@ type Props = {
 const CaptainTile: React.FC<Props> = ({ player, variant }) => {
   const openDetails = useOpenPlayerDetails();
   const isReference = variant === "reference";
-  const points = player.raw_points * player.multiplier;
+  const points = captainComparisonPoints(player);
 
   return (
     <div className={clsx("flex", isReference && "opacity-60 grayscale-[40%]")}>

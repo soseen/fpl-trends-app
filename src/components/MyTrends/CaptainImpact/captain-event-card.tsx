@@ -12,6 +12,7 @@ import { HelpCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { CaptainEvent, CaptainPlayer } from "src/queries/getCaptainImpact";
 import CaptainTile from "./captain-tile";
+import { captainComparisonPoints } from "./captain-comparison";
 
 type Props = {
   event: CaptainEvent;
@@ -181,15 +182,15 @@ const renderReferenceSlot = (player: CaptainPlayer | null): React.ReactNode => {
 const CaptainEventCard: React.FC<Props> = ({ event }) => {
   const { gw } = event;
   const isTripleCaptain = event.user_captain.multiplier === 3;
-  const userPoints = event.user_captain.raw_points * event.user_captain.multiplier;
+  const userPoints = captainComparisonPoints(event.user_captain);
   const diffVsCaptain = (player: CaptainPlayer | null): number | undefined =>
-    player ? userPoints - player.raw_points * player.multiplier : undefined;
+    player ? userPoints - captainComparisonPoints(player) : undefined;
 
   const userPlayer = event.user_captain;
   const breakdown = captainPointsBreakdown(userPlayer);
   const didNotPlay = (userPlayer.minutes ?? 0) === 0;
   const captaincyDidntApply = userPlayer.multiplier === 0;
-  const multiplier = userPlayer.multiplier ?? 1;
+  const multiplier = Math.min(userPlayer.multiplier, 2);
   const showMultiplier = multiplier > 1;
 
   return (
@@ -268,6 +269,12 @@ const CaptainEventCard: React.FC<Props> = ({ event }) => {
             )}
           </span>
         </div>
+        {isTripleCaptain && (
+          <div className="mt-1 text-right text-[10px] text-text/50 sm:text-xs">
+            Triple Captain extra: {formatNet(userPlayer.raw_points)} (excluded from
+            comparison)
+          </div>
+        )}
       </div>
     </Card>
   );

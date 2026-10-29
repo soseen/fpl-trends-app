@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { formatRankDelta } from "../TeamImpact/format";
 
 type Props = {
+  tripleCaptainExtra: number;
   totalUser: number;
   totalTop10k: number;
   totalTemplate: number;
@@ -30,6 +31,7 @@ const totalToneClass = (n: number): string => {
 };
 
 const CaptainImpactSummary: React.FC<Props> = ({
+  tripleCaptainExtra,
   totalUser,
   totalTop10k,
   totalTemplate,
@@ -70,6 +72,12 @@ const CaptainImpactSummary: React.FC<Props> = ({
           totalGws={totalGws}
         />
       </div>
+      {tripleCaptainExtra !== 0 && (
+        <p className="text-center text-[10px] text-text/50 sm:text-xs">
+          Triple Captain extra: {formatSigned(tripleCaptainExtra)} (excluded from
+          comparison)
+        </p>
+      )}
     </div>
   );
 };
@@ -105,7 +113,11 @@ const Column: React.FC<ColumnProps> = ({
     )}
     {rankImpact !== undefined && (
       <span
-        title="Estimated rank movement from the weighted captain points difference over the selected range"
+        title={
+          rankImpact == null
+            ? "A rank estimate for this captain comparison is unavailable. Triple Captain points are excluded."
+            : "Estimated rank movement from the captain points difference over the selected range"
+        }
         className={clsx(
           "text-[9px] sm:text-[10px]",
           rankImpact == null ? "text-text/50" : totalToneClass(Math.round(rankImpact)),

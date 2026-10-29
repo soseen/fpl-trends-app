@@ -1,3 +1,4 @@
+import { captainComparisonSummary } from "../CaptainImpact/captain-comparison";
 import { useState, type FC } from "react";
 import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { Button } from "@/components/ui/button";
@@ -55,9 +56,8 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
 
   const orderedGws: number[] = [];
   if (Number.isFinite(startGw) && endGw >= startGw) {
-    // Skip GW 1: no transfers are possible before the season starts,
-    // so a "rolled" placeholder there is misleading.
-    const fromGw = Math.max(startGw, 2);
+    // Transfers begin in GW 2, while captaincy also applies in GW 1.
+    const fromGw = Math.max(startGw, tab === "transfers" ? 2 : 1);
     for (let gw = endGw; gw >= fromGw; gw -= 1) orderedGws.push(gw);
   }
   const visibleGws = showAll ? orderedGws : orderedGws.slice(0, DEFAULT_VISIBLE_GWS);
@@ -97,10 +97,10 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
               <div className="flex flex-col gap-3">
                 {visibleGws.map((gw) => {
                   const ev = transferByGw.get(gw);
-                  return ev ? (
+                  return ev && ev.pairs.length > 0 ? (
                     <TransferEventCard key={`tev-${gw}`} event={ev} />
                   ) : (
-                    <RolledTransferCard key={`tr-${gw}`} gw={gw} />
+                    <RolledTransferCard key={`tr-${gw}`} gw={gw} noTransfers={!!ev} />
                   );
                 })}
               </div>
@@ -118,13 +118,7 @@ const TransfersCaptaincyView: FC<Props> = ({ transfersQuery, captainQuery }) => 
           ) : captain ? (
             <>
               <CaptainImpactSummary
-                totalUser={captain.total_user_captain_pts}
-                totalTop10k={captain.total_top10k_captain_pts}
-                totalTemplate={captain.total_template_captain_pts}
-                totalDiffVsTop10k={captain.total_diff_vs_top10k}
-                totalDiffVsTemplate={captain.total_diff_vs_template}
-                rankImpactVsTemplate={captain.total_rank_impact_vs_template ?? null}
-                rankImpactVsTop10k={captain.total_rank_impact_vs_top10k ?? null}
+                {...captainComparisonSummary(captain)}
                 matchedTop10kCount={captain.matched_top10k_count}
                 matchedTemplateCount={captain.matched_template_count}
                 totalGws={captain.total_with_captain}

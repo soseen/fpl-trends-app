@@ -1,3 +1,4 @@
+import { captainComparisonSummary } from "./captain-comparison";
 import { useState, type FC } from "react";
 import type { SectionQuery } from "src/queries/getManagerAnalysis";
 import { Button } from "@/components/ui/button";
@@ -41,13 +42,7 @@ const CaptainImpactView: FC<Props> = ({ query }) => {
   return (
     <div className="flex w-full flex-col gap-4">
       <CaptainImpactSummary
-        totalUser={data.total_user_captain_pts}
-        totalTop10k={data.total_top10k_captain_pts}
-        totalTemplate={data.total_template_captain_pts}
-        totalDiffVsTop10k={data.total_diff_vs_top10k}
-        totalDiffVsTemplate={data.total_diff_vs_template}
-        rankImpactVsTemplate={data.total_rank_impact_vs_template ?? null}
-        rankImpactVsTop10k={data.total_rank_impact_vs_top10k ?? null}
+        {...captainComparisonSummary(data)}
         matchedTop10kCount={data.matched_top10k_count}
         matchedTemplateCount={data.matched_template_count}
         totalGws={data.total_with_captain}
