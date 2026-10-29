@@ -10,8 +10,10 @@ export const useTeamsTable = () => {
   );
   const [isDefensiveStats, setIsDefensiveStats] = useState(true);
 
-  const onSelectValueChange = useCallback((value: string) => {
-    setIsDefensiveStats(value === "defensive" ? true : false);
+  const onStatsTypeChange = useCallback((value: string) => {
+    if (value === "defensive" || value === "attacking") {
+      setIsDefensiveStats(value === "defensive");
+    }
   }, []);
 
   const processedTeams = useMemo(() => {
@@ -80,6 +82,6 @@ export const useTeamsTable = () => {
   return {
     teams,
     isDefensiveStats,
-    onSelectValueChange,
+    onStatsTypeChange,
   };
 };

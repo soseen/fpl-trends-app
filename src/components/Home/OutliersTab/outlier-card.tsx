@@ -54,12 +54,13 @@ const OutlierCard = ({ footballer, include }: Props) => {
       onClick={() => setFootballer(footballer)}
       ariaLabel={`Open ${footballer.web_name} details`}
       className="h-auto w-full"
-      imageAreaClassName="aspect-[8/9] pt-2 md:pt-3"
+      imageAreaClassName="aspect-square pt-1 md:aspect-[8/9] md:pt-3 max-md:[&>img]:scale-100"
+      topLeftClassName="max-md:left-0 max-md:top-1"
       topLeft={
         metric ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="inline-flex max-w-full items-center gap-0.5 rounded-md bg-accent3/90 px-1 py-0.5 text-[9px] font-semibold leading-none shadow-sm ring-1 ring-inset ring-accent4/40 md:gap-1 md:px-1.5 md:text-xs">
+              <span className="inline-flex max-w-full items-center gap-0.5 rounded-md bg-accent3/90 px-1 py-0.5 text-[9px] font-semibold leading-none shadow-sm ring-1 ring-inset ring-accent4/40 max-md:rounded-l-none md:gap-1 md:px-1.5 md:text-xs">
                 <span className="tabular-nums text-magenta">{metric.value}</span>
                 <span className="text-text/60">{metric.suffix}</span>
               </span>
@@ -82,7 +83,7 @@ const OutlierCard = ({ footballer, include }: Props) => {
         <FootballerImage
           code={footballer.code}
           teamCode={footballer.team_code}
-          className="h-auto max-h-[88%] w-auto max-w-[86%] rounded-none object-contain md:max-h-[86%] md:max-w-[78%]"
+          className="h-auto max-h-[88%] w-auto max-w-[78%] rounded-none object-contain md:max-h-[86%]"
         />
       }
       name={footballer?.web_name}

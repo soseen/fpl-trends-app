@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,13 +9,8 @@ import {
 } from "@/components/ui/table";
 import { useTeamsTable } from "./use-teams-table";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { getTeamsBadge } from "src/utils/images";
 import TeamsTableSkeleton from "./teams-table.skeleton";
 import clsx from "clsx";
@@ -23,7 +19,8 @@ import type { RootState } from "src/redux/store";
 import { AsyncThunkStatus } from "src/redux/types";
 
 const TeamsTable = () => {
-  const { teams, isDefensiveStats, onSelectValueChange } = useTeamsTable();
+  const { teams, isDefensiveStats, onStatsTypeChange } = useTeamsTable();
+  const [gpTooltipOpen, setGpTooltipOpen] = useState(false);
   const teamsStatus = useSelector((state: RootState) => state.teams.status);
   const { isPreseason, analysisSeasonLabel } = useSelector(
     (state: RootState) => state.gameweeks,
@@ -48,79 +45,131 @@ const TeamsTable = () => {
 
   return (
     <div className="flex w-full flex-col text-text">
-      <div className="mb-4 flex flex-shrink flex-grow-0 items-center justify-between">
-        <h2 className="text-xs text-text md:text-lg">Team Rankings</h2>
-        <Select defaultValue="defensive" onValueChange={onSelectValueChange}>
-          <SelectTrigger className="h-auto w-[120px] border-transparent bg-magenta px-2 py-1 text-text">
-            <SelectValue placeholder="Stats Type" />
-          </SelectTrigger>
-          <SelectContent sideOffset={5} className="w-[120px] cursor-pointer bg-magenta">
-            <SelectItem
-              className="outline-non cursor-pointer px-2 py-1 text-text"
-              value="attacking"
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="text-xs text-text md:text-base">Team Rankings</h2>
+        <ToggleGroup
+          type="single"
+          value={isDefensiveStats ? "defensive" : "attacking"}
+          onValueChange={onStatsTypeChange}
+          aria-label="Team ranking stats"
+          className="shrink-0 gap-0 rounded-md border border-accent4 bg-accent5 p-0.5"
+        >
+          {[
+            { value: "defensive", label: "Defensive" },
+            { value: "attacking", label: "Attacking" },
+          ].map(({ value, label }) => (
+            <ToggleGroupItem
+              key={value}
+              value={value}
+              className="h-7 rounded px-2 text-[11px] text-text/60 hover:bg-accent3 hover:text-text data-[state=on]:bg-magenta data-[state=on]:text-white md:text-xs"
             >
-              Attacking
-            </SelectItem>
-            <SelectItem
-              className="cursor-pointer px-2 py-1 text-text outline-none"
-              value="defensive"
-            >
-              Defensive
-            </SelectItem>
-          </SelectContent>
-        </Select>
+              {label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
       </div>
 
-      <Table className="rounded-md bg-secondary px-4 py-6 text-sm shadow-xl md:px-6 md:text-base">
+      <Table className="table-fixed rounded-md bg-secondary text-[13px] tabular-nums shadow-xl sm:text-sm">
+        <colgroup>
+          <col className="w-7" />
+          <col />
+          <col className="w-7" />
+          <col className="w-[104px]" />
+          <col className="w-14" />
+        </colgroup>
         <TableHeader>
-          <TableRow className="border-transparent">
-            <TableHead className="w-[50px] p-2">#</TableHead>
-            <TableHead className="p-2">Team</TableHead>
-            <TableHead className="p-2 text-right">GP</TableHead>
-            <TableHead className="p-2 text-right">
-              {isDefensiveStats ? "npxGA" : "npxG"}
+          <TableRow className="border-accent4 bg-accent5/50 hover:bg-accent5/50">
+            <TableHead scope="col" className="px-1.5 py-2 text-right text-text/60">
+              #
             </TableHead>
-            <TableHead className="p-2 text-right">
+            <TableHead scope="col" className="px-1.5 py-2 text-text/80">
+              Team
+            </TableHead>
+            <TableHead scope="col" className="px-1.5 py-2 text-right text-text/60">
+              <Tooltip open={gpTooltipOpen} onOpenChange={setGpTooltipOpen}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="GP: games played in the selected gameweek range"
+                    onPointerDown={(event) => {
+                      // Keep Radix from closing before the click toggles the tooltip.
+                      event.preventDefault();
+                    }}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setGpTooltipOpen((open) => !open);
+                    }}
+                    className="rounded-sm underline decoration-dotted underline-offset-4 focus-visible:outline focus-visible:outline-1 focus-visible:outline-magenta"
+                  >
+                    GP
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Games played in the selected gameweek range
+                </TooltipContent>
+              </Tooltip>
+            </TableHead>
+            <TableHead scope="col" className="px-1.5 py-2 text-right text-text/80">
+              <div className="grid grid-cols-[1fr_3rem] items-center gap-1">
+                <span>{isDefensiveStats ? "npxGA" : "npxG"}</span>
+                <span className="text-[10px] font-normal text-text/50">Δ season</span>
+              </div>
+            </TableHead>
+            <TableHead scope="col" className="px-1.5 py-2 text-right text-text/80">
               {isDefensiveStats ? "Clean Sheets" : "Goals Scored"}
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {teams.map((team, index) => {
-            const diff =
-              (team?.avg ?? 0) -
-              (isDefensiveStats
-                ? (team.avgNPXGAFullSeason ?? 0)
-                : (team.avgNPXGFullSeason ?? 0));
+            const diff = Number(
+              (
+                (team?.avg ?? 0) -
+                (isDefensiveStats
+                  ? (team.avgNPXGAFullSeason ?? 0)
+                  : (team.avgNPXGFullSeason ?? 0))
+              ).toFixed(2),
+            );
             const rankingDiff = (team.fullSeasonRank ?? 0) - (index + 1);
+            const isImproved = isDefensiveStats ? diff < 0 : diff > 0;
 
             return (
-              // <TableRow className={index % 2 === 0 ? "bg-accent3" : ""} key={team?.name}>
               <TableRow
                 className={clsx(
-                  "border-transparent",
-                  `${index % 2 === 0 ? "bg-accent3" : ""}`,
+                  "border-accent4/40 hover:bg-accent4/40",
+                  index % 2 === 0 && "bg-accent3/60",
                 )}
                 key={team?.name}
               >
-                <TableCell className="p-2 text-left font-medium">{index + 1}</TableCell>
+                <TableCell className="px-1.5 py-2 text-right text-text/50">
+                  {index + 1}
+                </TableCell>
 
-                <TableCell className="p-2 text-left">
-                  <div className="flex items-center gap-2 whitespace-nowrap">
+                <TableCell className="px-1.5 py-2 text-left">
+                  <div className="flex min-w-0 items-center gap-1.5">
                     <img
                       src={getTeamsBadge(team?.code)}
                       alt={team?.short_name}
-                      className="h-4 w-4 object-contain lg:h-5 lg:w-5"
+                      className="h-4 w-4 shrink-0 object-contain"
                     />
-                    <p>{team?.name}</p>
+                    <span className="min-w-0 flex-1 truncate" title={team.name}>
+                      <span className="lg:hidden xl:inline">{team.name}</span>
+                      <span className="hidden lg:inline xl:hidden">
+                        {team.short_name}
+                      </span>
+                    </span>
                     {rankingDiff !== 0 && (
                       <span
-                        className={`text-sm ${rankingDiff > 0 ? "text-green-500" : "text-red-500"} flex items-center`}
+                        className={clsx(
+                          "inline-flex w-7 shrink-0 items-center justify-end gap-0.5 text-[10px] md:text-xs",
+                          rankingDiff > 0 ? "text-emerald-300/80" : "text-rose-300/80",
+                        )}
+                        aria-label={`${Math.abs(rankingDiff)} places ${rankingDiff > 0 ? "higher" : "lower"} than the full-season ranking`}
                       >
                         {rankingDiff > 0 ? (
-                          <FaArrowUp className="mx-1 inline" />
+                          <FaArrowUp className="h-2.5 w-2.5" aria-hidden />
                         ) : (
-                          <FaArrowDown className="mx-1 inline" />
+                          <FaArrowDown className="h-2.5 w-2.5" aria-hidden />
                         )}
                         {Math.abs(rankingDiff)}
                       </span>
@@ -128,29 +177,42 @@ const TeamsTable = () => {
                   </div>
                 </TableCell>
 
-                <TableCell className="p-2 text-right">{team?.gamesPlayed}</TableCell>
-
-                <TableCell className="flex items-center justify-end p-2 text-right">
-                  <p>{team?.avg?.toFixed(2)}</p>
-                  {diff !== 0 &&
-                    (() => {
-                      const isImproved = isDefensiveStats ? diff < 0 : diff > 0;
-                      return (
-                        <span
-                          className={`text-sm ${isImproved ? "text-green-500" : "text-red-500"} flex items-center`}
-                        >
-                          {isImproved ? (
-                            <FaArrowUp className="mx-1 inline" />
-                          ) : (
-                            <FaArrowDown className="mx-1 inline" />
-                          )}
-                          <p>{Math.abs(diff).toFixed(2)}</p>
-                        </span>
-                      );
-                    })()}
+                <TableCell className="px-1.5 py-2 text-right text-text/60">
+                  {team?.gamesPlayed}
                 </TableCell>
 
-                <TableCell className="p-2 text-right">
+                <TableCell className="px-1.5 py-2 text-right">
+                  <div className="grid grid-cols-[1fr_3rem] items-center gap-1">
+                    <span className="font-semibold text-white/90">
+                      {team?.avg?.toFixed(2)}
+                    </span>
+                    {diff !== 0 ? (
+                      <span
+                        className={clsx(
+                          "inline-flex items-center justify-end gap-0.5 text-[10px] md:text-xs",
+                          isImproved ? "text-emerald-300/80" : "text-rose-300/80",
+                        )}
+                        aria-label={`${Math.abs(diff).toFixed(2)} ${diff > 0 ? "above" : "below"} the season average`}
+                      >
+                        {isImproved ? (
+                          <FaArrowUp className="h-2.5 w-2.5" aria-hidden />
+                        ) : (
+                          <FaArrowDown className="h-2.5 w-2.5" aria-hidden />
+                        )}
+                        {Math.abs(diff).toFixed(2)}
+                      </span>
+                    ) : (
+                      <span
+                        className="text-[10px] text-text/40 md:text-xs"
+                        aria-label="Same as the season average"
+                      >
+                        —
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
+
+                <TableCell className="px-1.5 py-2 text-right font-medium text-white/90">
                   {isDefensiveStats ? team?.totalCleanSheets : team?.totalGoals}
                 </TableCell>
               </TableRow>
@@ -159,8 +221,8 @@ const TeamsTable = () => {
         </TableBody>
       </Table>
 
-      <p className="mt-2 text-xs italic md:text-sm">
-        * presented data is compared with the season&apos;s total
+      <p className="mt-2 text-[10px] text-text/60 md:text-xs">
+        Arrows compare rank and per-game averages with the full season.
       </p>
     </div>
   );

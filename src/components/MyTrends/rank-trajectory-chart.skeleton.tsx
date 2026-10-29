@@ -12,7 +12,7 @@ const RankTrajectoryChartSkeleton: React.FC = () => (
       <Skeleton className="h-7 w-24 rounded-md" />
       <Skeleton className="h-7 w-28 rounded-md" />
     </div>
-    <Skeleton className="h-56 w-full xs:h-64 md:h-80" />
+    <Skeleton className="h-44 w-full sm:h-56 md:h-80" />
   </div>
 );
 

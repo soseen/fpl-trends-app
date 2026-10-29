@@ -230,7 +230,7 @@ const RankTrajectoryChart: React.FC<Props> = ({ data, startGw, endGw }) => {
         })}
       </div>
 
-      <div className="h-56 w-full xs:h-64 md:h-80">
+      <div className="h-44 w-full sm:h-56 md:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={points}
